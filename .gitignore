@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Server env (contains secrets)
+.env
+
+# Nested legacy repo shell (app lives at this repo's root)
+FishAI/
+
+# Editor
+.idea/
+*.log
