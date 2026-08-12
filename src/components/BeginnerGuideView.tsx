@@ -37,7 +37,7 @@ const KNOTS_DATA: KnotGuide[] = [
     bestForLine: 'Braid, Monofilament & Fluorocarbon',
     difficulty: 'EASY',
     summary: 'The gold standard fishing knot. Exceptionally strong, almost impossible to slip, and very easy to tie.',
-    videoEmbedUrl: 'https://www.youtube.com/embed/a6nuh1K_v80',
+    videoEmbedUrl: 'https://www.youtube.com/embed/TFk_Ktw2f1w',
     steps: [
       'Double about 6 inches of line and pass the loop through the eye of the hook or lure.',
       'Tie a simple overhand knot with the doubled line, leaving the hook hanging in the loop.',
@@ -53,7 +53,7 @@ const KNOTS_DATA: KnotGuide[] = [
     bestForLine: 'Monofilament & Fluorocarbon (Light to Medium test)',
     difficulty: 'EASY',
     summary: 'The classic angler knot for tying hooks, swivels, and lures to monofilament or fluorocarbon leader.',
-    videoEmbedUrl: 'https://www.youtube.com/embed/e_pW2mD_c5k',
+    videoEmbedUrl: 'https://www.youtube.com/embed/fXWRZe784QU',
     steps: [
       'Thread the line through the hook eye, leaving 5-6 inches of tag line.',
       'Wrap the tag end around the standing line 5 to 7 times.',
@@ -70,7 +70,7 @@ const KNOTS_DATA: KnotGuide[] = [
     bestForLine: 'All Line Types (Braid, Mono, Fluoro)',
     difficulty: 'MEDIUM',
     summary: 'Versatile multi-purpose knot. Can tie lures, hooks, spool line on reels, or join two lines together.',
-    videoEmbedUrl: 'https://www.youtube.com/embed/J5qZ-9H4M7c',
+    videoEmbedUrl: 'https://www.youtube.com/embed/-xubtzqhXUA',
     steps: [
       'Run 6 inches of line through the eye and fold it back parallel to the main line.',
       'Bring the tag end back to form a loop over the double line.',
@@ -86,7 +86,7 @@ const KNOTS_DATA: KnotGuide[] = [
     bestForLine: 'Monofilament & Fluorocarbon Leaders',
     difficulty: 'MEDIUM',
     summary: 'Creates a fixed loop that allows crankbaits, topwaters, and swimbaits to swing freely with maximum action.',
-    videoEmbedUrl: 'https://www.youtube.com/embed/J5qZ-9H4M7c',
+    videoEmbedUrl: 'https://www.youtube.com/embed/fP4JToqRh-A',
     steps: [
       'Tie an overhand knot in the line 2 inches above the tag end, but do not pull it tight.',
       'Pass the tag end through the lure eye and back through the overhand knot loop.',
