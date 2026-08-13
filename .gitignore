@@ -13,3 +13,5 @@ FishAI/
 # Editor
 .idea/
 *.log
+.vercel
+.env*

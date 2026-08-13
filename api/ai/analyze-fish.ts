@@ -1,6 +1,6 @@
 // Vercel serverless function: /api/ai/analyze-fish
 // Same contract as the local Express route (server/routes/aiRoutes.ts).
-import { analyzeWithProviders, configuredProviders } from './_vision';
+import { analyzeWithProviders, configuredProviders } from '../../lib/vision';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {

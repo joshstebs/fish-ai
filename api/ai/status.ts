@@ -1,5 +1,5 @@
 // Vercel serverless function: /api/ai/status
-import { configuredProviders } from './_vision';
+import { configuredProviders } from '../../lib/vision';
 
 export default async function handler(_req: any, res: any) {
   const providers = configuredProviders();
