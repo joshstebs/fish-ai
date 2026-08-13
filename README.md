@@ -36,3 +36,27 @@ Everything else (weather, solunar, insights, assistant, logbook) works with no k
 ## Stack
 
 Vite + React 18 + TypeScript + Tailwind + Express (`@google/genai` for vision).
+
+## Deploying to Vercel
+
+The repo is Vercel-ready: `api/index.ts` exports the Express app as a serverless function, `vercel.json` rewrites `/api/*` to it and all other routes to the SPA.
+
+**Via git (recommended)** — push to GitHub, then import the repo at vercel.com. Set the env var first:
+
+```
+GEMINI_API_KEY=<your key>   (Production)
+```
+
+**Via CLI**
+
+```bash
+npm i -g vercel
+vercel login
+vercel env add GEMINI_API_KEY production
+vercel --prod
+```
+
+Notes:
+- Vision (`/api/ai/analyze-fish`) needs `GEMINI_API_KEY`; without it the app still works — the vision tab shows an honest 503.
+- Function max duration is set to 60s in `vercel.json` (Hobby plan limit) for Gemini's response time.
+- No other keys needed: weather is Open-Meteo, solunar is computed locally.

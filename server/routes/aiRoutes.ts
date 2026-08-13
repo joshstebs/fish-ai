@@ -3,7 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 
 export const aiRouter = Router();
 
-const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
+const apiKey = process.env.GEMINI_API_KEY || '';
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 const MODEL = 'gemini-flash-latest'; // alias — always the current stable Flash (2.5-flash is deprecated for new keys)
