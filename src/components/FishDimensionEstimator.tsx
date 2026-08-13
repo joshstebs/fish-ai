@@ -24,6 +24,56 @@ import {
 } from 'lucide-react';
 import { CatchLogItem } from '../types/catchLogTypes';
 
+/**
+ * Downscale + JPEG-compress a photo client-side before upload.
+ * Raw phone photos are 5-10MB+ as base64 and would exceed Vercel's 4.5MB
+ * function body limit; compressed payloads are ~300-600KB — faster uploads,
+ * cheaper/snappier AI calls. Falls back to the original on any failure so
+ * the upload flow never breaks. Everything is now JPEG, matching the
+ * server's default mimeType.
+ */
+const MAX_IMAGE_DIMENSION = 1600;
+const JPEG_QUALITY = 0.85;
+
+function compressImageForUpload(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Could not read image file.'));
+    reader.onload = () => {
+      const original = typeof reader.result === 'string' ? reader.result : null;
+      if (!original) return reject(new Error('Could not read image file.'));
+
+      const img = new Image();
+      img.onerror = () => resolve(original); // not a decodable image — keep original
+      img.onload = () => {
+        try {
+          const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(img.width, img.height));
+          const w = Math.max(1, Math.round(img.width * scale));
+          const h = Math.max(1, Math.round(img.height * scale));
+
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return resolve(original);
+
+          // White backdrop so PNG transparency doesn't turn black in JPEG
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+
+          const compressed = canvas.toDataURL('image/jpeg', JPEG_QUALITY);
+          resolve(compressed.length < original.length ? compressed : original);
+        } catch {
+          resolve(original);
+        }
+      };
+      img.src = original;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 interface RegulatoryInfo {
   legalStatus: 'HARVEST_ALLOWED' | 'CATCH_AND_RELEASE_ONLY' | 'PROTECTED' | 'SEASONAL_RESTRICTION';
   minLegalLengthInches: number;
@@ -155,13 +205,9 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setSelectedImage(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    compressImageForUpload(file)
+      .then(setSelectedImage)
+      .catch((err) => console.error('Image load failed:', err));
   };
 
   const handleAnalyzePhoto = async () => {

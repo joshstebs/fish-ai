@@ -13,3 +13,6 @@ FishAI/
 # Editor
 .idea/
 *.log
+
+# Vercel CLI
+.vercel/
