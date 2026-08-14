@@ -7,7 +7,7 @@ dist/
 # Server env (contains secrets)
 .env
 
-# Nested legacy repo shell (app lives at this repo's root)
+# Nested legacy repo shell
 FishAI/
 
 # Editor
@@ -15,6 +15,5 @@ FishAI/
 *.log
 
 # Vercel CLI
-.vercel/
 .vercel
 .env*
