@@ -166,7 +166,7 @@ export const BeginnerGuideView: React.FC = () => {
               <GraduationCap className="w-3.5 h-3.5" /> Beginner Masterclass Series
             </span>
           </div>
-          <h2 className="text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
             🎓 Complete Beginner Fishing Guide & Masterclass
           </h2>
           <p className="text-slate-400 text-sm mt-1">

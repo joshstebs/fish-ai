@@ -123,7 +123,7 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
               <Compass className="w-3.5 h-3.5" /> GPS Coordinates & Depth Active
             </span>
           </div>
-          <h2 className="text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
             🗺️ Interactive Fishing Location & Spot Intelligence
           </h2>
           <p className="text-slate-400 text-sm mt-1">

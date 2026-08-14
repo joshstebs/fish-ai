@@ -107,7 +107,7 @@ export function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950">
       {/* Top Main Navbar Header */}
-      <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-white/10 shadow-2xl">
+      <header className="sticky top-0 z-40 bg-dusk backdrop-blur-md border-b border-white/10 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('VISION')}>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-blue-600 flex items-center justify-center text-slate-950 shadow-lg glow-emerald">
@@ -115,7 +115,7 @@ export function App() {
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h1 className="text-lg font-black tracking-tight text-white uppercase font-sans">
+                <h1 className="text-lg font-display font-black tracking-tight text-white uppercase">
                   Fish<span className="text-emerald-400">AI</span>
                 </h1>
               </div>

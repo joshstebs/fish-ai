@@ -75,7 +75,7 @@ export function SettingsView() {
             <ShieldCheck className="w-3.5 h-3.5" /> Account & Subscription
           </span>
         </div>
-        <h2 className="text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+        <h2 className="font-display text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
           <Settings className="w-6 h-6 text-sky-400" /> Your Plan & Device
         </h2>
         <p className="text-slate-400 text-sm mt-1">

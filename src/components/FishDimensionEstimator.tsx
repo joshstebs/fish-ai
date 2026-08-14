@@ -396,7 +396,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
               <Sparkles className="w-3.5 h-3.5" /> Spatial Calibration Scale Active
             </span>
           </div>
-          <h2 className="text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
             🐟 FishAI Photo Dimension & Weight Estimator
           </h2>
           <p className="text-slate-400 text-sm mt-1">
@@ -717,7 +717,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                   <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" /> Identified Species
                   </span>
-                  <h3 className="text-2xl sm:text-3xl font-black uppercase text-white tracking-tight leading-tight">
+                  <h3 className="text-2xl sm:text-3xl font-display font-black uppercase text-white tracking-tight leading-tight">
                     {result.commonName || result.species}
                   </h3>
                   <p className="text-sm italic font-mono text-slate-400">

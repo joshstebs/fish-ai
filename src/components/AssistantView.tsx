@@ -206,7 +206,7 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ catches, spots }) 
             <Sparkles className="w-3.5 h-3.5" /> Offline Intelligence Engine
           </span>
         </div>
-        <h2 className="text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+        <h2 className="font-display text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
           <Bot className="w-6 h-6 text-emerald-400" /> Your Personal Fishing Assistant
         </h2>
         <p className="text-slate-400 text-sm mt-1">

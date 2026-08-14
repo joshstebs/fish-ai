@@ -119,7 +119,7 @@ export const TrophyWallView: React.FC<TrophyWallProps> = ({ catches }) => {
               <Trophy className="w-3.5 h-3.5" /> Real Achievements Only
             </span>
           </div>
-          <h2 className="text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
             🏆 Catch Leaderboard & Trophy Wall
           </h2>
           <p className="text-slate-400 text-sm mt-1">

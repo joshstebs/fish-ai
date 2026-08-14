@@ -13,22 +13,36 @@ export default {
           800: '#0c224a',
           700: '#13356f',
         },
-        // Warm dark charcoal ramp (FishAI 2026 design refresh — matches the
-        // approved concept screens: #0D1114 base, elevated warm cards).
+        // FishAI 2026 "glow-up" — exact palette extracted from the approved
+        // Lovable design (fishai-glow-up.lovable.app): deep charcoal + teal.
         slate: {
-          50: '#f7f9fb',
-          100: '#ebeff3',
-          200: '#d8dee5',
-          300: '#b6c0cb',
-          400: '#8a97a6',
-          500: '#55616e',
-          600: '#3a4551',
-          700: '#2a333e',
-          800: '#1e252e',
-          900: '#151a21',
-          950: '#0d1114',
-        }
-      }
+          50: '#f7f9fa',
+          100: '#eef0f2',
+          200: '#dde0e4',
+          300: '#b7bdc4',
+          400: '#9399a0',
+          500: '#5c646c',
+          600: '#3a4148',
+          700: '#292e35',
+          800: '#1d2228',
+          900: '#14191e',
+          950: '#090e12',
+        },
+        emerald: {
+          50: '#ecfdf7',
+          100: '#d1fae8',
+          200: '#a7f3d7',
+          300: '#6ee7c0',
+          400: '#33d4ad',
+          500: '#27bd98',
+          600: '#1ca184',
+          700: '#15806a',
+        },
+      },
+      fontFamily: {
+        display: ['Oswald', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
     },
   },
   plugins: [],

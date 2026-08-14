@@ -90,7 +90,7 @@ export const BarometricTrackerView: React.FC<BarometricTrackerViewProps> = ({ sp
               <CloudSun className="w-3.5 h-3.5" /> Live Weather Powered
             </span>
           </div>
-          <h2 className="text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
             📉 Barometric Pressure Trend & Bite Predictor
           </h2>
           <p className="text-slate-400 text-sm mt-1">

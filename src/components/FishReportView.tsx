@@ -183,7 +183,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
               <Gauge className="w-3.5 h-3.5" /> Live Weather Powered
             </span>
           </div>
-          <h2 className="text-3xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-3xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
             🎣 Today's Fish Report
           </h2>
           <p className="text-slate-400 text-sm mt-1">

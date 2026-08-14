@@ -54,7 +54,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
               <Sparkles className="w-3.5 h-3.5" /> Learning From Your Log
             </span>
           </div>
-          <h2 className="text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+          <h2 className="font-display text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
             🧠 Your Personal Fishing Intelligence
           </h2>
           <p className="text-slate-400 text-sm mt-1">

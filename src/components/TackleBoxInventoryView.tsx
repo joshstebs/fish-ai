@@ -66,7 +66,7 @@ export const TackleBoxInventoryView: React.FC = () => {
               <Package className="w-3.5 h-3.5" /> Personal Gear & Lure Inventory
             </span>
           </div>
-          <h2 className="text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+          <h2 className="font-display text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
             🧰 Digital Tackle Box Inventory
           </h2>
           <p className="text-slate-400 text-sm mt-1">

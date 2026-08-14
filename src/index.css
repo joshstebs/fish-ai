@@ -12,11 +12,16 @@
 
 /* Custom glowing borders & gradients */
 .glow-emerald {
-  box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 25px -5px rgba(51, 212, 173, 0.25);
 }
 
 .glow-blue {
   box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.25);
+}
+
+/* Dusk gradient — Lovable 'gradient-dusk' treatment */
+.bg-dusk {
+  background: linear-gradient(180deg, #10161c 0%, #090e12 100%);
 }
 
 /* Custom Scrollbar */

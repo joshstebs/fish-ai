@@ -227,7 +227,7 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
               <Sparkles className="w-3.5 h-3.5" /> Pattern & Spot History Active
             </span>
           </div>
-          <h2 className="text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
             📖 Personal Catch Logbook & Spot Analytics
           </h2>
           <p className="text-slate-400 text-sm mt-1">

@@ -51,7 +51,7 @@ export const LivewellTimerView: React.FC = () => {
               <HeartPulse className="w-3.5 h-3.5" /> Aeration & Handling Timers
             </span>
           </div>
-          <h2 className="text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+          <h2 className="font-display text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
             ⏱️ Livewell Aeration & Fish Health Timer
           </h2>
           <p className="text-slate-400 text-sm mt-1">
