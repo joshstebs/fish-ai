@@ -7,12 +7,15 @@ export const aiRouter = Router();
 // Provider configuration — each tier activates when its key is present.
 // Order: Gemini (primary) -> OpenRouter free vision -> Groq (last resort).
 // ---------------------------------------------------------------------------
-const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
+const GEMINI_KEYS = [
+  process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '',
+  process.env.GEMINI_API_KEY_2 || '',
+].filter(Boolean) as string[];
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || '';
 const GROQ_KEY = process.env.GROQ_API_KEY || '';
 
-const ai = GEMINI_KEY ? new GoogleGenAI({ apiKey: GEMINI_KEY }) : null;
-const MODEL = 'gemini-flash-latest'; // alias — always the current stable Flash
+const geminiClients = GEMINI_KEYS.map((apiKey) => new GoogleGenAI({ apiKey }));
+const MODEL = process.env.GEMINI_MODEL || 'gemini-flash-lite-latest'; // lite tier = generous free quotas
 
 // OpenRouter: tried in order until one returns parseable JSON (free tiers
 // rate-limit per-model from shared upstream pools, so we rotate).
@@ -24,7 +27,7 @@ const OPENROUTER_MODELS = [
 ];
 const GROQ_MODEL = 'qwen/qwen3.6-27b'; // vision-capable on Groq's free tier
 
-const configured = !!(ai || OPENROUTER_KEY || GROQ_KEY);
+const configured = !!(GEMINI_KEYS.length || OPENROUTER_KEY || GROQ_KEY);
 
 // ============================================================================
 // Helpers
@@ -91,7 +94,7 @@ aiRouter.get('/status', (_req, res) => {
   if (GROQ_KEY) fallbacks.push(`groq (${GROQ_MODEL})`);
   res.json({
     configured,
-    model: ai ? MODEL : null,
+    model: GEMINI_KEYS.length ? MODEL : null,
     fallbacks,
   });
 });
@@ -148,10 +151,10 @@ RULES:
 
   const errors: string[] = [];
 
-  // --- Tier 1: Gemini ------------------------------------------------------
-  if (ai) {
+  // --- Tier 1: Gemini (rotates key1 -> key2) ------------------------------
+  for (const client of geminiClients) {
     try {
-      const response = await ai.models.generateContent({
+      const response = await client.models.generateContent({
         model: MODEL,
         contents: [
           {
