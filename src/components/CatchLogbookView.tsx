@@ -227,7 +227,7 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => exportCatchesToCSV(catches)}
             disabled={catches.length === 0}

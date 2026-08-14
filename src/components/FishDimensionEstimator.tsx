@@ -21,8 +21,20 @@ import {
   Minimize2,
   Info,
   RefreshCw,
+  Lock,
+  CreditCard,
 } from 'lucide-react';
 import { CatchLogItem } from '../types/catchLogTypes';
+import { getAppSecret, setAppSecret } from '../utils/apiAuth';
+import { SAMPLE_FISH_PHOTOS } from '../utils/samplePhotos';
+import {
+  getCustomerId,
+  getStoredEmail,
+  fetchBillingStatus,
+  startCheckout,
+  openBillingPortal,
+  type BillingStatus,
+} from '../utils/billing';
 
 /**
  * Downscale + JPEG-compress a photo client-side before upload.
@@ -124,24 +136,6 @@ interface FishDimensionEstimatorProps {
   onNavigateToLogbook?: () => void;
 }
 
-const SAMPLE_FISH_PHOTOS = [
-  {
-    name: 'Trophy Largemouth Bass',
-    refHint: 'Human hand holding lip (7.5 in scale reference)',
-    url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop&q=80',
-  },
-  {
-    name: 'Wild Rainbow Trout',
-    refHint: 'Fishing rod handle in background (12 in reference)',
-    url: 'https://images.unsplash.com/photo-1524704654690-b56c05c78a00?w=800&auto=format&fit=crop&q=80',
-  },
-  {
-    name: 'Northern Pike',
-    refHint: 'Measuring tape grid in boat photo',
-    url: 'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?w=800&auto=format&fit=crop&q=80',
-  },
-];
-
 export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
   onSaveCatchToLog,
   onNavigateToLogbook,
@@ -151,6 +145,34 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [result, setResult] = useState<FishAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [needsAuth, setNeedsAuth] = useState<boolean>(false);
+  const [authInput, setAuthInput] = useState<string>(getAppSecret());
+  const [needsBilling, setNeedsBilling] = useState<boolean>(false);
+  const [billingEmail, setBillingEmail] = useState<string>(getStoredEmail());
+  const [billingBusy, setBillingBusy] = useState<boolean>(false);
+  const [billingMsg, setBillingMsg] = useState<string | null>(null);
+  const [billing, setBilling] = useState<BillingStatus | null>(null);
+
+  // After returning from Stripe Checkout (?checkout=success|canceled), refresh
+  // entitlement once and clean the URL so a refresh doesn't re-trigger it.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const outcome = params.get('checkout');
+    if (outcome) {
+      history.replaceState({}, '', window.location.pathname);
+      fetchBillingStatus().then((status) => {
+        setBilling(status);
+        if (status.entitled) {
+          setNeedsBilling(false);
+          setBillingMsg('Your free trial is active — AI analysis is unlocked.');
+        } else if (outcome === 'canceled') {
+          setBillingMsg('Checkout canceled — no charge was made. You can try again anytime.');
+        }
+      });
+    } else if (getCustomerId()) {
+      fetchBillingStatus().then(setBilling);
+    }
+  }, []);
 
   // Interactive Measurement Tool State
   const [isOverlayActive, setIsOverlayActive] = useState<boolean>(true);
@@ -215,14 +237,47 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
     setError(null);
 
     try {
+      // Demo sample photos are remote URLs — convert to base64 so the server
+      // accepts them (it rejects tiny payloads that can't be a real photo).
+      let imagePayload = selectedImage;
+      if (!imagePayload.startsWith('data:')) {
+        try {
+          const imgResp = await fetch(imagePayload);
+          const blob = await imgResp.blob();
+          imagePayload = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = () => reject(new Error('Could not read the sample photo.'));
+            reader.readAsDataURL(blob);
+          });
+        } catch {
+          throw new Error('Could not load the sample photo — try uploading your own instead.');
+        }
+      }
+
       const resp = await fetch('/api/ai/analyze-fish', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-fish-app-secret': getAppSecret(),
+          'x-fish-customer-id': getCustomerId(),
+        },
         body: JSON.stringify({
-          imageBase64: selectedImage,
+          imageBase64: imagePayload,
           referenceObjectHint: refHint,
         }),
       });
+
+      if (resp.status === 401) {
+        setNeedsAuth(true);
+        setAuthInput(getAppSecret());
+        throw new Error('AI analysis is locked — enter your app password to unlock.');
+      }
+
+      if (resp.status === 402) {
+        setNeedsBilling(true);
+        throw new Error('AI analysis requires an active subscription.');
+      }
 
       if (!resp.ok) {
         let serverMsg = `Analysis failed with status ${resp.status}`;
@@ -243,11 +298,60 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
 
       const data = await resp.json();
       setResult(data);
+      // Refresh entitlement so the Premium bar / Manage link appears promptly.
+      fetchBillingStatus().then(setBilling).catch(() => {});
     } catch (err: any) {
       console.error('Error analyzing fish:', err);
       setError(err?.message || 'Failed to estimate fish physical dimensions.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Unlock the AI API with the app password (stored on this device only).
+  const handleUnlock = async () => {
+    const secret = authInput.trim();
+    if (!secret) {
+      setError('Enter the app password to unlock AI analysis.');
+      return;
+    }
+    setAppSecret(secret);
+    setNeedsAuth(false);
+    setError(null);
+    await handleAnalyzePhoto();
+  };
+
+  // Start the 7-day free trial (or resubscribe) via Stripe Checkout.
+  const handleStartTrial = async () => {
+    const email = billingEmail.trim();
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      setError('Enter a valid email address to start your free trial.');
+      return;
+    }
+    setBillingBusy(true);
+    setError(null);
+    setBillingMsg(null);
+    try {
+      const { url } = await startCheckout(email);
+      window.location.href = url; // redirect to Stripe Checkout
+    } catch (err: any) {
+      setError(err?.message || 'Could not start checkout. Please try again.');
+    } finally {
+      setBillingBusy(false);
+    }
+  };
+
+  // Manage / cancel the subscription via the Stripe Customer Portal.
+  const handleManageBilling = async () => {
+    setBillingBusy(true);
+    setError(null);
+    try {
+      const url = await openBillingPortal();
+      window.location.href = url;
+    } catch (err: any) {
+      setError(err?.message || 'Could not open the billing portal.');
+    } finally {
+      setBillingBusy(false);
     }
   };
 
@@ -474,6 +578,106 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
 
         {/* Right Column: AI Output & Regulatory Analysis */}
         <div className="lg:col-span-7 space-y-4">
+          {needsAuth && (
+            <div className="bg-slate-900 border-l-4 border-amber-500 p-5 rounded-xl border-y border-r border-white/10 shadow-2xl space-y-4">
+              <div className="flex items-center gap-3">
+                <Lock className="w-5 h-5 text-amber-400 shrink-0" />
+                <div>
+                  <h3 className="text-sm font-black uppercase tracking-wider text-white">
+                    AI Analysis Locked
+                  </h3>
+                  <p className="text-slate-400 text-xs font-mono mt-0.5">
+                    Enter the app password to unlock Gemini vision. Stored on this device only.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  value={authInput}
+                  onChange={(e) => setAuthInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleUnlock(); }}
+                  placeholder="App password"
+                  autoFocus
+                  className="flex-1 bg-slate-950 border border-slate-800 text-white text-xs font-bold uppercase tracking-wider font-mono rounded-lg px-3 py-2.5 focus:border-amber-500 outline-none"
+                />
+                <button
+                  onClick={handleUnlock}
+                  className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black uppercase text-xs tracking-wider rounded-lg transition-all active:scale-95"
+                >
+                  Unlock
+                </button>
+              </div>
+            </div>
+          )}
+
+          {needsBilling && !billing?.entitled && (
+            <div className="bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl border-y border-r border-white/10 shadow-2xl space-y-4">
+              <div className="flex items-center gap-3">
+                <CreditCard className="w-5 h-5 text-emerald-400 shrink-0" />
+                <div>
+                  <h3 className="text-sm font-black uppercase tracking-wider text-white">
+                    {getCustomerId() ? 'Your Trial Has Ended' : 'Try FishAI Free for 7 Days'}
+                  </h3>
+                  <p className="text-slate-400 text-xs font-mono mt-0.5">
+                    {getCustomerId()
+                      ? 'Subscribe to unlock AI fish analysis.'
+                      : 'AI-powered fish identification & dimension estimates. $7.99/mo after the trial. Cancel anytime.'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={billingEmail}
+                  onChange={(e) => setBillingEmail(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleStartTrial(); }}
+                  placeholder="you@email.com"
+                  className="flex-1 bg-slate-950 border border-slate-800 text-white text-xs font-bold uppercase tracking-wider font-mono rounded-lg px-3 py-2.5 focus:border-emerald-500 outline-none"
+                />
+                <button
+                  onClick={handleStartTrial}
+                  disabled={billingBusy}
+                  className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black uppercase text-xs tracking-wider rounded-lg transition-all active:scale-95 disabled:opacity-50"
+                >
+                  {billingBusy ? 'Opening...' : getCustomerId() ? 'Subscribe $7.99/mo' : 'Start Free Trial'}
+                </button>
+              </div>
+              {getCustomerId() && (
+                <button
+                  onClick={handleManageBilling}
+                  disabled={billingBusy}
+                  className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-400 transition-colors"
+                >
+                  Manage subscription
+                </button>
+              )}
+            </div>
+          )}
+
+          {billing?.entitled && (
+            <div className="flex items-center justify-between bg-emerald-950/30 border border-emerald-500/20 p-3 rounded-xl">
+              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                ✓ Premium active — AI analysis unlocked
+                {billing.status === 'trialing' && billing.trialEndsAt
+                  ? ` (trial ends ${new Date(billing.trialEndsAt * 1000).toLocaleDateString()})`
+                  : ''}
+              </span>
+              <button
+                onClick={handleManageBilling}
+                className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-400 transition-colors"
+              >
+                Manage
+              </button>
+            </div>
+          )}
+
+          {billingMsg && !error && (
+            <div className="bg-emerald-950/40 border border-emerald-500/30 p-4 rounded-xl text-emerald-300 text-xs font-mono">
+              {billingMsg}
+            </div>
+          )}
+
           {error && (
             <div className="bg-red-950/40 border border-red-500/30 p-4 rounded-xl text-red-300 text-xs font-mono flex items-center gap-3">
               <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" />

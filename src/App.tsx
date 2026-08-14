@@ -14,6 +14,9 @@ import { LivewellTimerView } from './components/LivewellTimerView';
 import { FishReportView } from './components/FishReportView';
 import { InsightsView } from './components/InsightsView';
 import { AssistantView } from './components/AssistantView';
+import { SettingsView } from './components/SettingsView';
+import { OwnerSignInModal } from './components/OwnerSignInModal';
+import { isSignedIn, signOut } from './utils/apiAuth';
 
 import {
   Camera,
@@ -31,16 +34,19 @@ import {
   Gauge,
   Brain,
   Bot,
+  Settings,
 } from 'lucide-react';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<
     | 'VISION' | 'LOGBOOK' | 'SPOTS' | 'TACKLE' | 'GUIDE' | 'SOLUNAR' | 'PRESSURE' | 'BOX' | 'TROPHY' | 'LIVEWELL'
-    | 'REPORT' | 'INSIGHTS' | 'ASSISTANT'
+    | 'REPORT' | 'INSIGHTS' | 'ASSISTANT' | 'SETTINGS'
   >('REPORT');
 
   const [catches, setCatches] = useState<CatchLogItem[]>([]);
   const [spots, setSpots] = useState<FishingSpot[]>([]);
+  const [signedIn, setSignedIn] = useState<boolean>(isSignedIn());
+  const [showSignIn, setShowSignIn] = useState<boolean>(false);
 
   useEffect(() => {
     setCatches(loadStoredCatches());
@@ -112,9 +118,6 @@ export function App() {
                 <h1 className="text-lg font-black tracking-tight text-white uppercase font-sans">
                   Fish<span className="text-emerald-400">AI</span>
                 </h1>
-                <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 font-mono text-[9px] font-bold uppercase rounded border border-emerald-500/30">
-                  ULTIMATE SUITE
-                </span>
               </div>
               <span className="text-[10px] font-mono text-slate-400 block -mt-0.5">
                 Multi-Modal Vision & All-in-One Angler Platform
@@ -123,7 +126,8 @@ export function App() {
           </div>
 
           {/* Primary Nav Buttons */}
-          <nav className="flex items-center gap-1 overflow-x-auto py-1">
+          <div className="flex items-center gap-2 min-w-0">
+          <nav className="flex items-center gap-1 overflow-x-auto py-1 flex-1 min-w-0">
             {[
               { id: 'REPORT', label: 'Fish Report', icon: Gauge, color: 'bg-teal-500 text-slate-950' },
               { id: 'VISION', label: 'Vision', icon: Camera, color: 'bg-emerald-500 text-slate-950' },
@@ -138,6 +142,7 @@ export function App() {
               { id: 'TROPHY', label: 'Trophies', icon: Trophy, color: 'bg-amber-300 text-slate-950' },
               { id: 'LIVEWELL', label: 'Livewell', icon: Timer, color: 'bg-teal-500 text-slate-950' },
               { id: 'GUIDE', label: 'Academy', icon: GraduationCap, color: 'bg-emerald-400 text-slate-950' },
+              { id: 'SETTINGS', label: 'Settings', icon: Settings, color: 'bg-sky-500 text-slate-950' },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -149,12 +154,37 @@ export function App() {
                     isActive ? `${tab.color} shadow-lg font-black scale-105` : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span className="hidden md:inline">{tab.label}</span>
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  <span className="text-[10px] sm:text-xs whitespace-nowrap">{tab.label}</span>
                 </button>
               );
             })}
           </nav>
+
+          {/* Owner sign-in / badge */}
+          {signedIn ? (
+            <button
+              onClick={() => {
+                if (window.confirm('Sign out of owner mode? AI analysis will be locked until you sign in again.')) {
+                  signOut();
+                  setSignedIn(false);
+                }
+              }}
+              className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:bg-emerald-500/25 transition-all"
+              title="Tap to sign out"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Owner
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowSignIn(true)}
+              className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:from-emerald-400 hover:to-teal-400 transition-all shadow-lg"
+            >
+              Sign In
+            </button>
+          )}
+          </div>
         </div>
       </header>
 
@@ -194,6 +224,8 @@ export function App() {
 
         {activeTab === 'TACKLE' && <TackleAssistantView />}
 
+        {activeTab === 'SETTINGS' && <SettingsView />}
+
         {activeTab === 'SOLUNAR' && <SolunarActivityView spots={spots} />}
 
         {activeTab === 'PRESSURE' && <BarometricTrackerView spots={spots} />}
@@ -212,11 +244,17 @@ export function App() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-emerald-400" />
-            <span className="font-bold text-slate-400">FishAI Ultimate Angler Suite v4.0</span>
+            <span className="font-bold text-slate-400">FishAI</span>
           </div>
           <span>13 Integrated Fishing Modules • Real Weather, Solunar Math & Personal Learning Loop</span>
         </div>
       </footer>
+
+      <OwnerSignInModal
+        open={showSignIn}
+        onClose={() => setShowSignIn(false)}
+        onSignedIn={() => setSignedIn(true)}
+      />
     </div>
   );
 }
