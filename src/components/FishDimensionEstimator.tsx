@@ -711,30 +711,26 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
 
           {result && (
             <div className="space-y-5">
-              {/* Species Badge & Save to Logbook */}
-              <div className="bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl border-y border-r border-white/10 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
-                    Identified Species
+              {/* Catch Report — Species Block */}
+              <div className="bg-slate-900 border border-white/10 rounded-xl shadow-xl overflow-hidden">
+                <div className="p-6 space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" /> Identified Species
                   </span>
-                  <h3 className="text-xl font-black text-white uppercase tracking-tight">
-                    {result.species}
+                  <h3 className="text-2xl sm:text-3xl font-black uppercase text-white tracking-tight leading-tight">
+                    {result.commonName || result.species}
                   </h3>
-                  <span className="text-xs text-slate-400 font-mono italic">
+                  <p className="text-sm italic font-mono text-slate-400">
                     {result.scientificName}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                  <div className="text-right shrink-0">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                      AI Confidence
-                    </span>
-                    <span className="text-2xl font-black text-emerald-400 font-mono">
-                      {result.confidence}%
+                  </p>
+                  <div className="pt-2">
+                    <span className="inline-flex items-center gap-1.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full px-3 py-1 text-xs font-black uppercase tracking-wider">
+                      <Sparkles className="w-3 h-3" /> AI Confidence {result.confidence}%
                     </span>
                   </div>
+                </div>
 
+                <div className="border-t border-white/10 bg-slate-950/60 px-6 py-3 flex flex-wrap items-center justify-end gap-2">
                   <button
                     onClick={() => setShowCorrection(true)}
                     className="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-black text-xs uppercase tracking-wider rounded-lg shadow-lg flex items-center gap-2 transition-all shrink-0 border border-slate-700"
@@ -796,63 +792,139 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                 </div>
               )}
 
-              {/* Physical Dimension Gauges */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Length Gauge */}
-                <div className="bg-slate-900 border border-white/10 p-5 rounded-xl space-y-2 shadow-xl">
-                  <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider">
-                    <span className="flex items-center gap-1.5 text-blue-400">
-                      <Ruler className="w-4 h-4" /> Estimated Length
+              {/* Estimated Stat Blocks */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Length Stat */}
+                <div className="bg-slate-900 border border-white/10 border-t-2 border-t-emerald-500 rounded-xl p-5 space-y-2 shadow-xl">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                      <Ruler className="w-3.5 h-3.5 text-emerald-400" /> Est. Length
                     </span>
-                    <span className="font-mono text-white">{result.estimatedLength.formatted}</span>
+                    <span className="text-[10px] font-mono text-slate-500 truncate">{result.estimatedLength.formatted}</span>
                   </div>
-                  <div className="bg-slate-950 p-3 rounded border border-slate-800 text-center">
-                    <span className="text-2xl font-black text-white font-mono">
-                      {result.estimatedLength.minInches}″ – {result.estimatedLength.maxInches}″
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-white font-mono leading-none">
+                      {result.estimatedLength.minInches}″–{result.estimatedLength.maxInches}″
                     </span>
-                    <span className="text-[11px] text-slate-400 block font-mono">
-                      ({Math.round(result.estimatedLength.minInches * 2.54)} - {Math.round(result.estimatedLength.maxInches * 2.54)} cm)
-                    </span>
+                    <span className="text-xs font-mono uppercase text-slate-400">in</span>
+                  </div>
+                  <div className="text-[10px] font-mono text-slate-500">
+                    {Math.round(result.estimatedLength.minInches * 2.54)}–{Math.round(result.estimatedLength.maxInches * 2.54)} cm
                   </div>
                 </div>
 
-                {/* Weight Gauge */}
-                <div className="bg-slate-900 border border-white/10 p-5 rounded-xl space-y-2 shadow-xl">
-                  <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider">
-                    <span className="flex items-center gap-1.5 text-amber-400">
-                      <Scale className="w-4 h-4" /> Estimated Weight
+                {/* Weight Stat */}
+                <div className="bg-slate-900 border border-white/10 border-t-2 border-t-emerald-500 rounded-xl p-5 space-y-2 shadow-xl">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                      <Scale className="w-3.5 h-3.5 text-emerald-400" /> Est. Weight
                     </span>
-                    <span className="font-mono text-amber-400">~{result.estimatedWeight.averageLbs} lbs avg</span>
+                    <span className="text-[10px] font-mono text-slate-500 truncate">~{result.estimatedWeight.averageLbs} lbs avg</span>
                   </div>
-                  <div className="bg-slate-950 p-3 rounded border border-slate-800 text-center">
-                    <span className="text-2xl font-black text-amber-400 font-mono">
-                      {result.estimatedWeight.minLbs} – {result.estimatedWeight.maxLbs} lbs
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-white font-mono leading-none">
+                      {result.estimatedWeight.minLbs}–{result.estimatedWeight.maxLbs}
                     </span>
-                    <span className="text-[11px] text-slate-400 block font-mono">
-                      ({(result.estimatedWeight.minLbs * 0.453592).toFixed(1)} - {(result.estimatedWeight.maxLbs * 0.453592).toFixed(1)} kg)
-                    </span>
+                    <span className="text-xs font-mono uppercase text-slate-400">lbs</span>
+                  </div>
+                  <div className="text-[10px] font-mono text-slate-500">
+                    {(result.estimatedWeight.minLbs * 0.453592).toFixed(1)}–{(result.estimatedWeight.maxLbs * 0.453592).toFixed(1)} kg
                   </div>
                 </div>
               </div>
 
-              {/* Harvest Rules Card */}
+              {/* Harvest / Legality Status Row */}
               {result.regulatoryInfo && (
-                <div className="bg-slate-900 border-l-4 border-amber-500 p-5 rounded-xl border-y border-r border-white/10 shadow-2xl space-y-4">
-                  <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="w-5 h-5 text-amber-400" />
-                      <h4 className="text-sm font-black uppercase tracking-wider text-white">
-                        Regional Fishing Rules & Legal Harvest Regulations
-                      </h4>
-                    </div>
-
-                    <span className={`px-3 py-1 text-xs font-black uppercase tracking-wider rounded border ${
+                <div className="bg-slate-900 border border-white/10 rounded-xl px-5 py-4 shadow-xl flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                      Harvest Status
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-wider border ${
                       result.regulatoryInfo.legalStatus === 'HARVEST_ALLOWED'
-                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                        : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                        ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                        : 'bg-amber-500/15 text-amber-400 border-amber-500/30'
                     }`}>
                       {result.regulatoryInfo.legalStatus.replace(/_/g, ' ')}
                     </span>
+                    <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-wider border ${
+                      result.estimatedLength.minInches >= result.regulatoryInfo.minLegalLengthInches
+                        ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                        : 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                    }`}>
+                      {result.estimatedLength.minInches >= result.regulatoryInfo.minLegalLengthInches
+                        ? '✓ Meets Min Size'
+                        : '⚠ Below Legal Size'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Scale Reference Object */}
+              {result.referenceObject && (
+                <div className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl space-y-3">
+                  <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                    <div className="flex items-center gap-2">
+                      <Crosshair className="w-4 h-4 text-emerald-400" />
+                      <h4 className="text-sm font-black uppercase tracking-wider text-white">
+                        Scale Reference Detection
+                      </h4>
+                    </div>
+                    <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider border ${
+                      result.referenceObject.detected
+                        ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                        : 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                    }`}>
+                      {result.referenceObject.detected ? 'Detected' : 'None Found'}
+                    </span>
+                  </div>
+                  <p className="text-xs font-mono text-slate-400 leading-relaxed">
+                    {result.referenceObject.description}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                      Scale Factor
+                    </span>
+                    <span className="text-xs font-mono font-bold text-emerald-400">
+                      {result.referenceObject.scaleFactor}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Key Characteristics */}
+              {result.keyCharacteristics && result.keyCharacteristics.length > 0 && (
+                <div className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl space-y-3">
+                  <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <Eye className="w-4 h-4 text-emerald-400" />
+                    <h4 className="text-sm font-black uppercase tracking-wider text-white">
+                      Key Identification Characteristics
+                    </h4>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {result.keyCharacteristics.map((c, idx) => (
+                      <span
+                        key={idx}
+                        className="bg-slate-950 border border-slate-800 rounded-full px-3 py-1.5 text-[11px] font-mono text-slate-300"
+                      >
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Harvest Rules Card */}
+              {result.regulatoryInfo && (
+                <div className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl space-y-4">
+                  <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <ShieldCheck className="w-5 h-5 text-amber-400" />
+                    <h4 className="text-sm font-black uppercase tracking-wider text-white">
+                      Regional Fishing Rules & Legal Harvest Regulations
+                    </h4>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
@@ -888,26 +960,65 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
 
               {/* Recommended Tackle Card */}
               {result.tackleRecommendations && (
-                <div className="bg-slate-900 border-l-4 border-blue-500 p-5 rounded-xl border-y border-r border-white/10 shadow-2xl space-y-4">
+                <div className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl space-y-4">
                   <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
-                    <Target className="w-5 h-5 text-blue-400" />
+                    <Target className="w-5 h-5 text-emerald-400" />
                     <h4 className="text-sm font-black uppercase tracking-wider text-white">
-                      Recommended Tackle & Presentation Techniques
+                      Recommended Tackle & Presentation
                     </h4>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                      <Zap className="w-3.5 h-3.5 text-amber-400" /> Artificial Lures:
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {result.tackleRecommendations.topArtificialLures.map((lure, idx) => (
-                        <div key={idx} className="bg-slate-950 px-3 py-2 rounded border border-slate-800 text-xs font-mono text-emerald-300 font-bold flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                          <span>{lure}</span>
-                        </div>
-                      ))}
+                  {result.tackleRecommendations.topLiveBaits.length > 0 && (
+                    <div className="space-y-1.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                        <Anchor className="w-3.5 h-3.5 text-emerald-400" /> Live Baits:
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {result.tackleRecommendations.topLiveBaits.map((bait, idx) => (
+                          <div key={idx} className="bg-slate-950 px-3 py-2 rounded border border-slate-800 text-xs font-mono text-emerald-300 font-bold flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                            <span>{bait}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
+                  )}
+
+                  {result.tackleRecommendations.topArtificialLures.length > 0 && (
+                    <div className="space-y-1.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                        <Zap className="w-3.5 h-3.5 text-emerald-400" /> Artificial Lures:
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {result.tackleRecommendations.topArtificialLures.map((lure, idx) => (
+                          <div key={idx} className="bg-slate-950 px-3 py-2 rounded border border-slate-800 text-xs font-mono text-emerald-300 font-bold flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                            <span>{lure}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
+                    {result.tackleRecommendations.presentationTechnique && (
+                      <div className="bg-slate-950 p-3 rounded border border-slate-800 space-y-1">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Presentation</span>
+                        <span className="text-white font-bold">{result.tackleRecommendations.presentationTechnique}</span>
+                      </div>
+                    )}
+                    {result.tackleRecommendations.waterColumnDepth && (
+                      <div className="bg-slate-950 p-3 rounded border border-slate-800 space-y-1">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Water Column</span>
+                        <span className="text-white font-bold">{result.tackleRecommendations.waterColumnDepth}</span>
+                      </div>
+                    )}
+                    {result.tackleRecommendations.recommendedLineAndRod && (
+                      <div className="bg-slate-950 p-3 rounded border border-slate-800 space-y-1 sm:col-span-2">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Line & Rod</span>
+                        <span className="text-white font-bold">{result.tackleRecommendations.recommendedLineAndRod}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

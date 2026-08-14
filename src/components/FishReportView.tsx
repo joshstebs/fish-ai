@@ -3,7 +3,9 @@ import {
   AlertTriangle,
   Anchor,
   Clock,
+  Cloud,
   CloudOff,
+  CloudRain,
   CloudSun,
   Fish,
   Gauge,
@@ -14,8 +16,10 @@ import {
   RefreshCw,
   Sun,
   Target,
+  Thermometer,
   TrendingDown,
   TrendingUp,
+  Wind,
 } from 'lucide-react';
 import {
   CatchLogItem,
@@ -59,13 +63,6 @@ const GRADE_STYLES: Record<FishingConditionsReport['grade'], string> = {
   POOR: 'bg-red-500/10 text-red-400 border-red-500/40',
 };
 
-const SCORE_TEXT: Record<FishingConditionsReport['grade'], string> = {
-  EXCELLENT: 'text-emerald-400',
-  GOOD: 'text-cyan-400',
-  FAIR: 'text-amber-400',
-  POOR: 'text-red-400',
-};
-
 const CONFIDENCE_STYLES: Record<FishingConditionsReport['confidence'], string> = {
   HIGH: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40',
   MEDIUM: 'bg-amber-500/10 text-amber-400 border-amber-500/40',
@@ -74,7 +71,7 @@ const CONFIDENCE_STYLES: Record<FishingConditionsReport['confidence'], string> =
 
 const IMPACT_STYLES: Record<ReportFactor['impact'], string> = {
   HELPS: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-  HURTS: 'bg-red-500/10 text-red-400 border-red-500/30',
+  HURTS: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
   NEUTRAL: 'bg-slate-500/10 text-slate-400 border-slate-500/30',
 };
 
@@ -165,6 +162,14 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
   const majorCount = astro ? astro.solunar.filter((p) => p.type === 'MAJOR').length : 0;
   const minorCount = astro ? astro.solunar.filter((p) => p.type === 'MINOR').length : 0;
 
+  // Styling helper for the live pressure trend (RISING / STEADY / FALLING).
+  const pressureTrendColor =
+    weather?.pressureTrend === 'RISING'
+      ? 'text-emerald-400'
+      : weather?.pressureTrend === 'FALLING'
+        ? 'text-amber-400'
+        : 'text-slate-500';
+
   return (
     <div className="space-y-6 font-sans text-slate-900">
       {/* Header Banner */}
@@ -178,7 +183,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
               <Gauge className="w-3.5 h-3.5" /> Live Weather Powered
             </span>
           </div>
-          <h2 className="text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-3xl font-black uppercase text-white tracking-tight flex items-center gap-2">
             🎣 Today's Fish Report
           </h2>
           <p className="text-slate-400 text-sm mt-1">
@@ -246,29 +251,6 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
         </div>
       )}
 
-      {/* Live weather strip (real data only) */}
-      {weather && (
-        <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-          <div className="flex items-center gap-1.5 text-amber-300 font-bold">
-            <CloudSun className="w-4 h-4 text-amber-400" />
-            <span>
-              {weather.current.temperatureF}°F • {weather.current.condition}
-            </span>
-          </div>
-          <div className="flex items-center gap-3 text-slate-400 text-[11px]">
-            <span>
-              Wind: {weather.current.windSpeedMph} mph {weather.current.windDirection}
-            </span>
-            <span>
-              Pressure: {weather.current.pressureInHg} inHg ({weather.pressureTrend})
-            </span>
-            <span className="text-slate-500">
-              fetched {formatTime(new Date(weather.fetchedAt))}
-            </span>
-          </div>
-        </div>
-      )}
-
       {weatherLoading ? (
         /* Loading skeleton while weather resolves */
         <div className="space-y-6">
@@ -312,27 +294,32 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
         </div>
       ) : report ? (
         <>
-          {/* Score Card */}
-          <div className="bg-slate-900 border border-white/10 p-6 rounded-xl shadow-xl space-y-4">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1">
-                  <Gauge className="w-3.5 h-3.5 text-cyan-400" /> Conditions Score for {report.targetSpecies}
+          {/* Hero: Bite Confidence score */}
+          <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 shadow-xl">
+            <div className="text-center">
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 inline-flex items-center gap-1.5">
+                <Gauge className="w-3.5 h-3.5 text-emerald-400" /> Bite Confidence · {report.targetSpecies}
+              </span>
+              <div className="mt-4 flex items-end justify-center gap-4">
+                <span className="text-5xl sm:text-6xl font-black font-mono leading-none text-emerald-400">
+                  {report.score}
                 </span>
-                <div className="flex items-end gap-3 mt-2">
-                  <span className={`text-6xl font-black font-mono leading-none ${SCORE_TEXT[report.grade]}`}>
-                    {report.score}
-                  </span>
-                  <span
-                    className={`px-2.5 py-1 text-[10px] font-black uppercase tracking-widest rounded border mb-1 ${GRADE_STYLES[report.grade]}`}
-                  >
-                    {report.grade}
-                  </span>
-                </div>
-                <p className="text-sm text-slate-300 mt-3 max-w-xl">{report.summary}</p>
+                <span
+                  className={`px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded border mb-1 ${GRADE_STYLES[report.grade]}`}
+                >
+                  {report.grade}
+                </span>
               </div>
-
-              <div className="flex flex-col items-start md:items-end gap-2 shrink-0">
+              <div className="mt-5 max-w-xs mx-auto">
+                <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-emerald-400 transition-all duration-500"
+                    style={{ width: `${report.score}%` }}
+                  />
+                </div>
+              </div>
+              <p className="text-sm text-slate-300 mt-4 max-w-xl mx-auto">{report.summary}</p>
+              <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
                 <span
                   className={`px-2.5 py-1 text-[10px] font-black uppercase tracking-widest rounded border ${CONFIDENCE_STYLES[report.confidence]}`}
                 >
@@ -343,28 +330,97 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
                 </span>
               </div>
             </div>
+          </div>
 
-            {/* Best Window — prominent */}
-            <div className="bg-slate-950 border border-cyan-500/30 rounded-lg p-4 flex items-center gap-3">
-              <Clock className="w-5 h-5 text-cyan-400 shrink-0" />
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">
-                  Best Window Today
+          {/* Live weather chips (real data only) */}
+          {weather && (
+            <div className="bg-slate-900 border border-white/10 rounded-xl shadow-xl p-5 space-y-4">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-base font-black text-white uppercase tracking-tight flex items-center gap-2">
+                  <CloudSun className="w-5 h-5 text-amber-400" /> Live Conditions
+                </h3>
+                <span className="text-[10px] font-mono text-slate-500 uppercase shrink-0">
+                  fetched {formatTime(new Date(weather.fetchedAt))}
                 </span>
-                {report.bestWindow ? (
-                  <span className="text-xl font-black font-mono text-white">
-                    {report.bestWindow.start} – {report.bestWindow.end}
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div className="bg-slate-900/60 border border-white/10 rounded-lg p-2.5 min-w-0">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                    <Thermometer className="w-3 h-3 text-amber-400" /> Temperature
                   </span>
-                ) : (
-                  <span className="text-sm font-mono text-slate-400">
-                    No standout window in the next few hours.
+                  <span className="text-sm font-black font-mono text-white block mt-1 truncate">
+                    {weather.current.temperatureF}°F
                   </span>
-                )}
+                </div>
+                <div className="bg-slate-900/60 border border-white/10 rounded-lg p-2.5 min-w-0">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                    <Wind className="w-3 h-3 text-cyan-400" /> Wind
+                  </span>
+                  <span className="text-sm font-black font-mono text-white block mt-1 truncate">
+                    {weather.current.windSpeedMph} mph {weather.current.windDirection}
+                  </span>
+                </div>
+                <div className="bg-slate-900/60 border border-white/10 rounded-lg p-2.5 min-w-0">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                    <Gauge className="w-3 h-3 text-purple-400" /> Pressure
+                  </span>
+                  <span className="text-sm font-black font-mono text-white block mt-1 truncate">
+                    {weather.current.pressureInHg} inHg
+                  </span>
+                  <span className={`text-[9px] font-mono font-black uppercase ${pressureTrendColor}`}>
+                    {weather.pressureTrend}
+                  </span>
+                </div>
+                <div className="bg-slate-900/60 border border-white/10 rounded-lg p-2.5 min-w-0">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                    <CloudRain className="w-3 h-3 text-blue-400" /> Precipitation
+                  </span>
+                  <span className="text-sm font-black font-mono text-white block mt-1 truncate">
+                    {weather.current.precipitationMm} mm
+                  </span>
+                </div>
+                <div className="bg-slate-900/60 border border-white/10 rounded-lg p-2.5 min-w-0">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                    <Cloud className="w-3 h-3 text-slate-400" /> Cloud Cover
+                  </span>
+                  <span className="text-sm font-black font-mono text-white block mt-1 truncate">
+                    {weather.current.cloudCoverPct}%
+                  </span>
+                </div>
+                <div className="bg-slate-900/60 border border-white/10 rounded-lg p-2.5 min-w-0">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                    <CloudSun className="w-3 h-3 text-amber-400" /> Conditions
+                  </span>
+                  <span className="text-sm font-black font-mono text-white block mt-1 truncate">
+                    {weather.current.condition}
+                  </span>
+                </div>
               </div>
             </div>
+          )}
 
-            {/* Real astronomy strip */}
-            {astro && (
+          {/* Best Window — prominent */}
+          <div className="bg-slate-900 border border-white/10 border-l-4 border-l-emerald-500/70 rounded-xl shadow-xl p-5 flex items-center gap-4">
+            <Clock className="w-5 h-5 text-emerald-400 shrink-0" />
+            <div className="min-w-0">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                Best Window Today
+              </span>
+              {report.bestWindow ? (
+                <span className="text-xl font-black font-mono text-white">
+                  {report.bestWindow.start} – {report.bestWindow.end}
+                </span>
+              ) : (
+                <span className="text-sm font-mono text-slate-400">
+                  No standout window in the next few hours.
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Real astronomy strip */}
+          {astro && (
+            <div className="bg-slate-900 border border-white/10 rounded-xl shadow-xl p-4">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <div className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 flex items-center gap-2 min-w-0">
                   <Moon className="w-4 h-4 text-purple-400 shrink-0" />
@@ -403,19 +459,19 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
                   </div>
                 </div>
               </div>
+              </div>
             )}
-          </div>
 
           {/* Factors */}
           <div className="bg-slate-900 border border-white/10 p-6 rounded-xl shadow-xl space-y-4">
             <h3 className="text-base font-black text-white uppercase tracking-tight flex items-center gap-2">
               <Target className="w-5 h-5 text-cyan-400" /> What's Driving the Score
             </h3>
-            <div className="space-y-3">
+            <div className="divide-y divide-slate-800/60">
               {report.factors.map((f, i) => (
                 <div
                   key={i}
-                  className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 flex items-start justify-between gap-3"
+                  className="py-3.5 first:pt-0 last:pb-0 flex items-start justify-between gap-3"
                 >
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -431,7 +487,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
                     <p className="text-xs text-slate-400 leading-relaxed">{f.detail}</p>
                   </div>
                   <span
-                    className={`px-2 py-0.5 text-[9px] font-mono font-black uppercase rounded border shrink-0 flex items-center gap-1 ${IMPACT_STYLES[f.impact]}`}
+                    className={`px-2.5 py-1 text-[9px] font-mono font-black uppercase rounded-full border shrink-0 flex items-center gap-1 ${IMPACT_STYLES[f.impact]}`}
                   >
                     {impactIcon(f.impact)} {f.impact}
                   </span>

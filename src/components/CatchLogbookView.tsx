@@ -19,6 +19,7 @@ import {
   Download,
   X,
   Loader2,
+  Fish,
 } from 'lucide-react';
 
 interface CatchLogbookViewProps {
@@ -95,6 +96,13 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
 
     return matchesSearch && matchesSpecies;
   });
+
+  // Render-only grouping of the filtered log by date (date part of formattedDate, e.g. "Jul 12, 2026")
+  const groupedCatches = filteredCatches.reduce<Record<string, CatchLogItem[]>>((groups, item) => {
+    const dateKey = (item.formattedDate.split('•')[0] || item.formattedDate).trim() || 'Unknown Date';
+    (groups[dateKey] = groups[dateKey] || []).push(item);
+    return groups;
+  }, {});
 
   // Analytics metrics calculation — real, from logged data
   const totalCatches = catches.length;
@@ -346,115 +354,138 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {filteredCatches.map((item) => (
-            <div
-              key={item.id}
-              className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl space-y-4 relative overflow-hidden group hover:border-slate-700 transition-all"
-            >
-              {/* Card Header */}
-              <div className="flex items-start justify-between gap-3 border-b border-slate-800 pb-3">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 block">
-                    {item.formattedDate}
-                  </span>
-                  <h3 className="text-lg font-black text-white uppercase tracking-tight">
-                    {item.species}
-                  </h3>
-                  {item.scientificName && (
-                    <span className="text-xs text-slate-400 font-mono italic block">
-                      {item.scientificName}
-                    </span>
-                  )}
-                </div>
+        <div className="space-y-6">
+          {/* Emerald summary strip — every catch teaches FishAI */}
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-2 shadow-lg">
+            <span className="text-xs font-mono font-bold text-emerald-300 uppercase tracking-wider">
+              {filteredCatches.length} catch{filteredCatches.length === 1 ? '' : 'es'} logged
+            </span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400/80 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> Every Catch Teaches FishAI
+            </span>
+          </div>
 
-                <button
-                  onClick={() => onDeleteCatch(item.id)}
-                  title="Delete Catch Entry"
-                  className="p-2 text-slate-500 hover:text-red-400 bg-slate-950 hover:bg-red-500/10 rounded-lg border border-slate-800 transition-all"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+          {/* Catches grouped by date */}
+          {Object.entries(groupedCatches).map(([date, items]) => (
+            <div key={date} className="space-y-3">
+              {/* Group header by date */}
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{date}</span>
+                <span className="flex-1 h-px bg-slate-800" />
+                <span className="text-[10px] font-mono text-slate-500">
+                  {items.length} catch{items.length === 1 ? '' : 'es'}
+                </span>
               </div>
 
-              {/* Photo & Key Metrics */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="relative aspect-square sm:aspect-auto rounded-lg overflow-hidden bg-slate-950 border border-slate-800">
-                  {item.photoUrl ? (
-                    <img
-                      src={item.photoUrl}
-                      alt={item.species}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <BookOpen className="w-8 h-8 text-slate-700" />
-                    </div>
-                  )}
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-slate-900 border border-white/10 rounded-xl p-4 shadow-xl relative overflow-hidden group hover:border-slate-700 transition-all"
+                  >
+                    {/* Header row: species badge + name, photo thumb, delete */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center shrink-0">
+                          <Fish className="w-5 h-5 text-emerald-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="text-base font-black text-white uppercase tracking-tight truncate leading-tight">
+                            {item.species}
+                          </h3>
+                          {item.scientificName && (
+                            <span className="text-[10px] text-slate-500 font-mono italic block truncate">
+                              {item.scientificName}
+                            </span>
+                          )}
+                        </div>
+                      </div>
 
-                <div className="sm:col-span-2 space-y-2.5 text-xs font-mono">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-slate-950 p-2 rounded border border-slate-800 space-y-0.5">
-                      <span className="text-[9px] uppercase font-bold text-slate-400 flex items-center gap-1">
-                        <Ruler className="w-3 h-3 text-blue-400" /> Length
-                      </span>
-                      <span className="text-xs font-black text-white block truncate">
-                        {item.estimatedLength}
-                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {item.photoUrl && (
+                          <img
+                            src={item.photoUrl}
+                            alt={item.species}
+                            className="w-11 h-11 object-cover rounded-lg border border-slate-800"
+                          />
+                        )}
+                        <button
+                          onClick={() => onDeleteCatch(item.id)}
+                          title="Delete Catch Entry"
+                          className="p-2 text-slate-500 hover:text-red-400 bg-slate-950 hover:bg-red-500/10 rounded-lg border border-slate-800 transition-all"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="bg-slate-950 p-2 rounded border border-slate-800 space-y-0.5">
-                      <span className="text-[9px] uppercase font-bold text-slate-400 flex items-center gap-1">
-                        <Scale className="w-3 h-3 text-amber-400" /> Weight
-                      </span>
-                      <span className="text-xs font-black text-amber-400 block truncate">
-                        {item.estimatedWeight}
-                      </span>
+                    {/* Key numbers: weight as a big emerald mono figure */}
+                    <div className="flex items-end justify-between gap-3 mt-3">
+                      <div className="min-w-0">
+                        <span className="text-[9px] font-black uppercase tracking-wider text-slate-500 block">
+                          <Scale className="w-3 h-3 text-emerald-400 inline -mt-0.5 mr-1" /> Weight
+                        </span>
+                        <span
+                          className={`font-mono font-black block truncate ${
+                            item.estimatedWeight === 'Not weighed'
+                              ? 'text-sm text-slate-500'
+                              : 'text-2xl text-emerald-400'
+                          }`}
+                        >
+                          {item.estimatedWeight}
+                        </span>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-[9px] font-black uppercase tracking-wider text-slate-500 block">
+                          <Ruler className="w-3 h-3 text-blue-400 inline -mt-0.5 mr-1" /> Length
+                        </span>
+                        <span className="text-xs font-mono font-bold text-white block">{item.estimatedLength}</span>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-1.5">
-                    {item.locationName && (
-                      <div className="flex items-center gap-1.5 text-slate-300 bg-slate-950 px-2.5 py-1.5 rounded border border-slate-800">
-                        <MapPin className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                        <span className="truncate font-bold">{item.locationName}</span>
+                    {/* Meta row: location + date + bait — small slate-400 */}
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-3 text-[11px] font-mono text-slate-400">
+                      {item.locationName && (
+                        <span className="flex items-center gap-1.5 min-w-0">
+                          <MapPin className="w-3 h-3 text-emerald-400 shrink-0" />
+                          <span className="truncate">{item.locationName}</span>
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1.5 shrink-0">{item.formattedDate}</span>
+                      {item.baitUsed && (
+                        <span className="flex items-center gap-1.5 min-w-0">
+                          <Anchor className="w-3 h-3 text-amber-400 shrink-0" />
+                          <span className="truncate">Bait: {item.baitUsed}</span>
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Weather Snapshot */}
+                    {item.weather && (
+                      <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono mt-3">
+                        <div className="flex items-center gap-1.5 text-amber-300 font-bold">
+                          <CloudSun className="w-4 h-4 text-amber-400" />
+                          <span>{item.weather.temperatureF}°F • {item.weather.condition}</span>
+                          {item.weather.source === 'live' && (
+                            <span className="text-[9px] uppercase text-emerald-400 border border-emerald-500/40 rounded px-1 py-0.5">live</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 text-slate-400 text-[10px]">
+                          <span>Wind: {item.weather.windSpeedMph} mph {item.weather.windDirection}</span>
+                          <span>Pressure: {item.weather.barometricPressureInHg} inHg</span>
+                        </div>
                       </div>
                     )}
 
-                    {item.baitUsed && (
-                      <div className="flex items-center gap-1.5 text-slate-300 bg-slate-950 px-2.5 py-1.5 rounded border border-slate-800">
-                        <Anchor className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span className="truncate font-bold">Bait: {item.baitUsed}</span>
+                    {/* Notes */}
+                    {item.notes && (
+                      <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs font-mono text-slate-300 italic mt-3">
+                        "{item.notes}"
                       </div>
                     )}
                   </div>
-                </div>
+                ))}
               </div>
-
-              {/* Weather Snapshot */}
-              {item.weather && (
-                <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-                  <div className="flex items-center gap-1.5 text-amber-300 font-bold">
-                    <CloudSun className="w-4 h-4 text-amber-400" />
-                    <span>{item.weather.temperatureF}°F • {item.weather.condition}</span>
-                    {item.weather.source === 'live' && (
-                      <span className="text-[9px] uppercase text-emerald-400 border border-emerald-500/40 rounded px-1 py-0.5">live</span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3 text-slate-400 text-[11px]">
-                    <span>Wind: {item.weather.windSpeedMph} mph {item.weather.windDirection}</span>
-                    <span>Pressure: {item.weather.barometricPressureInHg} inHg</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Notes */}
-              {item.notes && (
-                <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs font-mono text-slate-300 italic">
-                  "{item.notes}"
-                </div>
-              )}
             </div>
           ))}
         </div>

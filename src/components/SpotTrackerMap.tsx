@@ -55,6 +55,21 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
            activeSpot?.name.toLowerCase().includes(c.locationName.toLowerCase() || '')
   );
 
+  // Render-only: most recent catch date per spot (for the quick-selector cards)
+  const lastFishedBySpot: Record<string, string> = {};
+  spots.forEach((spot) => {
+    const spotCatches = catches
+      .filter(
+        (c) =>
+          c.locationName.toLowerCase().includes(spot.name.toLowerCase()) ||
+          spot.name.toLowerCase().includes(c.locationName.toLowerCase())
+      )
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    if (spotCatches.length > 0) {
+      lastFishedBySpot[spot.id] = (spotCatches[0].formattedDate.split('•')[0] || spotCatches[0].formattedDate).trim();
+    }
+  });
+
   // Real GPS coordinates from the browser — never random fabricated coords.
   const handleCreateSpot = async () => {
     if (!newSpotName) return;
@@ -128,6 +143,21 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Visual Map Simulation & Pinned Spot Cards */}
         <div className="lg:col-span-7 space-y-4">
+          {/* Privacy banner — your spots, your data, your edge */}
+          <div className="bg-slate-900 border-l-4 border-emerald-500 border-y border-r border-white/10 rounded-xl p-4 shadow-xl flex items-start gap-3">
+            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
+              <Lock className="w-4 h-4 text-emerald-400" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-sm font-black uppercase text-white tracking-tight">
+                100% Private. You Own Your Data.
+              </h3>
+              <p className="text-slate-400 text-sm mt-1">
+                Private location intelligence built from your fishing history. We don't sell your data. Ever.
+              </p>
+            </div>
+          </div>
+
           {/* Simulated Map View Canvas */}
           <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden shadow-2xl relative">
             {/* Map Header Toolbar */}
@@ -233,8 +263,11 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
                   {spot.privacyLevel === 'APPROXIMATE' && <EyeOff className="w-3 h-3 text-amber-400 shrink-0" />}
                   {spot.privacyLevel === 'PUBLIC' && <Globe className="w-3 h-3 text-red-400 shrink-0" />}
                 </h4>
+                <div className="text-[10px] text-slate-400 font-mono truncate">
+                  {lastFishedBySpot[spot.id] ? `Last fished ${lastFishedBySpot[spot.id]}` : 'Never fished'}
+                </div>
                 <div className="text-[10px] text-slate-400 font-mono">
-                  {spot.totalCatches} Catches • {spot.averageDepthFeet} ft depth
+                  {spot.totalCatches} catches • {spot.averageDepthFeet} ft depth
                 </div>
               </button>
             ))}
