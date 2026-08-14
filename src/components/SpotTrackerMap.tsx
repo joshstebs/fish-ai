@@ -8,7 +8,6 @@ import {
   Waves,
   Anchor,
   CloudSun,
-  Layers,
   Sparkles,
   Search,
   BookOpen,
@@ -19,6 +18,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { getUserLocation } from '../utils/weather';
+import { SpotLeafletMap } from './SpotLeafletMap';
 
 interface SpotTrackerMapProps {
   spots: FishingSpot[];
@@ -35,6 +35,15 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
 }) => {
   const [selectedSpotId, setSelectedSpotId] = useState<string>(spots[0]?.id || '');
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+
+  // Coordinates picked on the interactive map — used instead of GPS when set.
+  const [mapPicked, setMapPicked] = useState<{ lat: number; lon: number; placeName?: string } | null>(null);
+
+  const handleMapPick = (lat: number, lon: number, placeName?: string) => {
+    setMapPicked({ lat, lon, placeName });
+    if (placeName && placeName !== 'My current location') setNewSpotName(placeName);
+    setIsAddModalOpen(true);
+  };
 
   // New Spot Form State
   const [newSpotName, setNewSpotName] = useState('');
@@ -78,14 +87,21 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
 
     let lat: number | null = null;
     let lon: number | null = null;
-    const loc = await getUserLocation();
-    if (loc) {
-      lat = loc.latitude;
-      lon = loc.longitude;
+
+    if (mapPicked) {
+      // Map-pinned spot — exact coordinates from where the user tapped.
+      lat = mapPicked.lat;
+      lon = mapPicked.lon;
+    } else {
+      const loc = await getUserLocation();
+      if (loc) {
+        lat = loc.latitude;
+        lon = loc.longitude;
+      }
     }
 
     if (lat === null || lon === null) {
-      setPrivacyError('Could not get your GPS position. Allow browser location access to tag a real spot — spots are never saved at made-up coordinates.');
+      setPrivacyError('Could not get your position — tap the map to pin the spot, or allow browser location access. Spots are never saved at made-up coordinates.');
       setIsCreating(false);
       return;
     }
@@ -107,6 +123,7 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
     setIsAddModalOpen(false);
     setNewSpotName('');
     setNewNotes('');
+    setMapPicked(null);
     setIsCreating(false);
   };
 
@@ -158,83 +175,13 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
             </div>
           </div>
 
-          {/* Simulated Map View Canvas */}
-          <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden shadow-2xl relative">
-            {/* Map Header Toolbar */}
-            <div className="bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-cyan-400" /> Satellite & Topo Depth Overlay
-              </span>
-              <span className="text-[10px] font-mono text-slate-400">
-                {spots.length} saved spot{spots.length === 1 ? '' : 's'} • coordinates stored privately on this device
-              </span>
-            </div>
-
-            {/* Visual Map Canvas Grid */}
-            <div className="relative aspect-16/10 bg-slate-950 overflow-hidden flex items-center justify-center">
-              {/* Tactical Water Grid Visual */}
-              <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
-
-              {/* Water Body Shape (Stylized Graphic) */}
-              <svg className="absolute inset-0 w-full h-full opacity-30" viewBox="0 0 800 500">
-                <path
-                  d="M100,200 Q250,50 450,150 T700,300 Q600,450 350,400 T100,200 Z"
-                  fill="#0284c7"
-                  stroke="#38bdf8"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M200,250 Q300,120 500,200 T650,350 Q550,420 300,350 Z"
-                  fill="#0369a1"
-                />
-              </svg>
-
-              {/* Pinned Spot Markers */}
-              {spots.map((spot, index) => {
-                const isSelected = spot.id === selectedSpotId;
-                // Pre-calculated relative map coordinates
-                const mapPositions = [
-                  { top: '38%', left: '42%' },
-                  { top: '25%', left: '68%' },
-                  { top: '65%', left: '30%' },
-                  { top: '55%', left: '75%' },
-                ];
-                const pos = mapPositions[index % mapPositions.length];
-
-                return (
-                  <div
-                    key={spot.id}
-                    onClick={() => setSelectedSpotId(spot.id)}
-                    style={{ top: pos.top, left: pos.left }}
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer group transition-all z-20`}
-                  >
-                    <div
-                      className={`relative flex items-center gap-2 p-2 rounded-full border shadow-2xl transition-all ${
-                        isSelected
-                          ? 'bg-cyan-500 text-slate-950 border-white ring-4 ring-cyan-500/40 scale-110'
-                          : 'bg-slate-900/90 text-white border-slate-700 hover:border-cyan-400'
-                      }`}
-                    >
-                      <MapPin className={`w-5 h-5 ${isSelected ? 'text-slate-950 animate-bounce' : 'text-cyan-400'}`} />
-                      <span className="text-xs font-black uppercase tracking-wider pr-1 hidden sm:inline">
-                        {spot.name}
-                      </span>
-                    </div>
-
-                    {/* Popup Tooltip */}
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-slate-900 border border-slate-700 px-3 py-1.5 rounded shadow-xl whitespace-nowrap z-30 pointer-events-none">
-                      <span className="text-[10px] font-bold text-white font-mono block">
-                        {spot.name} • {spot.waterBody}
-                      </span>
-                      <span className="text-[9px] text-cyan-400 font-mono">
-                        {spot.totalCatches} Catches Logged
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          {/* Real Interactive Map (Leaflet + OpenStreetMap — free, no API key) */}
+          <SpotLeafletMap
+            spots={spots}
+            selectedSpotId={selectedSpotId}
+            onSelectSpot={setSelectedSpotId}
+            onPickLocation={handleMapPick}
+          />
 
           {/* Spot Quick Selector Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -401,6 +348,12 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
                 ✕
               </button>
             </div>
+
+            {mapPicked && (
+              <div className="bg-emerald-950/30 border border-emerald-500/30 rounded-lg px-3 py-2 font-mono text-[10px] text-emerald-300">
+                📍 Pin: {mapPicked.lat.toFixed(5)}, {mapPicked.lon.toFixed(5)} — saved exactly where you tapped
+              </div>
+            )}
 
             <div className="space-y-3 font-sans text-xs">
               <div className="space-y-1">
