@@ -62,12 +62,15 @@ async function analyzeWithProviders(
   const prompt = PROMPT.replace('{{REFERENCE_HINT}}', referenceObjectHint || 'none');
   const errors: string[] = [];
 
-  // Tier 1: Gemini (REST, no SDK)
-  const geminiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
-  if (geminiKey) {
+  // Tier 1: Gemini (REST, no SDK) — rotates key1 -> key2
+  const geminiKeys = [
+    process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '',
+    process.env.GEMINI_API_KEY_2 || '',
+  ].filter(Boolean);
+  for (const geminiKey of geminiKeys) {
     try {
       const data = await postJson(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(geminiKey)}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GEMINI_MODEL || 'gemini-flash-lite-latest'}:generateContent?key=${encodeURIComponent(geminiKey)}`,
         {},
         {
           contents: [
@@ -168,6 +171,7 @@ export default async function handler(req: any, res: any) {
 
   const hasAnyKey = !!(
     process.env.GEMINI_API_KEY ||
+    process.env.GEMINI_API_KEY_2 ||
     process.env.VITE_GEMINI_API_KEY ||
     process.env.OPENROUTER_API_KEY ||
     process.env.GROQ_API_KEY
