@@ -384,7 +384,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
     : 0;
 
   return (
-    <div className="space-y-6 font-sans text-slate-900">
+    <div className="fishai-premium-vision space-y-6 font-sans text-slate-900">
       {/* Header Banner */}
       <div className="bg-slate-900 border-l-4 border-emerald-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -397,7 +397,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
             </span>
           </div>
           <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
-            🐟 FishAI Photo Dimension & Weight Estimator
+            Catch <span className="text-emerald-400">Snapshot</span>
           </h2>
           <p className="text-slate-400 text-sm mt-1">
             Upload a catch photo. Gemini Multi-Modal Vision identifies species, detects scale reference landmarks, calculates total physical length, estimates weight, and provides local harvest rules.
