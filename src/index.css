@@ -12,137 +12,94 @@
   }
 }
 
-/* FishAI premium dashboard treatment. Scoped to the report and Vision modules so
-   the existing Logbook, Map, Tackle, and billing screens retain their own UI. */
-.fishai-premium-report,
-.fishai-premium-vision {
-  position: relative;
-  color: #e6f0ec;
-}
+/* ============================================================
+   FishAI premium theme - deep-water green + teal, app-wide.
+   Every module (Logbook, Map, Tackle, Insights, Settings, ...)
+   gets the same dashboard treatment as Fish Report / Vision.
+   ============================================================ */
 
-.fishai-premium-report::before,
-.fishai-premium-vision::before {
-  content: '';
-  position: absolute;
-  inset: -24px -18px auto;
-  height: 230px;
-  pointer-events: none;
-  background: radial-gradient(ellipse at 60% 0%, rgba(20, 201, 178, .10), transparent 68%);
-}
-
-.fishai-premium-report > *,
-.fishai-premium-vision > * { position: relative; }
-
-.fishai-premium-report .bg-slate-900,
-.fishai-premium-vision .bg-slate-900 {
+/* Cards */
+.bg-slate-900 {
   background: linear-gradient(145deg, rgba(21, 32, 31, .94), rgba(7, 15, 15, .96)) !important;
   border-color: rgba(179, 219, 209, .13) !important;
-  box-shadow: 0 20px 44px rgba(0, 0, 0, .20), inset 0 1px 0 rgba(255,255,255,.025) !important;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, .20), inset 0 1px 0 rgba(255, 255, 255, .025) !important;
 }
 
-.fishai-premium-report .bg-slate-950,
-.fishai-premium-vision .bg-slate-950 {
+.bg-slate-950 {
   background: rgba(3, 10, 10, .72) !important;
   border-color: rgba(155, 194, 185, .13) !important;
 }
 
-.fishai-premium-report .rounded-xl,
-.fishai-premium-vision .rounded-xl { border-radius: 13px !important; }
-
-.fishai-premium-report .rounded-2xl,
-.fishai-premium-vision .rounded-2xl { border-radius: 16px !important; }
-
-.fishai-premium-report h2,
-.fishai-premium-vision h2 {
+/* Headings - condensed display face */
+h1,
+h2,
+h3 {
   font-family: 'Oswald', 'Arial Narrow', sans-serif;
   letter-spacing: .015em;
-  line-height: .96;
+  line-height: 1.02;
 }
 
-.fishai-premium-report .border-cyan-500,
-.fishai-premium-vision .border-emerald-500 { border-color: #18cbb4 !important; }
-
-.fishai-premium-report .bg-cyan-600,
-.fishai-premium-vision .bg-emerald-600 {
+/* Accent colors: teal family */
+.border-emerald-500 { border-color: #18cbb4 !important; }
+.border-cyan-500 { border-color: #18cbb4 !important; }
+.bg-emerald-500 { background-color: #18cbb4 !important; }
+.bg-emerald-400 { background-color: #18cbb4 !important; }
+.bg-cyan-600,
+.bg-emerald-600 {
   background: linear-gradient(105deg, #12aa95, #1bd0b9) !important;
 }
+.text-emerald-400 { color: #21d2ba !important; }
+.text-cyan-400 { color: #29d8c3 !important; }
+.text-emerald-300 { color: #3ee6cf !important; }
+.text-slate-400 { color: #91a19c !important; }
+.text-slate-300 { color: #c7d4d0 !important; }
+.text-white { color: #eff7f2 !important; }
 
-.fishai-premium-report .text-cyan-400,
-.fishai-premium-vision .text-cyan-400 { color: #29d8c3 !important; }
-
-.fishai-premium-report .text-emerald-400,
-.fishai-premium-vision .text-emerald-400 { color: #21d2ba !important; }
-
-.fishai-premium-report .text-slate-400,
-.fishai-premium-vision .text-slate-400 { color: #91a19c !important; }
-
-.fishai-premium-report .text-slate-300,
-.fishai-premium-vision .text-slate-300 { color: #c7d4d0 !important; }
-
-.fishai-premium-report .text-white,
-.fishai-premium-vision .text-white { color: #eff7f2 !important; }
-
-.fishai-premium-report button,
-.fishai-premium-vision button { transition: transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease; }
-
-.fishai-premium-report button:hover:not(:disabled),
-.fishai-premium-vision button:hover:not(:disabled) { transform: translateY(-1px); }
-
-.fishai-premium-report select,
-.fishai-premium-vision input,
-.fishai-premium-vision textarea {
+/* Form controls */
+select,
+input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+textarea {
   border-color: rgba(153, 193, 184, .20) !important;
   background-color: rgba(3, 10, 10, .72) !important;
 }
 
-.fishai-premium-report .bg-emerald-400,
-.fishai-premium-vision .bg-emerald-500 {
-  background-color: #18cbb4 !important;
+/* Buttons */
+button {
+  transition: transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
-.fishai-premium-vision .lg\:col-span-5 > .bg-slate-900 {
-  border-top: 2px solid rgba(24, 203, 180, .56) !important;
+/* Header */
+.bg-dusk {
+  background: linear-gradient(180deg, #0d1b19 0%, #06100f 100%);
 }
 
-.fishai-premium-report .border-l-4,
-.fishai-premium-vision .border-l-4 {
-  border-left-color: #18cbb4 !important;
-}
-
-@media (max-width: 640px) {
-  .fishai-premium-report .p-6,
-  .fishai-premium-vision .p-6 { padding: 1.15rem !important; }
-}
-
-/* Custom glowing borders & gradients */
+/* Glow */
 .glow-emerald {
-  box-shadow: 0 0 25px -5px rgba(51, 212, 173, 0.25);
+  box-shadow: 0 0 25px -5px rgba(24, 203, 180, 0.30);
 }
 
 .glow-blue {
-  box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 0 25px -5px rgba(41, 216, 195, 0.25);
 }
 
-/* Dusk gradient — Lovable 'gradient-dusk' treatment */
-.bg-dusk {
-  background: linear-gradient(180deg, #10161c 0%, #090e12 100%);
-}
-
-/* Custom Scrollbar */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090d16;
+  background: #0a1210;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #1e3a33;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #2a4a41;
 }
