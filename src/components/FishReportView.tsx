@@ -171,7 +171,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
         : 'text-slate-500';
 
   return (
-    <div className="space-y-6 font-sans text-slate-900">
+    <div className="fishai-premium-report space-y-6 font-sans text-slate-900">
       {/* Header Banner */}
       <div className="bg-slate-900 border-l-4 border-cyan-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -184,7 +184,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
             </span>
           </div>
           <h2 className="text-3xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
-            🎣 Today's Fish Report
+            Daily <span className="text-emerald-400">Fish Report</span>
           </h2>
           <p className="text-slate-400 text-sm mt-1">
             An honest, personalized conditions score for your target species — built from real live weather, real solunar math, and your own catch history.
