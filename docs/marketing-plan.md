@@ -73,3 +73,30 @@ Body: (see corrected copy below in chat / git history) — features + "free core
 - Always disclose AI-built nature where relevant.
 - **Pricing accuracy is mandatory**: "free" only for the free tier; AI estimator = "7-day free trial, $7.99/mo after, cancel anytime".
 - Every claim in posts is true.
+
+---
+
+# DAY 1 — Launch post (r/SideProject) — paste-ready, 2026-08-17
+
+**Title:**
+> I built an AI fishing app that IDs your catch from a photo — honest confidence scores, 7-day free trial
+
+**Body:**
+> Side project I've been building for a year — fishing app (PWA, no app store) with an AI catch estimator: take a photo, it identifies the species and estimates length/weight **with a confidence score**. When it's unsure, it says so — that honesty is the whole brand.
+>
+> What's in it:
+> • 📏 AI photo estimator (PRO, 7-day free trial, $7.99/mo)
+> • 📊 Live barometric pressure + real solunar tables
+> • 📍 GPS spot saving with privacy levels (real Leaflet map)
+> • 🎣 Catch logbook, trophies, tackle box, beginner guides
+>
+> **Free forever:** everything except the AI estimator.
+> **Privacy-first:** your data stays yours, 100%.
+>
+> Try it: **fishai.shop**
+>
+> Built with: React + Vite, Node/Express, Gemini vision, Leaflet, Stripe. Deployed on Vercel.
+>
+> I'm running a 7-day experiment to prove the funnel — feedback (good and brutal) genuinely makes the product better. What would you change first?
+
+**Posting rules:** post 7–9pm ET; reply to every comment first hour; link once in body + once more max in comments.
