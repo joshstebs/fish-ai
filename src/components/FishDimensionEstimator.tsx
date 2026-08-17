@@ -135,11 +135,15 @@ interface FishAnalysisResult {
 interface FishDimensionEstimatorProps {
   onSaveCatchToLog?: (catchItem: Omit<CatchLogItem, 'id' | 'timestamp' | 'formattedDate'>) => void;
   onNavigateToLogbook?: () => void;
+  openPro?: boolean;
+  onProOpened?: () => void;
 }
 
 export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
   onSaveCatchToLog,
   onNavigateToLogbook,
+  openPro,
+  onProOpened,
 }) => {
   const [selectedImage, setSelectedImage] = useState<string>(SAMPLE_FISH_PHOTOS[0].url);
   const [refHint, setRefHint] = useState<string>(SAMPLE_FISH_PHOTOS[0].refHint);
@@ -152,6 +156,14 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
   const [billingEmail, setBillingEmail] = useState<string>(getStoredEmail());
   const [billingBusy, setBillingBusy] = useState<boolean>(false);
   const [billingMsg, setBillingMsg] = useState<string | null>(null);
+
+  // Header "Try PRO" trigger — opens the PRO upgrade modal from anywhere in the app.
+  React.useEffect(() => {
+    if (openPro) {
+      setNeedsBilling(true);
+      onProOpened?.();
+    }
+  }, [openPro, onProOpened]);
   const [billing, setBilling] = useState<BillingStatus | null>(null);
 
   // After returning from Stripe Checkout (?checkout=success|canceled), refresh

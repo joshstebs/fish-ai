@@ -60,8 +60,9 @@ function useAppState() {
   const [signedIn, setSignedIn] = React.useState<boolean>(isSignedIn());
   const [showSignIn, setShowSignIn] = React.useState<boolean>(false);
   const [moreOpen, setMoreOpen] = React.useState<boolean>(false);
+  const [proFromHeader, setProFromHeader] = React.useState<boolean>(false);
   React.useEffect(() => { setCatches(loadStoredCatches()); setSpots(loadStoredSpots()); }, []);
-  return { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen };
+  return { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen, proFromHeader, setProFromHeader };
 }
 
 function SeoLanding({ onStart }: { onStart: () => void }) {
@@ -213,7 +214,7 @@ function AcademyIndex({ onStart }: { onStart: () => void }) {
 
 export function AppRoutes() {
   const state = useAppState();
-  const { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen } = state;
+  const { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen, proFromHeader, setProFromHeader } = state;
 
   const handleSaveCatch = (newCatchData: Omit<CatchLogItem, 'id' | 'timestamp' | 'formattedDate'>) => {
     const now = new Date();
@@ -232,7 +233,6 @@ export function AppRoutes() {
   };
 
   const goTo = (tab: TabId) => { setActiveTab(tab); setMoreOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); };
-  const goToPricing = () => { setActiveTab('SETTINGS'); setMoreOpen(false); setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150); };
 
   const renderTabButton = (tab: TabDef) => {
     const Icon = tab.icon;
@@ -265,18 +265,18 @@ export function AppRoutes() {
             </div>
           </nav>
           <div className="hidden md:flex items-center gap-2 shrink-0">
-            {!signedIn && (<button onClick={goToPricing} className="px-3 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:from-emerald-300 hover:to-teal-300 transition-all shadow-lg"><Sparkles className="w-3.5 h-3.5" />Try PRO Free</button>)}
+            {!signedIn && (<button onClick={() => { goTo('VISION'); setProFromHeader(true); }} className="px-3 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:from-emerald-300 hover:to-teal-300 transition-all shadow-lg"><Sparkles className="w-3.5 h-3.5" />Try PRO Free</button>)}
             {signedIn ? (<button onClick={() => { if (window.confirm('Sign out of owner mode? AI analysis will be locked until you sign in again.')) { signOut(); setSignedIn(false); }}} className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:bg-emerald-500/25 transition-all" title="Tap to sign out"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />Owner</button>) : (<button onClick={() => setShowSignIn(true)} className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:from-emerald-400 hover:to-teal-400 transition-all shadow-lg">Sign In</button>)}
           </div>
           <div className="md:hidden flex items-center gap-2 shrink-0">
-            {signedIn ? (<button onClick={() => { if (window.confirm('Sign out of owner mode?')) { signOut(); setSignedIn(false); }}} className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />Owner</button>) : (<button onClick={goToPricing} className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-lg flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" />Try PRO</button>)}
+            {signedIn ? (<button onClick={() => { if (window.confirm('Sign out of owner mode?')) { signOut(); setSignedIn(false); }}} className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />Owner</button>) : (<button onClick={() => { goTo('VISION'); setProFromHeader(true); }} className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-lg flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" />Try PRO</button>)}
           </div>
         </div>
       </header>
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 pb-28 md:pb-8">
         <Suspense fallback={<div className="py-24 text-center text-xs font-mono text-slate-500 uppercase tracking-widest">Loading…</div>}>
           {activeTab === 'REPORT' && <FishReportView catches={catches} spots={spots} />}
-          {activeTab === 'VISION' && <FishDimensionEstimator onSaveCatchToLog={handleSaveCatch} onNavigateToLogbook={() => goTo('LOGBOOK')} />}
+          {activeTab === 'VISION' && <FishDimensionEstimator onSaveCatchToLog={handleSaveCatch} onNavigateToLogbook={() => goTo('LOGBOOK')} openPro={proFromHeader} onProOpened={() => setProFromHeader(false)} />}
           {activeTab === 'LOGBOOK' && <CatchLogbookView catches={catches} spots={spots} onAddCatch={handleSaveCatch} onDeleteCatch={handleDeleteCatch} onNavigateToFishVision={() => goTo('VISION')} />}
           {activeTab === 'INSIGHTS' && <InsightsView catches={catches} />}
           {activeTab === 'ASSISTANT' && <AssistantView catches={catches} spots={spots} />}
