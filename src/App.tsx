@@ -16,6 +16,7 @@ import { InsightsView } from './components/InsightsView';
 import { AssistantView } from './components/AssistantView';
 import { SettingsView } from './components/SettingsView';
 import { OwnerSignInModal } from './components/OwnerSignInModal';
+import { UpgradeBanner } from './components/UpgradeBanner';
 import { isSignedIn, signOut } from './utils/apiAuth';
 
 import {
@@ -127,7 +128,7 @@ export function App() {
 
           {/* Primary Nav Buttons */}
           <div className="flex items-center gap-2 min-w-0">
-          <nav className="flex items-center gap-1 overflow-x-auto py-1 flex-1 min-w-0">
+          <nav className="flex items-center gap-1 flex-wrap py-1 flex-1 min-w-0">
             {[
               { id: 'REPORT', label: 'Fish Report', icon: Gauge, color: 'bg-teal-500 text-slate-950' },
               { id: 'VISION', label: 'Vision', icon: Camera, color: 'bg-emerald-500 text-slate-950' },
@@ -150,8 +151,8 @@ export function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`px-3 py-1.5 sm:px-3 sm:py-2 rounded-lg font-black text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${
-                    isActive ? `${tab.color} shadow-lg font-black scale-105` : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  className={`px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg font-black text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 ${
+                    isActive ? `${tab.color} shadow-lg font-black` : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -190,6 +191,7 @@ export function App() {
 
       {/* Main Body Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
+        <UpgradeBanner />
         {activeTab === 'REPORT' && <FishReportView catches={catches} spots={spots} />}
 
         {activeTab === 'VISION' && (

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CatchLogItem, FishingSpot, WeatherSnapshot } from '../types/catchLogTypes';
 import { exportCatchesToCSV } from '../utils/storage';
 import { fetchLiveWeather, resolveWeatherCoords } from '../utils/weather';
+import { SPECIES_OPTIONS } from '../utils/species';
 import {
   BookOpen,
   Search,
@@ -30,23 +31,7 @@ interface CatchLogbookViewProps {
   onNavigateToFishVision: () => void;
 }
 
-const MANUAL_SPECIES = [
-  'Largemouth Bass',
-  'Smallmouth Bass',
-  'Northern Pike',
-  'Walleye',
-  'Rainbow Trout',
-  'Brown Trout',
-  'Catfish',
-  'Crappie',
-  'Bluegill',
-  'Yellow Perch',
-  'Red Drum',
-  'Snook',
-  'Tarpon',
-  'Muskellunge',
-  'Other / Custom',
-];
+const MANUAL_SPECIES = SPECIES_OPTIONS;
 
 export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
   catches,

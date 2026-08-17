@@ -32,29 +32,12 @@ import { buildFishReport, recommendLures, suggestTargetSpecies } from '../utils/
 import { fetchLiveWeather, resolveWeatherCoords } from '../utils/weather';
 import { formatTime, getMoonInfo, getSolunarPeriods, getSunTimes } from '../utils/solunar';
 import { speciesOf } from '../utils/insights';
+import { CURATED_SPECIES } from '../utils/species';
 
 interface FishReportViewProps {
   catches: CatchLogItem[];
   spots: FishingSpot[];
 }
-
-/** Curated species list — shown alongside any species actually logged by the user. */
-const CURATED_SPECIES = [
-  'Largemouth Bass',
-  'Smallmouth Bass',
-  'Northern Pike',
-  'Walleye',
-  'Rainbow Trout',
-  'Brown Trout',
-  'Catfish',
-  'Crappie',
-  'Bluegill',
-  'Yellow Perch',
-  'Red Drum',
-  'Snook',
-  'Tarpon',
-  'Muskellunge',
-];
 
 const GRADE_STYLES: Record<FishingConditionsReport['grade'], string> = {
   EXCELLENT: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40',
@@ -187,7 +170,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
             Daily <span className="text-emerald-400">Fish Report</span>
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            An honest, personalized conditions score for your target species — built from real live weather, real solunar math, and your own catch history.
+            Your personalized bite score — real weather, real solunar math, your own catch history.
           </p>
         </div>
         <button
