@@ -29,6 +29,7 @@ const FishReportView = React.lazy(() => import('./components/FishReportView').th
 const InsightsView = React.lazy(() => import('./components/InsightsView').then(m => ({ default: m.InsightsView })));
 const AssistantView = React.lazy(() => import('./components/AssistantView').then(m => ({ default: m.AssistantView })));
 const SettingsView = React.lazy(() => import('./components/SettingsView').then(m => ({ default: m.SettingsView })));
+const ProCtaModal = React.lazy(() => import('./components/ProCtaModal').then(m => ({ default: m.default })));
 
 type TabId = 'REPORT' | 'VISION' | 'LOGBOOK' | 'SPOTS' | 'TACKLE' | 'GUIDE' | 'SOLUNAR' | 'PRESSURE' | 'BOX' | 'TROPHY' | 'LIVEWELL' | 'INSIGHTS' | 'ASSISTANT' | 'SETTINGS';
 interface TabDef { id: TabId; label: string; icon: React.ComponentType<{ className?: string }>; color: string; }
@@ -59,9 +60,10 @@ function useAppState() {
   const [spots, setSpots] = React.useState<FishingSpot[]>([]);
   const [signedIn, setSignedIn] = React.useState<boolean>(isSignedIn());
   const [showSignIn, setShowSignIn] = React.useState<boolean>(false);
+  const [proOpen, setProOpen] = React.useState<boolean>(false);
   const [moreOpen, setMoreOpen] = React.useState<boolean>(false);
   React.useEffect(() => { setCatches(loadStoredCatches()); setSpots(loadStoredSpots()); }, []);
-  return { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen };
+  return { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen, proOpen, setProOpen };
 }
 
 function SeoLanding({ onStart }: { onStart: () => void }) {
@@ -213,7 +215,7 @@ function AcademyIndex({ onStart }: { onStart: () => void }) {
 
 export function AppRoutes() {
   const state = useAppState();
-  const { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen } = state;
+  const { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen, proOpen, setProOpen } = state;
 
   const handleSaveCatch = (newCatchData: Omit<CatchLogItem, 'id' | 'timestamp' | 'formattedDate'>) => {
     const now = new Date();
@@ -265,11 +267,11 @@ export function AppRoutes() {
             </div>
           </nav>
           <div className="hidden md:flex items-center gap-2 shrink-0">
-            {!signedIn && (<button onClick={goToPricing} className="px-3 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:from-emerald-300 hover:to-teal-300 transition-all shadow-lg"><Sparkles className="w-3.5 h-3.5" />Try PRO Free</button>)}
+            {!signedIn && (<button onClick={() => setProOpen(true)} className="px-3 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:from-emerald-300 hover:to-teal-300 transition-all shadow-lg"><Sparkles className="w-3.5 h-3.5" />Try PRO Free</button>)}
             {signedIn ? (<button onClick={() => { if (window.confirm('Sign out of owner mode? AI analysis will be locked until you sign in again.')) { signOut(); setSignedIn(false); }}} className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:bg-emerald-500/25 transition-all" title="Tap to sign out"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />Owner</button>) : (<button onClick={() => setShowSignIn(true)} className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:from-emerald-400 hover:to-teal-400 transition-all shadow-lg">Sign In</button>)}
           </div>
           <div className="md:hidden flex items-center gap-2 shrink-0">
-            {signedIn ? (<button onClick={() => { if (window.confirm('Sign out of owner mode?')) { signOut(); setSignedIn(false); }}} className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />Owner</button>) : (<button onClick={goToPricing} className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-lg flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" />Try PRO</button>)}
+            {signedIn ? (<button onClick={() => { if (window.confirm('Sign out of owner mode?')) { signOut(); setSignedIn(false); }}} className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />Owner</button>) : (<button onClick={() => setProOpen(true)} className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-lg flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" />Try PRO</button>)}
           </div>
         </div>
       </header>
@@ -309,6 +311,9 @@ export function AppRoutes() {
         </div>)}
       </nav>
       <OwnerSignInModal open={showSignIn} onClose={() => setShowSignIn(false)} onSignedIn={() => setSignedIn(true)} />
+      <Suspense fallback={null}>
+        <ProCtaModal open={proOpen} onClose={() => setProOpen(false)} />
+      </Suspense>
     </>
   );
 }
