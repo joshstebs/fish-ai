@@ -10,6 +10,8 @@ import {
   ChevronDown, LayoutGrid, PlusCircle, ArrowRight,
 } from 'lucide-react';
 import { GlobalSeo } from './components/SeoHead';
+import { ListiclePage } from './pages/ListiclePage';
+import { HowToChoosePage } from './pages/HowToChoosePage';
 
 const FishDimensionEstimator = React.lazy(() => import('./components/FishDimensionEstimator').then(m => ({ default: m.FishDimensionEstimator })));
 const CatchLogbookView = React.lazy(() => import('./components/CatchLogbookView').then(m => ({ default: m.CatchLogbookView })));
