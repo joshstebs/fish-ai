@@ -32,6 +32,7 @@ import { buildFishReport, recommendLures, suggestTargetSpecies } from '../utils/
 import { fetchLiveWeather, resolveWeatherCoords } from '../utils/weather';
 import { formatTime, getMoonInfo, getSolunarPeriods, getSunTimes } from '../utils/solunar';
 import { speciesOf } from '../utils/insights';
+import { Fold } from './Fold';
 
 interface FishReportViewProps {
   catches: CatchLogItem[];
@@ -187,7 +188,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
             Daily <span className="text-emerald-400">Fish Report</span>
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            An honest, personalized conditions score for your target species — built from real live weather, real solunar math, and your own catch history.
+            A personalized bite score for your target species from real weather, solunar math, and your catch history.
           </p>
         </div>
         <button
@@ -418,9 +419,13 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
             </div>
           </div>
 
-          {/* Real astronomy strip */}
+          {/* Real astronomy strip (collapsible to keep the landing page tight) */}
           {astro && (
-            <div className="bg-slate-900 border border-white/10 rounded-xl shadow-xl p-4">
+            <Fold
+              title="Moon, Sun & Solunar"
+              icon={<Moon className="w-4 h-4" />}
+              badge={`${majorCount} major · ${minorCount} minor`}
+            >
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <div className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 flex items-center gap-2 min-w-0">
                   <Moon className="w-4 h-4 text-purple-400 shrink-0" />
@@ -459,14 +464,15 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
                   </div>
                 </div>
               </div>
-              </div>
-            )}
+            </Fold>
+          )}
 
           {/* Factors */}
-          <div className="bg-slate-900 border border-white/10 p-6 rounded-xl shadow-xl space-y-4">
-            <h3 className="text-base font-black text-white uppercase tracking-tight flex items-center gap-2">
-              <Target className="w-5 h-5 text-cyan-400" /> What's Driving the Score
-            </h3>
+          <Fold
+            title="What's Driving the Score"
+            icon={<Target className="w-5 h-5" />}
+            defaultOpen
+          >
             <div className="divide-y divide-slate-800/60">
               {report.factors.map((f, i) => (
                 <div
@@ -494,13 +500,14 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
                 </div>
               ))}
             </div>
-          </div>
+          </Fold>
 
           {/* Recommended Lures */}
-          <div className="bg-slate-900 border border-white/10 p-6 rounded-xl shadow-xl space-y-4">
-            <h3 className="text-base font-black text-white uppercase tracking-tight flex items-center gap-2">
-              <Anchor className="w-5 h-5 text-amber-400" /> Recommended Lures for Today
-            </h3>
+          <Fold
+            title="Recommended Lures for Today"
+            icon={<Anchor className="w-5 h-5" />}
+            defaultOpen
+          >
             {lures.length === 0 ? (
               <p className="text-xs text-slate-400">
                 Log a few {species} catches or connect live weather to get lure
@@ -525,7 +532,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
                 ))}
               </div>
             )}
-          </div>
+          </Fold>
 
           {/* Caveat */}
           <p className="text-[11px] text-slate-500 font-mono italic px-1">{report.caveat}</p>
