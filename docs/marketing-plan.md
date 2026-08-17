@@ -100,3 +100,34 @@ Body: (see corrected copy below in chat / git history) — features + "free core
 > I'm running a 7-day experiment to prove the funnel — feedback (good and brutal) genuinely makes the product better. What would you change first?
 
 **Posting rules:** post 7–9pm ET; reply to every comment first hour; link once in body + once more max in comments.
+
+---
+
+# ASSET PACK v2 — X thread + channel copies (all UTM-tagged)
+
+**UTM convention (instrument everything):** every link = `https://fishai.shop/?utm_source=<channel>&utm_medium=social&utm_campaign=launch_v1`
+- reddit → `utm_source=reddit` · x → `utm_source=x` · fb → `utm_source=facebook` · ig → `utm_source=instagram` · yt → `utm_source=youtube` · pin → `utm_source=pinterest`
+
+## X/Twitter launch thread (6 tweets, paste-ready)
+1. 🎣 I built a fishing app with an AI that estimates your catch's size from a photo. It says exactly how confident it is. When it's unsure, it tells you. → fishai.shop
+2. The idea: most "AI fishing" apps fake results. Ours is honest — confidence scores, real species ID, and it learns when you correct it. Honesty as a feature.
+3. What else: live barometric pressure + real solunar tables so you know WHEN the bite turns on. GPS spot-saving with privacy levels.
+4. Free forever: logbook, spots, pressure, solunar, tackle box, trophies, beginner guides. PRO (7-day free trial, $7.99/mo): the AI photo estimator.
+5. Privacy-first: your data stays yours. No accounts on third-party servers, no selling data. 100% yours.
+6. Try it free: https://fishai.shop/?utm_source=x&utm_medium=social&utm_campaign=launch_v1 — and if it gets a fish wrong, tell me. That's how it gets better. 🐟
+
+## Instagram caption (Reel with promo video F_v2)
+"Your catch. One photo. Honest AI. 📏 Species ID + size estimate with a REAL confidence score — no fake results. Free core app, 7-day free trial on the AI estimator. Link in bio → fishai.shop"
+
+## Facebook group post (fishing groups)
+Short version of the r/SideProject post + "free to try, AI estimator 7-day trial" + fishai.shop link (UTM facebook).
+
+## YouTube Shorts description
+"AI fishing app that IDs your catch from a photo — honest confidence scores. Try free: fishai.shop (UTM youtube). #fishing #ai #catchandrelease"
+
+## Pinterest pins (3)
+1. "AI estimates your catch size from a photo" → link
+2. "When fish bite: live pressure + solunar" → link
+3. "Catch logbook with GPS spots — private by default" → link
+
+**Posting order Day 1:** r/SideProject (7-9pm ET) → X thread same evening → IG Reel next day → FB group next day.
