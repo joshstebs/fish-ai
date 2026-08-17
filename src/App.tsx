@@ -12,6 +12,8 @@ import {
 import { GlobalSeo } from './components/SeoHead';
 import { ListiclePage } from './pages/ListiclePage';
 import { HowToChoosePage } from './pages/HowToChoosePage';
+import { CompareFishbrainPage } from './pages/CompareFishbrainPage';
+import { CompareFishAnglerPage } from './pages/CompareFishAnglerPage';
 
 const FishDimensionEstimator = React.lazy(() => import('./components/FishDimensionEstimator').then(m => ({ default: m.FishDimensionEstimator })));
 const CatchLogbookView = React.lazy(() => import('./components/CatchLogbookView').then(m => ({ default: m.CatchLogbookView })));
@@ -321,6 +323,8 @@ export default function App() {
         <Route path="/best-fishing-app" element={<BestFishingApp onStart={() => window.location.assign('/')} />} />
         <Route path="/listicle" element={<ListiclePage onStart={() => window.location.assign('/')} />} />
         <Route path="/how-to-choose" element={<HowToChoosePage onStart={() => window.location.assign('/')} />} />
+        <Route path="/fishai-vs-fishbrain" element={<CompareFishbrainPage onStart={() => window.location.assign('/')} />} />
+        <Route path="/fishai-vs-fishangler" element={<CompareFishAnglerPage onStart={() => window.location.assign('/')} />} />
         <Route path="/academy" element={<AcademyIndex onStart={() => window.location.assign('/')} />} />
         <Route path="/seo" element={<SeoLanding onStart={() => window.location.assign('/')} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
