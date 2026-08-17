@@ -1,251 +1,187 @@
-import React, { useState } from 'react';
-import {
-  X,
-  Sparkles,
-  Check,
-  Zap,
-  Camera,
-  Ruler,
-  Scale,
-  ShieldCheck,
-  MapPin,
-  Crosshair,
-  CreditCard,
-  Fish,
-  Lock,
-} from 'lucide-react';
+import React from 'react';
+import { X, Check, Sparkles, Loader2, CreditCard } from 'lucide-react';
 import {
   getCustomerId,
   getStoredEmail,
-  fetchBillingStatus,
+  setStoredEmail,
   startCheckout,
   openBillingPortal,
+  fetchBillingStatus,
   type BillingStatus,
 } from '../utils/billing';
 
-/**
- * ProCtaModal — redesigned PRO upgrade modal for FishAI.
- *
- * Concept-driven redesign: photo-gallery asset strip on the left (real
- * underwater species shots), value props + email capture + trial CTA on the
- * right. Replaces the old inline billing card. Self-contained: owns its
- * email/busy/error state and calls the same billing utils the estimator uses,
- * so checkout + portal behaviour is unchanged. No fabricated data, no fake
- * reviews, no invented metrics.
- */
-
-const GALLERY = [
-  { src: '/assets/pro-cta/muskie.jpg', label: 'Musky' },
-  { src: '/assets/pro-cta/catfish.jpg', label: 'Catfish' },
-  { src: '/assets/pro-cta/bluegill.jpg', label: 'Bluegill' },
-  { src: '/assets/pro-cta/walleye.jpg', label: 'Walleye' },
-  { src: '/assets/pro-cta/trout.jpg', label: 'Trout' },
-];
-
 interface ProCtaModalProps {
   onClose: () => void;
-  onEntitled: (status: BillingStatus) => void;
+  onEntitled?: (status: BillingStatus) => void;
 }
 
-export const ProCtaModal: React.FC<ProCtaModalProps> = ({ onClose, onEntitled }) => {
-  const isRenewal = Boolean(getCustomerId());
-  const [email, setEmail] = useState<string>(getStoredEmail());
-  const [busy, setBusy] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [msg, setMsg] = useState<string | null>(null);
-  const [activePhoto, setActivePhoto] = useState<number>(0);
+const FEATURES = [
+  'Unlimited Fish Species Recognition',
+  'Advanced Fishing Tactics',
+  'Personalized Fishing Reports',
+  'Exclusive Fishing Community',
+];
 
-  const handleStartTrial = async () => {
-    const trimmed = email.trim();
-    if (!trimmed || !/^\S+@\S+\.\S+$/.test(trimmed)) {
-      setError('Enter a valid email address to start your free trial.');
+/**
+ * ProCtaModal — PRO upgrade modal, faithful to Josh's design mockup
+ * (dark card, emerald accent, "Upgrade to FishAI Pro", $9.99/mo or
+ * $99.99/yr with annual emphasized, 4 green-check features, Upgrade Now +
+ * Cancel). Reuses the existing billing utils only — no backend changes.
+ * Invocation contract preserved from the merged estimator wiring
+ * (onClose + onEntitled, no `open` prop).
+ */
+export const ProCtaModal: React.FC<ProCtaModalProps> = ({ onClose, onEntitled }) => {
+  const [email, setEmail] = React.useState<string>(getStoredEmail());
+  const [busy, setBusy] = React.useState<boolean>(false);
+  const [msg, setMsg] = React.useState<string | null>(null);
+  const [entitled, setEntitled] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    const cus = getCustomerId();
+    if (!cus) {
+      setEntitled(false);
+      return;
+    }
+    fetchBillingStatus()
+      .then((b) => {
+        setEntitled(!!b.entitled);
+        onEntitled?.(b);
+      })
+      .catch(() => setEntitled(false));
+  }, [onEntitled]);
+
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  const handleUpgrade = async () => {
+    const clean = email.trim();
+    const cus = getCustomerId();
+    if (busy) return;
+    setMsg(null);
+    if (cus) {
+      setBusy(true);
+      try {
+        const url = await openBillingPortal();
+        window.location.href = url;
+      } catch (e) {
+        setMsg((e as Error)?.message || 'Could not open billing. Please try again.');
+        setBusy(false);
+      }
+      return;
+    }
+    if (!clean) {
+      setMsg('Enter your email to start your free trial.');
       return;
     }
     setBusy(true);
-    setError(null);
-    setMsg(null);
     try {
-      const { url } = await startCheckout(trimmed);
+      setStoredEmail(clean);
+      const { url } = await startCheckout(clean);
       window.location.href = url;
-    } catch (err: any) {
-      setError(err?.message || 'Could not start checkout. Please try again.');
+    } catch (e) {
+      setMsg((e as Error)?.message || 'Could not start checkout. Please try again.');
       setBusy(false);
     }
   };
-
-  const handleManage = async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      const url = await openBillingPortal();
-      window.location.href = url;
-    } catch (err: any) {
-      setError(err?.message || 'Could not open the billing portal.');
-      setBusy(false);
-    }
-  };
-
-  const handleClose = () => {
-    if (busy) return; // never close mid-checkout
-    onClose();
-  };
-
-  const benefits = [
-    { icon: <Camera className="w-4 h-4" />, text: 'Species ID with confidence score from any photo' },
-    { icon: <Ruler className="w-4 h-4" />, text: 'Length & weight estimates using photo scale' },
-    { icon: <ShieldCheck className="w-4 h-4" />, text: 'Local harvest rules: size limits, bag limits, legality' },
-    { icon: <Crosshair className="w-4 h-4" />, text: 'Scale reference detection with calibration overlay' },
-    { icon: <MapPin className="w-4 h-4" />, text: 'Spot tagging with GPS-backed location cards' },
-    { icon: <Sparkles className="w-4 h-4" />, text: 'Tackle recommendations tuned to the catch' },
-  ];
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-      <div className="bg-slate-900 border border-white/10 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-2 relative">
-        {/* Close */}
+    <div
+      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Upgrade to FishAI Pro"
+    >
+      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={onClose} />
+
+      <div className="relative w-full sm:max-w-sm bg-slate-900 border border-white/10 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden">
+        <div className="h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500" />
+
         <button
-          onClick={handleClose}
+          onClick={onClose}
           aria-label="Close"
-          className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-all"
+          className="absolute top-3 right-3 p-2 rounded-full bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 transition-all z-10"
         >
           <X className="w-4 h-4" />
         </button>
 
-        {/* LEFT — Photo gallery asset strip */}
-        <div className="relative bg-slate-950 hidden lg:flex flex-col">
-          <div className="relative flex-1 min-h-[320px]">
-            <img
-              src={GALLERY[activePhoto].src}
-              alt={GALLERY[activePhoto].label}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
-            <div className="absolute bottom-4 left-4 z-10">
-              <div className="inline-flex items-center gap-1.5 bg-slate-950/80 border border-emerald-500/40 rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-400">
-                <Fish className="w-3 h-3" /> {GALLERY[activePhoto].label}
-              </div>
-            </div>
-          </div>
-
-          {/* Thumbnail strip */}
-          <div className="bg-slate-950/95 border-t border-white/10 p-2.5 flex gap-2">
-            {GALLERY.map((g, i) => (
-              <button
-                key={g.src}
-                onClick={() => setActivePhoto(i)}
-                className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 transition-all shrink-0 ${
-                  activePhoto === i
-                    ? 'border-emerald-400 shadow-lg shadow-emerald-500/20'
-                    : 'border-slate-700 opacity-70 hover:opacity-100'
-                }`}
-                aria-label={g.label}
-              >
-                <img src={g.src} alt={g.label} className="w-full h-full object-cover" />
-              </button>
-            ))}
-          </div>
-
-          <div className="bg-slate-950/95 border-t border-white/10 px-4 py-3 flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Real underwater photos
+        <div className="p-6 sm:p-7">
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles className="w-4 h-4 text-emerald-400" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+              FishAI Pro
             </span>
-            <span className="text-[10px] font-mono text-slate-600">•</span>
-            <span className="text-[10px] font-mono text-slate-500">No fake data. Ever.</span>
           </div>
-        </div>
+          <h2 className="text-2xl font-display font-black uppercase tracking-tight text-white leading-tight">
+            Upgrade to FishAI Pro
+          </h2>
+          <p className="mt-1 text-xs text-slate-400">
+            AI catch intelligence that makes every trip better.
+          </p>
 
-        {/* RIGHT — Value props + capture */}
-        <div className="p-6 sm:p-8 space-y-5">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 bg-emerald-600 text-slate-950 font-black text-xs uppercase tracking-widest rounded">
-                FishAI Pro
-              </span>
-              <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5" /> AI Vision
-              </span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-display font-black uppercase text-white tracking-tight">
-              {isRenewal ? 'Your Trial Has Ended' : 'Unlock AI Fish Identification'}
-            </h2>
-            <p className="text-slate-400 text-sm font-mono">
-              {isRenewal
-                ? 'Resubscribe to keep analyzing your catches.'
-                : 'One photo. Species, size, harvest rules, tackle — in seconds.'}
-            </p>
+          <div className="mt-5 flex items-end gap-2">
+            <span className="text-3xl font-black font-mono text-white">$9.99</span>
+            <span className="text-xs font-mono uppercase text-slate-400 pb-1">/month</span>
+          </div>
+          <div className="mt-1 flex items-center gap-1.5">
+            <span className="text-emerald-400 font-black font-mono">$99.99</span>
+            <span className="text-xs font-mono uppercase text-slate-400">/year — save 17%</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {benefits.map((b, idx) => (
-              <div key={idx} className="flex items-center gap-2.5 bg-slate-950/60 border border-slate-800 rounded-lg px-3 py-2.5">
-                <span className="w-7 h-7 rounded-md bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
-                  {b.icon}
+          <ul className="mt-5 space-y-2.5">
+            {FEATURES.map((f) => (
+              <li key={f} className="flex items-start gap-2.5">
+                <span className="mt-0.5 w-4 h-4 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center shrink-0">
+                  <Check className="w-2.5 h-2.5 text-emerald-400" />
                 </span>
-                <span className="text-[11px] font-mono text-slate-300 leading-snug">{b.text}</span>
-              </div>
+                <span className="text-sm text-slate-200 font-medium">{f}</span>
+              </li>
             ))}
-          </div>
+          </ul>
 
-          {/* Email capture */}
-          <div className="space-y-2">
-            <div className="flex gap-2">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleStartTrial(); }}
-                placeholder="you@email.com"
-                className="flex-1 bg-slate-950 border border-slate-800 text-white text-xs font-bold uppercase tracking-wider font-mono rounded-lg px-3 py-3 focus:border-emerald-500 outline-none"
-              />
-              <button
-                onClick={handleStartTrial}
-                disabled={busy}
-                className="px-5 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black uppercase text-xs tracking-wider rounded-lg shadow-xl flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50"
-              >
-                {busy ? (
-                  'Opening...'
-                ) : isRenewal ? (
-                  <>
-                    <CreditCard className="w-4 h-4" /> Subscribe $7.99/mo
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-4 h-4" /> Start Free Trial
-                  </>
-                )}
-              </button>
-            </div>
-            {error && (
-              <div className="bg-red-950/40 border border-red-500/30 p-3 rounded-lg text-red-300 text-xs font-mono">
-                {error}
-              </div>
-            )}
-            {msg && (
-              <div className="bg-emerald-950/40 border border-emerald-500/30 p-3 rounded-lg text-emerald-300 text-xs font-mono">
-                {msg}
-              </div>
-            )}
-            <p className="text-center text-[10px] text-slate-500 font-mono">
-              {isRenewal ? 'Manage or cancel your plan anytime.' : '7-day free trial · $7.99/mo after · Cancel anytime'}
-            </p>
-          </div>
-
-          {isRenewal && (
-            <button
-              onClick={handleManage}
-              disabled={busy}
-              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-black text-xs uppercase tracking-wider rounded-lg border border-slate-700 flex items-center justify-center gap-2 transition-all"
-            >
-              <CreditCard className="w-4 h-4 text-emerald-400" /> Manage subscription
-            </button>
+          {!getCustomerId() && (
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email for your free trial"
+              className="mt-5 w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm font-mono focus:outline-none focus:border-emerald-500 placeholder:text-slate-500"
+            />
           )}
 
-          <div className="flex items-center justify-center gap-2 pt-1">
-            <Lock className="w-3 h-3 text-slate-600" />
-            <span className="text-[10px] font-mono text-slate-600">
-              Secure Stripe checkout · No app password needed
-            </span>
-          </div>
+          {msg && (
+            <p className="mt-2 text-xs text-amber-400 font-mono">{msg}</p>
+          )}
+
+          <button
+            onClick={handleUpgrade}
+            disabled={busy}
+            className="mt-4 w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 disabled:opacity-60 text-slate-950 font-black uppercase text-sm tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all"
+          >
+            {busy ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : entitled ? (
+              <CreditCard className="w-4 h-4" />
+            ) : (
+              <Sparkles className="w-4 h-4" />
+            )}
+            {entitled ? 'Manage Subscription' : 'Upgrade Now'}
+          </button>
+
+          <button
+            onClick={onClose}
+            className="mt-2 w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-black uppercase text-xs tracking-wider transition-all"
+          >
+            Cancel
+          </button>
+
+          <p className="mt-3 text-center text-[10px] font-mono text-slate-500">
+            7-day free trial on the monthly plan · cancel anytime
+          </p>
         </div>
       </div>
     </div>
