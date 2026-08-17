@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function ListiclePage() {
+export function ListiclePage({ onStart }: { onStart?: () => void } = {}) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
       <h1 className="text-2xl sm:text-4xl font-display font-black uppercase tracking-tight text-white">best fishing apps 2026: the complete list</h1>
