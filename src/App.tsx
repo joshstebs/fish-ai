@@ -317,6 +317,8 @@ export default function App() {
         <Route path="/blog" element={<BlogIndex onStart={() => window.location.assign('/')} />} />
         <Route path="/blog/:slug" element={<BlogPost slug={window.location.pathname.replace('/blog/','')} onStart={() => window.location.assign('/')} />} />
         <Route path="/best-fishing-app" element={<BestFishingApp onStart={() => window.location.assign('/')} />} />
+        <Route path="/listicle" element={<ListiclePage onStart={() => window.location.assign('/')} />} />
+        <Route path="/how-to-choose" element={<HowToChoosePage onStart={() => window.location.assign('/')} />} />
         <Route path="/academy" element={<AcademyIndex onStart={() => window.location.assign('/')} />} />
         <Route path="/seo" element={<SeoLanding onStart={() => window.location.assign('/')} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
