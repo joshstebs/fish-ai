@@ -400,7 +400,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
             Catch <span className="text-emerald-400">Snapshot</span>
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Upload a catch photo. Gemini Multi-Modal Vision identifies species, detects scale reference landmarks, calculates total physical length, estimates weight, and provides local harvest rules.
+            Snap a photo — species ID, size estimate, and harvest rules in seconds.
           </p>
         </div>
       </div>
