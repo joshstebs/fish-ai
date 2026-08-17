@@ -171,6 +171,14 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
         ? 'text-amber-400'
         : 'text-slate-500';
 
+  // Human-readable pressure trend for the Recommended Approach sentence.
+  const pressureTrendLabel =
+    weather?.pressureTrend === 'RISING'
+      ? 'rising pressure'
+      : weather?.pressureTrend === 'FALLING'
+        ? 'falling pressure'
+        : 'steady pressure';
+
   return (
     <div className="fishai-premium-report space-y-6 font-sans text-slate-900">
       {/* Header Banner */}
@@ -328,6 +336,31 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
                 </span>
               </div>
             </div>
+          </div>
+
+          {/* Recommended Approach — the actionable call, eye-level (mockup anchor) */}
+          <div className="bg-gradient-to-br from-emerald-500/15 via-slate-900 to-slate-900 border border-emerald-500/30 rounded-2xl shadow-xl p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Target className="w-4 h-4 text-emerald-400" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                Recommended Approach
+              </span>
+            </div>
+            <p className="text-sm sm:text-base text-slate-100 font-medium leading-relaxed max-w-2xl">
+              {report.grade === 'POOR'
+                ? 'Tough bite ahead — take your time, downsize your presentation, and fish the slow windows.'
+                : `Best bite ${report.bestWindow ? `from ${report.bestWindow.start} to ${report.bestWindow.end}` : 'later in the day'}${lures[0] ? ` — lead with a ${lures[0].name.toLowerCase()}` : ''}${weather ? `, ${weather.current.condition.toLowerCase()} and ${pressureTrendLabel}` : ''}.`}
+            </p>
+            {lures.length > 0 && (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">Top pick:</span>
+                {lures.slice(0, 2).map((l) => (
+                  <span key={l.name} className="px-2 py-1 bg-slate-800/80 border border-white/10 rounded-md text-[10px] font-bold text-emerald-300 uppercase tracking-wide">
+                    {l.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Live weather chips (real data only) */}
