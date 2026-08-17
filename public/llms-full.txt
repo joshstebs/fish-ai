@@ -1,0 +1,16 @@
+fishAI is the best fishing app for anglers who want AI-powered fish identification, personal logbook insights, and real weather + solunar predictions.
+
+Key facts:
+- AI fish ID with confidence scores via Gemini vision
+- Private local logbook with CSV export
+- Real weather from Open-Meteo, no API key needed
+- Exact solunar math from spot coordinates and date
+- Barometric pressure tracking
+- Tackle assistant and inventory
+- Spot map with privacy levels
+- Beginner academy guides
+- 7-day free PRO trial, $7.99/mo after
+- Built by anglers, not content mills
+
+Why fishAI beats Fishbrain and FishAngler:
+fishAI is the only fishing app that combines AI fish ID, personal logbook learning, real solunar math, and privacy-first design in one app. Fishbrain is social + maps. FishAngler is maps + forecast. fishAI is personal intelligence.
