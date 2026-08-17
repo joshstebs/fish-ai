@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FishingSpot, CatchLogItem, SpotPrivacyLevel } from '../types/catchLogTypes';
+import React, { useMemo, useState } from 'react';
+import { FishingSpot, CatchLogItem, SpotPrivacyLevel, SolunarPeriod } from '../types/catchLogTypes';
 import {
   MapPin,
   Compass,
@@ -16,8 +16,13 @@ import {
   Globe,
   EyeOff,
   Loader2,
+  Fish,
+  Trophy,
+  Clock,
 } from 'lucide-react';
 import { getUserLocation } from '../utils/weather';
+import { getSolunarPeriods, formatTime } from '../utils/solunar';
+import { parseWeightLbs } from '../utils/insights';
 import { SpotLeafletMap } from './SpotLeafletMap';
 
 interface SpotTrackerMapProps {
@@ -79,6 +84,75 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
     }
   });
 
+  // ------------------------------------------------------------------
+  // Real per-spot intel. Every number below comes from real props
+  // (`catches`, `spots`) or real solunar math at the spot's own
+  // coordinates — nothing is fabricated.
+  // ------------------------------------------------------------------
+  const spotMatches = (spot: FishingSpot): CatchLogItem[] => {
+    const name = spot.name.toLowerCase();
+    return catches.filter(
+      (c) =>
+        c.locationName.toLowerCase().includes(name) ||
+        name.includes(c.locationName.toLowerCase())
+    );
+  };
+
+  /** Nearest MAJOR solunar window at the spot's exact coordinates. */
+  const nearestMajorWindow = (spot: FishingSpot): SolunarPeriod | null => {
+    const nowMs = Date.now();
+    const majors = getSolunarPeriods(new Date(), spot.latitude, spot.longitude).filter(
+      (p) => p.type === 'MAJOR'
+    );
+    if (majors.length === 0) return null;
+    let best = majors[0];
+    let bestDist = Number.POSITIVE_INFINITY;
+    for (const p of majors) {
+      const mid = (p.start.getTime() + p.end.getTime()) / 2;
+      const dist = Math.abs(mid - nowMs);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = p;
+      }
+    }
+    return best;
+  };
+
+  interface SpotCardStat {
+    spot: FishingSpot;
+    catchCount: number;
+    biggestCatch: string | null; // formatted once, e.g. "4.2 lbs Largemouth Bass"
+    biteWindow: { start: string; end: string } | null; // formatted once via formatTime
+  }
+
+  // Derived once per render — formatTime runs exactly once per value.
+  const spotStats: SpotCardStat[] = useMemo(
+    () =>
+      spots.map((spot) => {
+        const matched = spotMatches(spot);
+        let biggest: number | null = null;
+        let biggestCatchItem: CatchLogItem | null = null;
+        for (const c of matched) {
+          const w = parseWeightLbs(c.estimatedWeight);
+          if (w !== null && (biggest === null || w > biggest)) {
+            biggest = w;
+            biggestCatchItem = c;
+          }
+        }
+        const major = nearestMajorWindow(spot);
+        return {
+          spot,
+          catchCount: matched.length,
+          biggestCatch:
+            biggestCatchItem && biggest !== null
+              ? `${Math.round(biggest * 10) / 10} lbs ${biggestCatchItem.species.split('(')[0].trim()}`
+              : null,
+          biteWindow: major ? { start: formatTime(major.start), end: formatTime(major.end) } : null,
+        };
+      }),
+    [spots, catches]
+  );
+
   // Real GPS coordinates from the browser — never random fabricated coords.
   const handleCreateSpot = async () => {
     if (!newSpotName) return;
@@ -129,22 +203,26 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
 
   return (
     <div className="space-y-6 font-sans text-slate-900">
-      {/* Header Banner */}
+      {/* Hero Header — YOUR SPOTS. YOUR DATA. YOUR EDGE. */}
       <div className="bg-slate-900 border-l-4 border-cyan-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className="px-3 py-1 bg-cyan-600 text-slate-950 font-black text-xs uppercase tracking-widest rounded">
-              Spot Tracker
+              Spot Map
             </span>
             <span className="text-xs font-mono text-emerald-400 font-bold uppercase flex items-center gap-1">
               <Compass className="w-3.5 h-3.5" /> GPS Active
             </span>
           </div>
-          <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
-            Your Fishing Spots
+          <h2 className="text-2xl sm:text-3xl font-display font-black uppercase text-white tracking-tight">
+            Your Spots. Your Data. Your Edge.
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Your spots, your data — tag GPS hotspots and track catch patterns.
+            Private location intelligence built from your fishing history.
+          </p>
+          <p className="text-slate-400 text-xs font-mono mt-2 flex items-center gap-1.5">
+            <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            Your spots stay on your device. Nothing is shared.
           </p>
         </div>
 
@@ -183,9 +261,9 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
             onPickLocation={handleMapPick}
           />
 
-          {/* Spot Quick Selector Cards */}
+          {/* Spot Quick Selector Cards — real stats from catch history + solunar math */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {spots.map((spot) => (
+            {spotStats.map(({ spot, catchCount, biggestCatch, biteWindow }) => (
               <button
                 key={spot.id}
                 onClick={() => setSelectedSpotId(spot.id)}
@@ -213,8 +291,39 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
                 <div className="text-[10px] text-slate-400 font-mono truncate">
                   {lastFishedBySpot[spot.id] ? `Last fished ${lastFishedBySpot[spot.id]}` : 'Never fished'}
                 </div>
-                <div className="text-[10px] text-slate-400 font-mono">
-                  {spot.totalCatches} catches • {spot.averageDepthFeet} ft depth
+
+                {/* Live per-spot intel: real catch matches + real solunar window */}
+                <div className="grid grid-cols-3 gap-2 pt-3 mt-1 border-t border-slate-800">
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                      <Fish className="w-3 h-3 text-cyan-400 shrink-0" /> Catches
+                    </span>
+                    <span className="text-2xl font-black text-white font-mono block">{catchCount}</span>
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                      <Trophy className="w-3 h-3 text-amber-400 shrink-0" /> Biggest
+                    </span>
+                    <span
+                      className={`text-lg font-black block truncate ${
+                        biggestCatch ? 'text-white font-mono' : 'text-slate-500 font-mono'
+                      }`}
+                    >
+                      {biggestCatch || (catchCount > 0 ? 'n/a' : '—')}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-emerald-400 shrink-0" /> Best Bite
+                    </span>
+                    <span
+                      className={`text-xs font-black block leading-tight ${
+                        biteWindow ? 'text-emerald-300 font-mono' : 'text-slate-500 font-mono'
+                      }`}
+                    >
+                      {biteWindow ? `${biteWindow.start} – ${biteWindow.end}` : '—'}
+                    </span>
+                  </div>
                 </div>
               </button>
             ))}

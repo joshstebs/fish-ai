@@ -1,6 +1,6 @@
 import React from 'react';
 import { CatchLogItem } from '../types/catchLogTypes';
-import { analyzeCatches } from '../utils/insights';
+import { analyzeCatches, speciesOf, parseLengthInches } from '../utils/insights';
 import { exportCatchesToCSV } from '../utils/storage';
 import {
   Brain,
@@ -41,24 +41,46 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
   // personalBests already sorted biggest-first by analyzeCatches; sort defensively anyway
   const personalBests = [...report.personalBests].sort((a, b) => b.weightLbs - a.weightLbs);
 
+  // --- 'My Catches' stats — every number derived from the REAL catches prop ---
+  const speciesCounts = new Map<string, number>();
+  const spots = new Set<string>();
+  for (const c of catches) {
+    const s = speciesOf(c);
+    speciesCounts.set(s, (speciesCounts.get(s) || 0) + 1);
+    if (c.locationName) spots.add(c.locationName);
+  }
+  const topSpeciesEntry = [...speciesCounts.entries()].sort((a, b) => b[1] - a[1])[0];
+  const topSpecies = topSpeciesEntry ? topSpeciesEntry[0] : null;
+  const topSpeciesCount = topSpeciesEntry ? topSpeciesEntry[1] : 0;
+  const totalSpots = spots.size;
+
+  // Biggest by weight first; fall back to longest by inches (also real data) and
+  // an honest empty state when the log has no size info at all.
+  const biggest = personalBests[0] ?? null;
+  const longest =
+    catches
+      .map((c) => ({ c, len: parseLengthInches(c.estimatedLength) }))
+      .filter((x): x is { c: CatchLogItem; len: number } => x.len !== null)
+      .sort((a, b) => b.len - a.len)[0] ?? null;
+
   return (
     <div className="space-y-6 font-sans text-slate-900">
-      {/* Header Banner */}
-      <div className="bg-slate-900 border-l-4 border-cyan-400 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Hero Header Banner */}
+      <div className="bg-slate-900 border-l-4 border-violet-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="px-3 py-1 bg-cyan-600 text-white font-black text-xs uppercase tracking-widest rounded inline-flex items-center gap-1.5">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className="px-3 py-1 bg-violet-600 text-white font-black text-xs uppercase tracking-widest rounded inline-flex items-center gap-1.5">
               <Brain className="w-3.5 h-3.5" /> Insights
             </span>
             <span className="text-xs font-mono text-emerald-400 font-bold uppercase flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" /> Pattern AI
+              <Sparkles className="w-3.5 h-3.5" /> Learning Loop
             </span>
           </div>
-          <h2 className="font-display text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
-            Your Fishing Intelligence
+          <h2 className="font-display text-2xl sm:text-3xl font-black uppercase text-white tracking-tight leading-tight">
+            Every Catch Teaches FishAI
           </h2>
-          <p className="text-slate-400 text-sm mt-1">
-            Every catch teaches FishAI your patterns — best hours, lures, and spots.
+          <p className="text-slate-400 text-sm mt-1.5 font-mono uppercase tracking-wider">
+            Log trips. Learn patterns. Get smarter recommendations.
           </p>
         </div>
 
@@ -88,47 +110,121 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
         </div>
       ) : (
         <>
-          {/* Stats Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-slate-900 border border-white/10 p-4 rounded-xl space-y-1 shadow-xl">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                <BookOpen className="w-3.5 h-3.5 text-blue-400" /> Total Catches
+          {/* My Catches — stat strip from the REAL catch log */}
+          <section className="space-y-3">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+              <BookOpen className="w-3.5 h-3.5 text-violet-400" /> My Catches
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-slate-900 border border-white/10 p-4 rounded-xl space-y-1 shadow-xl">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                  <BookOpen className="w-3.5 h-3.5 text-blue-400" /> Total Catches
+                </span>
+                <span className="text-2xl font-black text-white font-mono">{report.totalCatches}</span>
+              </div>
+
+              <div className="bg-slate-900 border border-white/10 p-4 rounded-xl space-y-1 shadow-xl">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                  <Fish className="w-3.5 h-3.5 text-emerald-400" /> Top Species
+                </span>
+                {topSpecies ? (
+                  <>
+                    <span className="text-lg font-black text-white font-mono uppercase truncate block">
+                      {topSpecies}
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                      {topSpeciesCount} catch{topSpeciesCount === 1 ? '' : 'es'} · {report.speciesCount} species
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-lg font-black text-slate-500 font-mono block">—</span>
+                )}
+              </div>
+
+              <div className="bg-slate-900 border border-white/10 p-4 rounded-xl space-y-1 shadow-xl">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                  <Trophy className="w-3.5 h-3.5 text-amber-400" /> Biggest
+                </span>
+                {biggest ? (
+                  <>
+                    <span className="text-2xl font-black text-amber-400 font-mono block">
+                      {fmtLbs(biggest.weightLbs)}
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider truncate block">
+                      {biggest.commonName}
+                    </span>
+                  </>
+                ) : longest ? (
+                  <>
+                    <span className="text-2xl font-black text-white font-mono block">
+                      {Number.isInteger(longest.len) ? longest.len : longest.len.toFixed(1)} in
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider truncate block">
+                      {longest.c.commonName} · longest
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-2xl font-black text-slate-500 font-mono block">—</span>
+                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">no size data</span>
+                  </>
+                )}
+              </div>
+
+              <div className="bg-slate-900 border border-white/10 p-4 rounded-xl space-y-1 shadow-xl">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-red-400" /> Total Spots
+                </span>
+                <span className="text-2xl font-black text-white font-mono">{totalSpots}</span>
+                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                  {totalSpots === 1 ? 'unique spot' : 'unique spots'}
+                </span>
+              </div>
+            </div>
+          </section>
+
+          {/* Best window + top lure — labeled cards with honest empty states */}
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-cyan-400" /> Best Bite Window
               </span>
-              <span className="text-2xl font-black text-white font-mono">{report.totalCatches}</span>
+              {report.bestHourRange !== '—' ? (
+                <>
+                  <span className="text-2xl font-black text-cyan-400 font-mono uppercase block truncate">
+                    {report.bestHourRange}
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                    Most productive 2-hour block in your log
+                  </span>
+                </>
+              ) : (
+                <span className="text-base font-black text-slate-500 font-mono block">
+                  Not enough data yet — log trips with times.
+                </span>
+              )}
             </div>
 
-            <div className="bg-slate-900 border border-white/10 p-4 rounded-xl space-y-1 shadow-xl">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                <Fish className="w-3.5 h-3.5 text-emerald-400" /> Species Tracked
-              </span>
-              <span className="text-2xl font-black text-emerald-400 font-mono">{report.speciesCount}</span>
-            </div>
-
-            <div className="bg-slate-900 border border-white/10 p-4 rounded-xl space-y-1 shadow-xl">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-cyan-400" /> Best Hour Window
-              </span>
-              <span className="text-lg font-black text-cyan-400 font-mono truncate block">
-                {report.bestHourRange}
-              </span>
-            </div>
-
-            <div className="bg-slate-900 border border-white/10 p-4 rounded-xl space-y-1 shadow-xl">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+            <div className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                 <Anchor className="w-3.5 h-3.5 text-amber-400" /> Top Lure
               </span>
               {report.bestLure ? (
                 <>
-                  <span className="text-sm font-black text-amber-400 truncate block">{report.bestLure.name}</span>
+                  <span className="text-xl font-black text-amber-400 font-mono uppercase truncate block">
+                    {report.bestLure.name}
+                  </span>
                   <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
-                    {report.bestLure.catches} catch{report.bestLure.catches === 1 ? '' : 'es'}
+                    {report.bestLure.catches} catch{report.bestLure.catches === 1 ? '' : 'es'} on this presentation
                   </span>
                 </>
               ) : (
-                <span className="text-base font-black text-slate-500 font-mono block">—</span>
+                <span className="text-base font-black text-slate-500 font-mono block">
+                  No lure data yet — log bait on your next catch.
+                </span>
               )}
             </div>
-          </div>
+          </section>
 
           {/* Patterns Found */}
           <div className="bg-slate-900 border border-white/10 rounded-xl p-6 shadow-xl space-y-4">

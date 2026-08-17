@@ -57,6 +57,19 @@ const CURATED_SPECIES = [
   'Muskellunge',
 ];
 
+/** Convert a "6:10 AM"-style clock string into a percent position across a 24h day. */
+function timeToPct(timeStr: string): number {
+  const m = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!m) return 0;
+  let hours = parseInt(m[1], 10);
+  const minutes = parseInt(m[2], 10);
+  const ampm = m[3].toUpperCase();
+  if (ampm === 'PM' && hours !== 12) hours += 12;
+  if (ampm === 'AM' && hours === 12) hours = 0;
+  const totalMinutes = Math.min(1439, hours * 60 + minutes);
+  return (totalMinutes / (24 * 60)) * 100;
+}
+
 const GRADE_STYLES: Record<FishingConditionsReport['grade'], string> = {
   EXCELLENT: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40',
   GOOD: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/40',
@@ -154,6 +167,19 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
     [catches, species, weather]
   );
 
+  // Best bite window expressed as 24h-percent positions for the horizontal bar.
+  const biteWindow = useMemo(() => {
+    if (!report || !report.bestWindow) return null;
+    const startPct = Math.max(0, Math.min(100, timeToPct(report.bestWindow.start)));
+    const endPct = Math.max(0, Math.min(100, timeToPct(report.bestWindow.end)));
+    return {
+      start: report.bestWindow.start,
+      end: report.bestWindow.end,
+      startPct,
+      widthPct: Math.max(1.5, endPct - startPct),
+    };
+  }, [report]);
+
   // Species options: everything the user has actually caught, plus the curated list.
   const speciesOptions = useMemo(() => {
     const logged = catches.map((c) => speciesOf(c));
@@ -186,17 +212,17 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-3 py-1 bg-cyan-600 text-slate-950 font-black text-xs uppercase tracking-widest rounded">
-              Live Conditions
+              Today's Fish Report
             </span>
             <span className="text-xs font-mono text-emerald-400 font-bold uppercase flex items-center gap-1">
               <Gauge className="w-3.5 h-3.5" /> Live Data
             </span>
           </div>
-          <h2 className="text-3xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
-            Daily <span className="text-emerald-400">Fish Report</span>
+          <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight">
+            Your Daily Fish Report
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Your bite score from live weather, solunar math, and catch history.
+            Real conditions. Real times. Best bite window. Every day.
           </p>
         </div>
         <button
@@ -208,6 +234,26 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
           <span>{weatherLoading ? 'Refreshing...' : 'Refresh'}</span>
         </button>
       </div>
+
+      {/* Target Zones — real spot names from the user's saved spots, never invented */}
+      {spots.length > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-slate-900/70 border border-cyan-500/20 p-4 rounded-xl shadow-lg">
+          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5 shrink-0">
+            <Target className="w-3.5 h-3.5 text-cyan-400" /> Target Zones
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {spots.map((s) => (
+              <span
+                key={s.id}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-cyan-500/40 bg-cyan-500/5 text-cyan-300 font-mono text-[10px] font-bold uppercase tracking-wide"
+              >
+                <MapPin className="w-3 h-3 text-cyan-400 shrink-0" />
+                {s.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Control Toolbar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900 p-4 border border-white/10 rounded-xl shadow-lg">
@@ -430,23 +476,42 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
             </div>
           )}
 
-          {/* Best Window — prominent */}
-          <div className="bg-slate-900 border border-white/10 border-l-4 border-l-emerald-500/70 rounded-xl shadow-xl p-5 flex items-center gap-4">
-            <Clock className="w-5 h-5 text-emerald-400 shrink-0" />
-            <div className="min-w-0">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                Best Window Today
+          {/* Best Bite Window — 24h horizontal bar */}
+          <div className="bg-slate-900 border border-white/10 border-l-4 border-l-cyan-500/70 rounded-xl shadow-xl p-5 space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-cyan-400" /> Best Bite Window
               </span>
-              {report.bestWindow ? (
-                <span className="text-xl font-black font-mono text-white">
-                  {report.bestWindow.start} – {report.bestWindow.end}
-                </span>
-              ) : (
-                <span className="text-sm font-mono text-slate-400">
-                  No standout window in the next few hours.
+              {biteWindow && (
+                <span className="text-[10px] font-mono font-black uppercase text-cyan-300/80 shrink-0">
+                  {biteWindow.start} – {biteWindow.end}
                 </span>
               )}
             </div>
+            {biteWindow ? (
+              <>
+                <div className="relative h-3 rounded-lg bg-slate-950 overflow-hidden">
+                  <div
+                    className="absolute inset-y-0 rounded-lg bg-gradient-to-r from-cyan-600 via-cyan-500 to-cyan-300"
+                    style={{ left: `${biteWindow.startPct}%`, width: `${biteWindow.widthPct}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[9px] font-mono font-bold uppercase text-slate-600">
+                  <span>12am</span>
+                  <span>6am</span>
+                  <span>12pm</span>
+                  <span>6pm</span>
+                  <span>12am</span>
+                </div>
+              </>
+            ) : (
+              <div className="border border-dashed border-slate-700 rounded-lg p-4 flex items-center gap-3">
+                <Clock className="w-4 h-4 text-slate-500 shrink-0" />
+                <p className="text-xs font-mono text-slate-400">
+                  No standout window in the next few hours — watch for the next solunar shift.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Real astronomy strip (collapsible to keep the landing page tight) */}
@@ -532,9 +597,9 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
             </div>
           </Fold>
 
-          {/* Recommended Lures */}
+          {/* Equipment — real lure names, badged only on the user's personal history */}
           <Fold
-            title="Recommended Lures for Today"
+            title="Equipment"
             icon={<Anchor className="w-5 h-5" />}
             defaultOpen
           >
@@ -544,21 +609,20 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
                 recommendations — no guesses here.
               </p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex flex-wrap gap-2">
                 {lures.map((l, i) => (
-                  <div key={i} className="bg-slate-950 border border-slate-800 rounded-lg p-4 space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-black text-white flex items-center gap-1.5">
-                        <Fish className="w-3.5 h-3.5 text-amber-400 shrink-0" /> {l.name}
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/40 text-emerald-300 font-mono text-[11px] font-bold uppercase tracking-wide"
+                  >
+                    <Fish className="w-3 h-3 text-emerald-400 shrink-0" />
+                    <span>{l.name}</span>
+                    {l.catches > 0 && (
+                      <span className="px-1.5 py-0.5 text-[9px] font-mono font-black uppercase rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shrink-0">
+                        {l.catches} catch{l.catches === 1 ? '' : 'es'}
                       </span>
-                      {l.catches > 0 && (
-                        <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shrink-0">
-                          {l.catches} catch{l.catches === 1 ? '' : 'es'}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] font-mono text-slate-400 leading-relaxed">{l.reason}</p>
-                  </div>
+                    )}
+                  </span>
                 ))}
               </div>
             )}
