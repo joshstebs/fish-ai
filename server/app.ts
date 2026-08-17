@@ -3,6 +3,7 @@ import cors from 'cors';
 import crypto from 'crypto';
 import { aiRouter } from './routes/aiRoutes.js';
 import { billingRouter, billingStripe, customerIsEntitled } from './routes/billingRoutes.js';
+import { mailRouter } from './routes/mailRoutes.js';
 
 // Shared Express app — used by:
 //  - server/server.ts (local dev: app.listen)
@@ -88,3 +89,6 @@ app.use('/api/ai', aiRouter);
 
 // Billing Routes (checkout / status / portal / webhook)
 app.use('/api/billing', billingRouter);
+
+// Mail Routes (Resend — test sender / future outreach + receipts)
+app.use('/api/mail', mailRouter);
