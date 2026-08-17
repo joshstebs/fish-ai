@@ -1,21 +1,13 @@
 import React, { useState } from 'react';
 import {
   GraduationCap,
-  Play,
-  CheckCircle2,
-  HelpCircle,
   Sparkles,
-  Layers,
-  ArrowRight,
-  Shield,
-  Zap,
   Anchor,
-  Compass,
-  Target,
   FileText,
   Video,
   Award,
 } from 'lucide-react';
+import { Fold } from './Fold';
 
 interface KnotGuide {
   id: string;
@@ -167,10 +159,10 @@ export const BeginnerGuideView: React.FC = () => {
             </span>
           </div>
           <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
-            🎓 Complete Beginner Fishing Guide & Masterclass
+            🎓 Beginner Fishing Guide
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Master essential knot tying, understand fishing line setups, choose the right rod & reel combo, explore top lures, and learn casting techniques.
+            Knots, lines, rods, lures, and casting. The essentials in one place.
           </p>
         </div>
       </div>
@@ -178,11 +170,11 @@ export const BeginnerGuideView: React.FC = () => {
       {/* Navigation Sub-Tabs */}
       <div className="flex flex-wrap items-center gap-2 bg-slate-900 p-2 border border-white/10 rounded-xl shadow-lg">
         {[
-          { id: 'KNOTS', label: '🪢 Essential Knots', desc: 'Tie Lures & Hooks' },
-          { id: 'LURES', label: '🎣 Lures & Baits', desc: 'Lure Selection' },
-          { id: 'LINES', label: '🧵 Line & Rigging', desc: 'Mono vs Fluoro vs Braid' },
-          { id: 'RODS', label: '🎣 Rods & Reels', desc: 'Spinning vs Baitcaster' },
-          { id: 'CASTING', label: '🎯 Casting Guide', desc: 'Overhead & Sidearm' },
+          { id: 'KNOTS', label: '🪢 Essential Knots' },
+          { id: 'LURES', label: '🎣 Lures & Baits' },
+          { id: 'LINES', label: '🧵 Line & Rigging' },
+          { id: 'RODS', label: '🎣 Rods & Reels' },
+          { id: 'CASTING', label: '🎯 Casting Guide' },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -336,12 +328,11 @@ export const BeginnerGuideView: React.FC = () => {
             ))}
           </div>
 
-          {/* Live Bait Overview */}
-          <div className="bg-slate-900 border border-white/10 p-6 rounded-xl space-y-4 shadow-xl">
-            <h3 className="text-base font-black text-white uppercase tracking-tight flex items-center gap-2">
-              <Anchor className="w-5 h-5 text-blue-400" /> Live & Natural Bait Breakdown
-            </h3>
-
+          {/* Live Bait Overview (collapsed by default to reduce scroll spam) */}
+          <Fold
+            title="Live & Natural Bait Breakdown"
+            icon={<Anchor className="w-5 h-5 text-blue-400" />}
+          >
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
               <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
                 <span className="font-bold text-amber-400 uppercase text-sm block">🪱 Nightcrawlers & Worms</span>
@@ -364,7 +355,7 @@ export const BeginnerGuideView: React.FC = () => {
                 </p>
               </div>
             </div>
-          </div>
+          </Fold>
         </div>
       )}
 

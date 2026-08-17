@@ -84,7 +84,7 @@ export function SettingsView() {
       </div>
 
       {/* Subscription Status */}
-      <div className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl space-y-4">
+      <div id="pricing" className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl space-y-4 scroll-mt-24">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
             <CreditCard className="w-5 h-5 text-emerald-400 shrink-0" />

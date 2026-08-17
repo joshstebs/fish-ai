@@ -76,6 +76,23 @@ button:hover:not(:disabled) {
   background: linear-gradient(180deg, #0d1b19 0%, #06100f 100%);
 }
 
+/* Collapsible fold panels (see src/components/Fold.tsx). Uses grid rows so
+   open/close animates without measuring content height in JS. */
+.fold-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 220ms ease;
+}
+
+.fold-panel > div {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.fold-panel-open {
+  grid-template-rows: 1fr;
+}
+
 /* Glow */
 .glow-emerald {
   box-shadow: 0 0 25px -5px rgba(24, 203, 180, 0.30);
