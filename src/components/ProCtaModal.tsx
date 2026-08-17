@@ -24,8 +24,8 @@ const FEATURES = [
 
 /**
  * ProCtaModal — PRO upgrade modal, faithful to Josh's design mockup
- * (dark card, emerald accent, "Upgrade to FishAI Pro", $9.99/mo or
- * $99.99/yr with annual emphasized, 4 green-check features, Upgrade Now +
+ * (dark card, emerald accent, "Upgrade to FishAI Pro", $7.99/mo with
+ * 7-day trial (matches live Stripe price), 4 green-check features, Upgrade Now +
  * Cancel). Reuses the existing billing utils only — no backend changes.
  * Invocation contract preserved from the merged estimator wiring
  * (onClose + onEntitled, no `open` prop).
@@ -124,12 +124,12 @@ export const ProCtaModal: React.FC<ProCtaModalProps> = ({ onClose, onEntitled })
           </p>
 
           <div className="mt-5 flex items-end gap-2">
-            <span className="text-3xl font-black font-mono text-white">$9.99</span>
+            <span className="text-3xl font-black font-mono text-white">$7.99</span>
             <span className="text-xs font-mono uppercase text-slate-400 pb-1">/month</span>
           </div>
-          <div className="mt-1 flex items-center gap-1.5">
-            <span className="text-emerald-400 font-black font-mono">$99.99</span>
-            <span className="text-xs font-mono uppercase text-slate-400">/year — save 17%</span>
+          <div className="mt-1 flex items-center gap-1.5 text-emerald-400 text-xs font-black uppercase tracking-wider">
+            <span>✓ 7-day free trial</span>
+            <span className="text-slate-500 font-mono normal-case">· cancel anytime</span>
           </div>
 
           <ul className="mt-5 space-y-2.5">
