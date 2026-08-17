@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { aiRouter } from './routes/aiRoutes.js';
 import { billingRouter, billingStripe, customerIsEntitled } from './routes/billingRoutes.js';
 import { mailRouter } from './routes/mailRoutes.js';
+import { rateLimit, rateLimitHeaders } from './utils/rateLimit.js';
 
 // Shared Express app — used by:
 //  - server/server.ts (local dev: app.listen)
