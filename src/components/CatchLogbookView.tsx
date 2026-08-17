@@ -20,6 +20,8 @@ import {
   X,
   Loader2,
   Fish,
+  Share2,
+  Check,
 } from 'lucide-react';
 
 interface CatchLogbookViewProps {
@@ -58,6 +60,7 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpeciesFilter, setSelectedSpeciesFilter] = useState('ALL');
   const [isQuickLogOpen, setIsQuickLogOpen] = useState(false);
+  const [copiedShareId, setCopiedShareId] = useState<string | null>(null);
 
   // Quick log form state
   const [qSpecies, setQSpecies] = useState('');
@@ -77,6 +80,32 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
   const [qTemp, setQTemp] = useState('');
   const [qCondition, setQCondition] = useState('');
   const [qSaveMsg, setQSaveMsg] = useState<string | null>(null);
+
+  /** Share a catch: native share sheet where available, clipboard fallback. */
+  const handleShareCatch = async (item: CatchLogItem) => {
+    const parts = [`🐟 ${item.species}`];
+    if (item.estimatedWeight && item.estimatedWeight !== 'Not weighed') parts.push(item.estimatedWeight);
+    if (item.estimatedLength && item.estimatedLength !== 'Not measured') parts.push(item.estimatedLength);
+    if (item.locationName) parts.push(`at ${item.locationName}`);
+    if (item.formattedDate) parts.push(item.formattedDate);
+    parts.push('Logged with FishAI — fishai.shop');
+    const text = parts.join(' · ');
+    try {
+      if (navigator.share) {
+        await navigator.share({ text });
+        return;
+      }
+      throw new Error('no-share-api');
+    } catch {
+      try {
+        await navigator.clipboard.writeText(text);
+        setCopiedShareId(item.id);
+        window.setTimeout(() => setCopiedShareId((cur) => (cur === item.id ? null : cur)), 1600);
+      } catch {
+        /* clipboard unavailable — silently ignore */
+      }
+    }
+  };
 
   // Unique species list for filter dropdown
   const speciesList = Array.from(new Set(catches.map((c) => c.commonName || c.species)));
@@ -409,6 +438,17 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
                             className="w-11 h-11 object-cover rounded-lg border border-slate-800"
                           />
                         )}
+                        <button
+                          onClick={() => handleShareCatch(item)}
+                          title="Share this catch"
+                          className="p-2 text-slate-500 hover:text-cyan-400 bg-slate-950 hover:bg-cyan-500/10 rounded-lg border border-slate-800 transition-all"
+                        >
+                          {copiedShareId === item.id ? (
+                            <Check className="w-4 h-4 text-emerald-400" />
+                          ) : (
+                            <Share2 className="w-4 h-4" />
+                          )}
+                        </button>
                         <button
                           onClick={() => onDeleteCatch(item.id)}
                           title="Delete Catch Entry"
