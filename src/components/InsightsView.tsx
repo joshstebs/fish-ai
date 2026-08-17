@@ -48,18 +48,17 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
         <div>
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="px-3 py-1 bg-cyan-600 text-white font-black text-xs uppercase tracking-widest rounded inline-flex items-center gap-1.5">
-              <Brain className="w-3.5 h-3.5" /> FishAI Insights Engine
+              <Brain className="w-3.5 h-3.5" /> Insights
             </span>
             <span className="text-xs font-mono text-emerald-400 font-bold uppercase flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" /> Learning From Your Log
+              <Sparkles className="w-3.5 h-3.5" /> Pattern AI
             </span>
           </div>
           <h2 className="font-display text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
-            🧠 Your Personal Fishing Intelligence
+            Your Fishing Intelligence
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            FishAI studies every catch YOU log — hours, lures, spots, and conditions — to learn the
-            patterns that actually work for your water.
+            Every catch teaches FishAI your patterns — best hours, lures, and spots.
           </p>
         </div>
 
@@ -81,11 +80,10 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
         <div className="bg-slate-900 border border-white/10 rounded-xl p-12 text-center space-y-4 shadow-xl">
           <Brain className="w-12 h-12 text-slate-600 mx-auto" />
           <h3 className="text-base font-black uppercase tracking-wider text-white">
-            No Patterns Yet — Log Your First Catch
+            No Patterns Yet
           </h3>
           <p className="text-slate-400 text-xs max-w-md mx-auto">
-            Log your first catch and FishAI starts learning your patterns — best hours, top lures,
-            productive spots, and personal bests. Insights improve with every catch you log.
+            Log a catch to start learning your patterns — best hours, top lures, and spots.
           </p>
         </div>
       ) : (

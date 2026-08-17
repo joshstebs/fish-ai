@@ -106,7 +106,7 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ catches, spots }) 
       id: nextId(),
       role: 'assistant',
       text:
-        "Hey! I'm your personal fishing assistant. I use **your** catch history, your saved spots, live weather, and solunar data — no generic advice unless you haven't logged enough yet.\n\nTry asking me where to fish, what lure to throw, when to go, or how today looks.",
+        "Hey! I use **your** catch history, spots, live weather & solunar data.\n\nAsk me where to fish, what to throw, when to go, or how today looks.",
       timestamp: new Date().toISOString(),
     },
   ]);
@@ -200,23 +200,23 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ catches, spots }) 
       <div className="bg-slate-900 border-l-4 border-emerald-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl">
         <div className="flex items-center gap-2 mb-1">
           <span className="px-3 py-1 bg-emerald-600 text-white font-black text-xs uppercase tracking-widest rounded">
-            FishAI Assistant
+            Fishing Assistant
           </span>
           <span className="text-xs font-mono text-cyan-400 font-bold uppercase flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5" /> Offline Intelligence Engine
+            <Sparkles className="w-3.5 h-3.5" /> Offline AI
           </span>
         </div>
         <h2 className="font-display text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
-          <Bot className="w-6 h-6 text-emerald-400" /> Your Personal Fishing Assistant
+          <Bot className="w-6 h-6 text-emerald-400" /> Fishing Assistant
         </h2>
         <p className="text-slate-400 text-sm mt-1">
-          Ask about where to fish, what to throw, when to go, or how today looks — answered from your own data.
+          Ask about spots, lures, timing, or conditions — from your data.
         </p>
         {/* Honest data-source label */}
         <div className="mt-3 flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-slate-500 border-t border-slate-800 pt-3">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
           <span>
-            Answers use your catch history, saved spots, live weather &amp; solunar data — offline, no fake data.
+            Your data only — no fake answers, ever.
           </span>
         </div>
       </div>
@@ -303,7 +303,7 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ catches, spots }) 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="ASK ABOUT SPOTS, LURES, TIMING, CONDITIONS..."
+            placeholder="ASK ABOUT SPOTS, LURES, TIMING..."
             className="flex-1 bg-slate-950 border border-slate-800 text-white text-xs font-bold uppercase tracking-wider pl-4 pr-3 py-3 rounded-lg focus:outline-none focus:border-emerald-500 font-mono placeholder:text-slate-600"
           />
           <button

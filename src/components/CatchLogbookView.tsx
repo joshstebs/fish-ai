@@ -250,17 +250,17 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-3 py-1 bg-blue-600 text-white font-black text-xs uppercase tracking-widest rounded">
-              FishAI Angler Logbook
+              Catch Logbook
             </span>
             <span className="text-xs font-mono text-cyan-400 font-bold uppercase flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" /> Pattern & Spot History Active
+              <Sparkles className="w-3.5 h-3.5" /> Pattern Tracking
             </span>
           </div>
           <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
-            📖 Personal Catch Logbook & Spot Analytics
+            Your Catch Logbook
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Record identified catches, track weather conditions, analyze bait productivity, and log successful fishing spots over time.
+            Every catch you log sharpens your insights.
           </p>
         </div>
 
@@ -279,7 +279,7 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
             className="px-3.5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-black uppercase text-xs tracking-wider rounded-lg shadow-lg flex items-center gap-2 transition-all"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Quick Log Catch</span>
+            <span>Quick Log</span>
           </button>
 
           <button
@@ -287,7 +287,7 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
             className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black uppercase text-xs tracking-wider rounded-lg shadow-lg flex items-center gap-2 transition-all"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Identify & Log New Catch</span>
+            <span>AI Identify</span>
           </button>
         </div>
       </div>
@@ -329,7 +329,7 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="SEARCH SPECIES, SPOT, BAIT, OR NOTES..."
+            placeholder="SEARCH CATCHES..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-slate-950 border border-slate-800 text-white text-xs font-bold uppercase tracking-wider pl-9 pr-3 py-2 rounded-lg focus:outline-none focus:border-blue-500 font-mono"
@@ -358,12 +358,12 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
         <div className="bg-slate-900 border border-white/10 rounded-xl p-12 text-center space-y-4 shadow-xl">
           <BookOpen className="w-12 h-12 text-slate-600 mx-auto" />
           <h3 className="text-base font-black uppercase tracking-wider text-white">
-            No Catch Records Found
+            No Catches Yet
           </h3>
           <p className="text-slate-400 text-xs max-w-md mx-auto">
             {catches.length === 0
-              ? 'Your catch logbook is currently empty. Log your first catch — the FishAI Vision Estimator (photo ID) or Quick Log (fast manual entry) both work.'
-              : 'No catch entries match your search or filter query.'}
+              ? 'Log your first catch with AI photo ID or quick manual entry.'
+              : 'No catches match your search.'}
           </p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
             <button
@@ -371,14 +371,14 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
               className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-wider rounded-lg transition-all shadow-md inline-flex items-center gap-2"
             >
               <PlusCircle className="w-4 h-4" />
-              <span>Open FishAI Vision Estimator</span>
+              <span>AI Photo ID</span>
             </button>
             <button
               onClick={() => setIsQuickLogOpen(true)}
               className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-black text-xs uppercase tracking-wider rounded-lg transition-all shadow-md inline-flex items-center gap-2"
             >
               <PlusCircle className="w-4 h-4" />
-              <span>Quick Log a Catch</span>
+              <span>Quick Log</span>
             </button>
           </div>
         </div>
@@ -537,7 +537,7 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
           <div className="bg-slate-900 border border-white/10 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-4 my-8">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
-                <PlusCircle className="w-5 h-5 text-cyan-400" /> Quick Log Catch
+                <PlusCircle className="w-5 h-5 text-cyan-400" /> Quick Log
               </h3>
               <button
                 onClick={() => setIsQuickLogOpen(false)}

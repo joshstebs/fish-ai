@@ -69,17 +69,17 @@ export function SettingsView() {
       <div className="bg-slate-900 border-l-4 border-sky-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl">
         <div className="flex items-center gap-2 mb-1">
           <span className="px-3 py-1 bg-sky-600 text-white font-black text-xs uppercase tracking-widest rounded">
-            FishAI Settings
+            Settings
           </span>
           <span className="text-xs font-mono text-cyan-400 font-bold uppercase flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5" /> Account & Subscription
+            <ShieldCheck className="w-3.5 h-3.5" /> Subscription
           </span>
         </div>
         <h2 className="font-display text-2xl font-black uppercase text-white tracking-tight flex items-center gap-2">
           <Settings className="w-6 h-6 text-sky-400" /> Your Plan & Device
         </h2>
         <p className="text-slate-400 text-sm mt-1">
-          Manage your FishAI Premium subscription — billing is handled securely by Stripe.
+          Manage your subscription — billing by Stripe.
         </p>
       </div>
 
@@ -125,7 +125,7 @@ export function SettingsView() {
               {busy ? 'Opening...' : 'Manage Subscription'}
             </button>
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-              Cancel, update payment method, or view invoices
+              Cancel, update payment, or view invoices
             </span>
           </div>
         )}
@@ -176,8 +176,7 @@ export function SettingsView() {
           {email ? email : 'No email set yet — start a free trial to link one.'}
         </p>
         <p className="text-[10px] font-mono text-slate-500">
-          Your subscription is tied to this device via Stripe. Clearing browser data
-          will remove it — use Manage Subscription first if you switch devices.
+          Tied to this device via Stripe. Manage Subscription before switching devices.
         </p>
       </div>
     </div>
