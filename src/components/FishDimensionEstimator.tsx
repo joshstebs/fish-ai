@@ -25,6 +25,7 @@ import {
   CreditCard,
 } from 'lucide-react';
 import { CatchLogItem } from '../types/catchLogTypes';
+import { ProCtaModal } from './ProCtaModal';
 import { getAppSecret, setAppSecret } from '../utils/apiAuth';
 import { SAMPLE_FISH_PHOTOS } from '../utils/samplePhotos';
 import {
@@ -612,48 +613,15 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
           )}
 
           {needsBilling && !billing?.entitled && (
-            <div className="bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl border-y border-r border-white/10 shadow-2xl space-y-4">
-              <div className="flex items-center gap-3">
-                <CreditCard className="w-5 h-5 text-emerald-400 shrink-0" />
-                <div>
-                  <h3 className="text-sm font-black uppercase tracking-wider text-white">
-                    {getCustomerId() ? 'Your Trial Has Ended' : 'Try FishAI Free for 7 Days'}
-                  </h3>
-                  <p className="text-slate-400 text-xs font-mono mt-0.5">
-                    {getCustomerId()
-                      ? 'Resubscribe to unlock AI analysis.'
-                      : '7-day free trial · $7.99/mo · Cancel anytime'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  value={billingEmail}
-                  onChange={(e) => setBillingEmail(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') handleStartTrial(); }}
-                  placeholder="you@email.com"
-                  className="flex-1 bg-slate-950 border border-slate-800 text-white text-xs font-bold uppercase tracking-wider font-mono rounded-lg px-3 py-2.5 focus:border-emerald-500 outline-none"
-                />
-                <button
-                  onClick={handleStartTrial}
-                  disabled={billingBusy}
-                  className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black uppercase text-xs tracking-wider rounded-lg transition-all active:scale-95 disabled:opacity-50"
-                >
-                  {billingBusy ? 'Opening...' : getCustomerId() ? 'Subscribe $7.99/mo' : 'Start Free Trial'}
-                </button>
-              </div>
-              {getCustomerId() && (
-                <button
-                  onClick={handleManageBilling}
-                  disabled={billingBusy}
-                  className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-400 transition-colors"
-                >
-                  Manage subscription
-                </button>
-              )}
-            </div>
-          )}
+                      <ProCtaModal
+                        onClose={() => setNeedsBilling(false)}
+                        onEntitled={(status) => {
+                          setBilling(status);
+                          setNeedsBilling(false);
+                          setBillingMsg('Your free trial is active — AI analysis is unlocked.');
+                        }}
+                      />
+                    )}
 
           {billing?.entitled && (
             <div className="flex items-center justify-between bg-emerald-950/30 border border-emerald-500/20 p-3 rounded-xl">
