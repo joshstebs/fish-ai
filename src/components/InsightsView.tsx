@@ -223,13 +223,11 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
       .filter((x): x is { c: CatchLogItem; len: number } => x.len !== null)
       .sort((a, b) => b.len - a.len)[0] ?? null;
 
-  // Bite Confidence Over Time — real per-day catch counts ([] when no usable dates)
   const daySeries = buildPerDaySeries(catches);
   const peakDayCount = daySeries.reduce((m, d) => Math.max(m, d.count), 0);
 
   return (
     <div className="space-y-6 font-sans text-slate-900">
-      {/* Hero Header Banner */}
       <div className="bg-slate-900 border-l-4 border-violet-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -391,7 +389,6 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
           </section>
 
           {/* Bite Confidence Over Time — real per-day catch counts, honest empty state */}
-          <section className="space-y-3">
             <div className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-0.5 min-w-0">
@@ -434,7 +431,6 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
           </section>
 
           {/* Patterns Found */}
-          <div className="bg-slate-900 border border-white/10 rounded-xl p-6 shadow-xl space-y-4">
             <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2">
               <Target className="w-4 h-4 text-cyan-400" /> Patterns Found
             </h3>
