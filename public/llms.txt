@@ -1,0 +1,3 @@
+fishAI is a personal fishing intelligence app.
+Core features: AI fish ID, logbook, insights, spot map, solunar, pressure, tackle assistant, academy.
+Differentiator: real weather + solunar math + private logbook + assistant that answers from your own catches.
