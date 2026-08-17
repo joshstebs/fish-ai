@@ -411,7 +411,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
           <div className="bg-slate-900 border border-white/10 p-5 rounded-xl space-y-4 shadow-xl">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                <Camera className="w-4 h-4 text-emerald-400" /> Photo & Ruler Calibration
+                <Camera className="w-4 h-4 text-emerald-400" /> Photo & Ruler
               </span>
               <button
                 onClick={() => setIsOverlayActive(!isOverlayActive)}
@@ -496,7 +496,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
             {/* Preset Samples Selector */}
             <div className="space-y-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-                Or Try Demo Sample Photos (upload a real catch for actual analysis):
+                Try a demo:
               </span>
               <div className="grid grid-cols-3 gap-2">
                 {SAMPLE_FISH_PHOTOS.map((sample, idx) => (
@@ -530,7 +530,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
             {/* Reference Scale Landmark Hint Input */}
             <div className="space-y-1.5 pt-2 border-t border-slate-800">
               <label className="text-[11px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                <Ruler className="w-3.5 h-3.5 text-blue-400" /> Spatial Calibration Landmark Hint:
+                <Ruler className="w-3.5 h-3.5 text-blue-400" /> Reference Object:
               </label>
               <input
                 type="text"
@@ -545,7 +545,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
             <div className="flex gap-2">
               <label className="flex-1 py-2.5 bg-slate-950 hover:bg-slate-800 text-slate-300 font-bold text-xs uppercase tracking-wider rounded-lg border border-slate-800 text-center cursor-pointer transition-all flex items-center justify-center gap-2">
                 <Upload className="w-4 h-4 text-emerald-400" />
-                <span>Upload Custom Photo</span>
+                <span>Upload Photo</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -564,12 +564,12 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
               {isLoading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
-                  <span>Processing Computer Vision...</span>
+                  <span>Analyzing...</span>
                 </>
               ) : (
                 <>
                   <Eye className="w-4 h-4 text-slate-950" />
-                  <span>Estimate Physical Dimensions</span>
+                  <span>Analyze Catch</span>
                 </>
               )}
             </button>
@@ -621,8 +621,8 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                   </h3>
                   <p className="text-slate-400 text-xs font-mono mt-0.5">
                     {getCustomerId()
-                      ? 'Subscribe to unlock AI fish analysis.'
-                      : 'AI-powered fish identification & dimension estimates. $7.99/mo after the trial. Cancel anytime.'}
+                      ? 'Resubscribe to unlock AI analysis.'
+                      : '7-day free trial · $7.99/mo · Cancel anytime'}
                   </p>
                 </div>
               </div>
@@ -678,6 +678,52 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
             </div>
           )}
 
+          {/* PRO Trial CTA — visible pre-sign-in, the #1 conversion lever */}
+          {!billing?.entitled && !needsBilling && !needsAuth && !result && !isLoading && (
+            <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/30 border border-emerald-500/30 rounded-xl p-5 shadow-2xl space-y-4 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-teal-500/5 pointer-events-none" />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-display font-black uppercase text-white tracking-tight">
+                      AI Fish Identification
+                    </h3>
+                    <p className="text-[11px] text-emerald-400 font-bold uppercase tracking-wider">
+                      PRO Feature
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-xs text-slate-300">
+                    <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>Species ID with confidence score</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-300">
+                    <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>Length & weight estimates from your photo</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-300">
+                    <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>Local harvest rules & tackle recommendations</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setNeedsBilling(true)}
+                  className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black uppercase text-xs tracking-wider rounded-lg shadow-xl flex items-center justify-center gap-2 transition-all active:scale-95"
+                >
+                  <Zap className="w-4 h-4" />
+                  Try PRO Free 7 Days
+                </button>
+                <p className="text-center text-[10px] text-slate-500 mt-2 font-mono">
+                  Then $7.99/mo · Cancel anytime
+                </p>
+              </div>
+            </div>
+          )}
+
           {error && (
             <div className="bg-red-950/40 border border-red-500/30 p-4 rounded-xl text-red-300 text-xs font-mono flex items-center gap-3">
               <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" />
@@ -689,10 +735,10 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
             <div className="bg-slate-900 border border-white/10 rounded-xl p-12 text-center space-y-4 shadow-xl">
               <Eye className="w-12 h-12 text-slate-600 mx-auto animate-pulse" />
               <h3 className="text-base font-black uppercase tracking-wider text-white">
-                Awaiting Fish Photo Analysis
+                Ready to Analyze
               </h3>
               <p className="text-slate-400 text-xs max-w-md mx-auto font-mono">
-                Click "Estimate Physical Dimensions" to calculate length, weight, scale calibration, and recommended tackle.
+                Upload a catch photo or try a demo — get species ID, size estimate, and harvest rules.
               </p>
             </div>
           )}
@@ -701,10 +747,10 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
             <div className="bg-slate-900 border border-emerald-500/30 rounded-xl p-12 text-center space-y-4 shadow-2xl">
               <Sparkles className="w-10 h-10 text-emerald-400 mx-auto animate-spin" />
               <h3 className="text-base font-black uppercase tracking-wider text-emerald-400">
-                Gemini Multi-Modal Vision Analysis...
+                Analyzing Your Catch...
               </h3>
               <p className="text-slate-400 text-xs max-w-md mx-auto font-mono">
-                Scanning spatial landmarks • Calculating pixel-to-length scale factor • Querying harvest rules...
+                Identifying species • Estimating dimensions • Checking harvest rules...
               </p>
             </div>
           )}
@@ -715,7 +761,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
               <div className="bg-slate-900 border border-white/10 rounded-xl shadow-xl overflow-hidden">
                 <div className="p-6 space-y-2">
                   <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" /> Identified Species
+                    <Sparkles className="w-3.5 h-3.5" /> Species
                   </span>
                   <h3 className="text-2xl sm:text-3xl font-display font-black uppercase text-white tracking-tight leading-tight">
                     {result.commonName || result.species}
@@ -870,7 +916,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                     <div className="flex items-center gap-2">
                       <Crosshair className="w-4 h-4 text-emerald-400" />
                       <h4 className="text-sm font-black uppercase tracking-wider text-white">
-                        Scale Reference Detection
+                        Scale Reference
                       </h4>
                     </div>
                     <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider border ${
@@ -901,7 +947,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                   <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
                     <Eye className="w-4 h-4 text-emerald-400" />
                     <h4 className="text-sm font-black uppercase tracking-wider text-white">
-                      Key Identification Characteristics
+                      Key Features
                     </h4>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -923,7 +969,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                   <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
                     <ShieldCheck className="w-5 h-5 text-amber-400" />
                     <h4 className="text-sm font-black uppercase tracking-wider text-white">
-                      Regional Fishing Rules & Legal Harvest Regulations
+                      Harvest Rules
                     </h4>
                   </div>
 
@@ -964,7 +1010,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                   <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
                     <Target className="w-5 h-5 text-emerald-400" />
                     <h4 className="text-sm font-black uppercase tracking-wider text-white">
-                      Recommended Tackle & Presentation
+                      Tackle & Presentation
                     </h4>
                   </div>
 
@@ -1033,7 +1079,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
           <div className="bg-slate-900 border border-white/10 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-5">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
-                <Bookmark className="w-5 h-5 text-emerald-400" /> Save Catch to Personal Logbook
+                <Bookmark className="w-5 h-5 text-emerald-400" /> Save to Logbook
               </h3>
               <button
                 onClick={() => setIsLogModalOpen(false)}
@@ -1052,13 +1098,13 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
               <div className="text-xs font-mono space-y-0.5">
                 <div className="font-bold text-white uppercase">{result.species}</div>
                 <div className="text-emerald-400 font-bold">{result.estimatedLength.formatted} • ~{result.estimatedWeight.averageLbs} lbs</div>
-                <div className="text-slate-500 text-[10px]">Weather is not auto-filled — add conditions when you log the catch.</div>
+                <div className="text-slate-500 text-[10px]">Add conditions from the Logbook after saving.</div>
               </div>
             </div>
 
             <div className="space-y-3 font-sans text-xs">
               <div className="space-y-1">
-                <label className="font-bold uppercase text-slate-400">Fishing Spot Name:</label>
+                <label className="font-bold uppercase text-slate-400">Spot</label>
                 <input
                   type="text"
                   value={locationName}
@@ -1069,7 +1115,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold uppercase text-slate-400">Bait / Lure Used:</label>
+                <label className="font-bold uppercase text-slate-400">Bait / Lure</label>
                 <input
                   type="text"
                   value={baitUsed}
@@ -1080,20 +1126,20 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold uppercase text-slate-400">Water Clarity:</label>
+                <label className="font-bold uppercase text-slate-400">Clarity</label>
                 <select
                   value={waterClarity}
                   onChange={(e) => setWaterClarity(e.target.value as any)}
                   className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-white font-mono focus:outline-none"
                 >
-                  <option value="CLEAR">Clear Water (High Visibility)</option>
-                  <option value="STAINED">Stained / Murky Water</option>
-                  <option value="MUDDY">Muddy / Low Visibility</option>
+                  <option value="CLEAR">Clear</option>
+                  <option value="STAINED">Stained</option>
+                  <option value="MUDDY">Muddy</option>
                 </select>
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold uppercase text-slate-400">Notes & Technique:</label>
+                <label className="font-bold uppercase text-slate-400">Notes</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}

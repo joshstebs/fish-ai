@@ -134,17 +134,17 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-3 py-1 bg-cyan-600 text-slate-950 font-black text-xs uppercase tracking-widest rounded">
-              FishAI Spot Tracker & Map
+              Spot Tracker
             </span>
             <span className="text-xs font-mono text-emerald-400 font-bold uppercase flex items-center gap-1">
-              <Compass className="w-3.5 h-3.5" /> GPS Coordinates & Depth Active
+              <Compass className="w-3.5 h-3.5" /> GPS Active
             </span>
           </div>
           <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
-            🗺️ Interactive Fishing Location & Spot Intelligence
+            Your Fishing Spots
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Visualize your top productive fishing spots, review historical catch patterns per water body, track water clarity, and tag new GPS hotspots.
+            Your spots, your data — tag GPS hotspots and track catch patterns.
           </p>
         </div>
 
@@ -153,7 +153,7 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
           className="px-4 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black uppercase text-xs tracking-wider rounded-lg shadow-lg flex items-center gap-2 transition-all shrink-0"
         >
           <PlusCircle className="w-4 h-4" />
-          <span>Add New Fishing Spot</span>
+          <span>Add Spot</span>
         </button>
       </div>
 
@@ -167,10 +167,10 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
             </div>
             <div className="min-w-0">
               <h3 className="text-sm font-black uppercase text-white tracking-tight">
-                100% Private. You Own Your Data.
+                100% Private. Your Data.
               </h3>
               <p className="text-slate-400 text-sm mt-1">
-                Private location intelligence built from your fishing history. We don't sell your data. Ever.
+                Your spots stay on your device. We never sell your data.
               </p>
             </div>
           </div>

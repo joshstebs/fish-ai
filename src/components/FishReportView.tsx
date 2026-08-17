@@ -103,7 +103,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
     const w = await fetchLiveWeather(c.latitude, c.longitude);
     setWeather(w);
     if (!w) {
-      setWeatherError('Live weather service unreachable. Check your connection and refresh.');
+      setWeatherError('Weather service unreachable — check your connection.');
     }
     setWeatherLoading(false);
   }, [spots]);
@@ -178,17 +178,17 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-3 py-1 bg-cyan-600 text-slate-950 font-black text-xs uppercase tracking-widest rounded">
-              FishAI Conditions Engine
+              Live Conditions
             </span>
             <span className="text-xs font-mono text-emerald-400 font-bold uppercase flex items-center gap-1">
-              <Gauge className="w-3.5 h-3.5" /> Live Weather Powered
+              <Gauge className="w-3.5 h-3.5" /> Live Data
             </span>
           </div>
           <h2 className="text-3xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
             Daily <span className="text-emerald-400">Fish Report</span>
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            A personalized bite score for your target species from real weather, solunar math, and your catch history.
+            Your bite score from live weather, solunar math, and catch history.
           </p>
         </div>
         <button
@@ -240,7 +240,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
           <div className="space-y-2">
             <p className="font-bold">{weatherError || 'Live weather unavailable.'}</p>
             <p className="text-amber-300/70">
-              The score below uses solunar math and your catch history only — no fake weather is shown. Try refreshing, or check your connection.
+              Score uses solunar math and history only — no fake weather shown.
             </p>
             <button
               onClick={handleRefresh}
@@ -284,13 +284,10 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
         <div className="bg-slate-900 border border-white/10 rounded-xl p-12 text-center space-y-4 shadow-xl">
           <MapPin className="w-12 h-12 text-slate-600 mx-auto" />
           <h3 className="text-base font-black uppercase tracking-wider text-white">
-            Location Needed for Your Report
+            Location Needed
           </h3>
           <p className="text-slate-400 text-xs max-w-md mx-auto">
-            Add a fishing spot with coordinates in your Spot Tracker, or allow browser
-            location access, to get your personalized conditions report. Without a
-            location there's no honest way to compute sun times, solunar windows, or
-            live weather for you.
+            Add a spot with coordinates or allow browser location to get your report.
           </p>
         </div>
       ) : report ? (
@@ -544,7 +541,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
             Report Unavailable
           </h3>
           <p className="text-slate-400 text-xs max-w-md mx-auto">
-            Something went wrong building today's report. Try refreshing.
+            Something went wrong — try refreshing.
           </p>
           <button
             onClick={handleRefresh}
