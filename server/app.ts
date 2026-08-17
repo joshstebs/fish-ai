@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { aiRouter } from './routes/aiRoutes.js';
 import { billingRouter, billingStripe, customerIsEntitled } from './routes/billingRoutes.js';
 import { mailRouter } from './routes/mailRoutes.js';
+import { rateLimit, rateLimitHeaders } from './utils/rateLimit.js';
 
 // Shared Express app — used by:
 //  - server/server.ts (local dev: app.listen)
@@ -29,6 +30,14 @@ app.get('/api/health', (req, res) => {
 // Owner sign-in — verify the app password (timing-safe). Public endpoint:
 // it exists so the app can validate a password BEFORE storing it locally.
 app.post('/api/auth/owner-verify', (req, res) => {
+  const ip = req.get('x-forwarded-for')?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+  const rlKey = `owner-verify:${ip}`;
+  const rl = rateLimit(rlKey, 20, 60_000);
+  if (!rl.ok) {
+    res.setHeader('Retry-After', String(Math.ceil(rl.retryAfterMs / 1000)));
+    return res.status(429).json({ error: 'Too many attempts.', ...rateLimitHeaders(rl) });
+  }
+  res.setHeader('X-RateLimit-Remaining', String(rl.remaining));
   if (!appSecret) {
     return res.status(503).json({
       error: 'API auth is not configured — set FISH_APP_SECRET in the server environment.',
@@ -57,6 +66,13 @@ app.post('/api/auth/owner-verify', (req, res) => {
 // works (pre-launch behavior).
 const appSecret = process.env.FISH_APP_SECRET || '';
 app.use('/api/ai', async (req, res, next) => {
+  const ip = req.get('x-forwarded-for')?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+  const rl = rateLimit(`ai:${ip}`, 10, 60_000);
+  if (!rl.ok) {
+    res.setHeader('Retry-After', String(Math.ceil(rl.retryAfterMs / 1000)));
+    return res.status(429).json({ error: 'Rate limit reached.', ...rateLimitHeaders(rl) });
+  }
+  res.setHeader('X-RateLimit-Remaining', String(rl.remaining));
   if (!appSecret) {
     return res.status(503).json({
       error: 'API auth is not configured — set FISH_APP_SECRET in the server environment.',

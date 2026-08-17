@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { GoogleGenAI } from '@google/genai';
+import { fetchWithTimeout, withTimeout } from '../utils/timeoutFetch.js';
+import { rateLimit, rateLimitHeaders, pruneRateLimit } from '../utils/rateLimit.js';
 
 export const aiRouter = Router();
 
@@ -53,7 +55,7 @@ async function openAiVisionCall(
   mimeType: string,
   extra: Record<string, unknown> = {},
 ): Promise<unknown> {
-  const res = await fetch(`${baseUrl}/chat/completions`, {
+  const res = await fetchWithTimeout(`${baseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -154,19 +156,22 @@ RULES:
   // --- Tier 1: Gemini (rotates key1 -> key2) ------------------------------
   for (const client of geminiClients) {
     try {
-      const response = await client.models.generateContent({
-        model: MODEL,
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              { text: prompt },
-              { inlineData: { mimeType, data: cleanBase64 } },
-            ],
-          },
-        ],
-        config: { responseMimeType: 'application/json', temperature: 0.2 },
-      });
+      const response = await withTimeout(
+        client.models.generateContent({
+          model: MODEL,
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                { text: prompt },
+                { inlineData: { mimeType, data: cleanBase64 } },
+              ],
+            },
+          ],
+          config: { responseMimeType: 'application/json', temperature: 0.2 },
+        }),
+        12_000
+      );
       const parsed = extractJson(response.text || '');
       return res.json(parsed);
     } catch (err: any) {
