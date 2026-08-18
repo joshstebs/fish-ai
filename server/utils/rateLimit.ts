@@ -27,9 +27,9 @@ export function rateLimit(key: string, limit: number, windowMs: number): { ok: b
   b.hits = b.hits.filter(t => t > now - windowMs);
   b.hits.push(now);
   buckets.set(key, b);
-  const remaining = Math.max(0, limit - b.hits.length);
-  const retryAfterMs = b.resetAt - now;
-  return { ok: remaining > 0, remaining, retryAfterMs };
+  // allow exactly `limit` requests per window; reject the one after
+  const over = b.hits.length > limit;
+  return { ok: !over, remaining: Math.max(0, limit - b.hits.length), retryAfterMs: b.resetAt - now };
 }
 
 export function rateLimitHeaders(lim: { remaining: number; retryAfterMs: number }): Record<string, string> {

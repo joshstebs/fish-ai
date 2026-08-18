@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { Resend } from 'resend';
+import { rateLimit, rateLimitHeaders } from '../utils/rateLimit.js';
 
 // Email routes — Resend with the key from environment (never hardcoded).
 // Key lives in server/.env as RESEND_API_KEY (or sourced from ~/.resend_key on dev box).
@@ -14,7 +15,16 @@ const TO = process.env.RESEND_TO || 'josh.stebs@gmail.com';
 
 // POST /api/mail/test — sends a hello-world to confirm the key works end to end.
 // Body optional: { to?, subject?, html? } overrides.
-mailRouter.post('/test', async (req, res) => {
+// Rate-limited: 5 sends/min per IP (spam guard on the free Resend tier).
+mailRouter.post('/test', (req, res, next) => {
+  const ip = (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+  const lim = rateLimit(`mail:${ip}`, 5, 60_000);
+  for (const [k, v] of Object.entries(rateLimitHeaders(lim))) res.setHeader(k, v);
+  if (!lim.ok) {
+    return res.status(429).json({ error: 'Too many emails — wait a minute.', retryAfterSeconds: Math.ceil(lim.retryAfterMs / 1000) });
+  }
+  next();
+}, async (req, res) => {
   if (!resend) {
     return res.status(503).json({ ok: false, error: 'RESEND_API_KEY not set in server/.env' });
   }
