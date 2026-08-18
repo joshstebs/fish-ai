@@ -116,6 +116,32 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
     setRefreshKey((k) => k + 1);
   }, []);
 
+  // Inline recovery from the "Location Needed" state: re-prompt browser geolocation
+  // directly from the report so a new user can unblock without leaving the screen.
+  const [locating, setLocating] = useState(false);
+  const handleLocate = useCallback(async () => {
+    if (!('geolocation' in navigator)) {
+      alert("Location isn't available in this browser. Try adding a fishing spot with coordinates in your Spot Tracker instead.");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+        setLocating(false);
+      },
+      (err) => {
+        setLocating(false);
+        if (err?.code === 1 /* permission denied */) {
+          alert("Location permission denied. You can still add a fishing spot with coordinates in your Spot Tracker to get a personalized report.");
+        } else {
+          alert("Couldn't get your location. Add a fishing spot with coordinates in your Spot Tracker to get a personalized report.");
+        }
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  }, []);
+
   // Resolved coordinates: the geolocation/spot resolution result, or a direct
   // fallback to the first spot that has coordinates.
   const effectiveCoords = useMemo(() => {
@@ -292,6 +318,14 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
             location there's no honest way to compute sun times, solunar windows, or
             live weather for you.
           </p>
+          <button
+            onClick={handleLocate}
+            disabled={locating}
+            className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 mx-auto shadow-lg hover:from-emerald-400 hover:to-teal-400 transition-all disabled:opacity-60"
+          >
+            <MapPin className="w-4 h-4" />
+            {locating ? 'Locating…' : 'Use My Location'}
+          </button>
         </div>
       ) : report ? (
         <>
