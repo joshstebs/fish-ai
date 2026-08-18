@@ -29,7 +29,7 @@ import {
   ReportFactor,
 } from '../types/catchLogTypes';
 import { buildFishReport, recommendLures, suggestTargetSpecies } from '../utils/report';
-import { fetchLiveWeather, resolveWeatherCoords } from '../utils/weather';
+import { fetchLiveWeather, resolveWeatherCoords, getUserLocation } from '../utils/weather';
 import { formatTime, getMoonInfo, getSolunarPeriods, getSunTimes } from '../utils/solunar';
 import { speciesOf } from '../utils/insights';
 import { Fold } from './Fold';
