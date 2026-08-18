@@ -5,7 +5,6 @@ import { aiRouter } from './routes/aiRoutes.js';
 import { billingRouter, billingStripe, customerIsEntitled } from './routes/billingRoutes.js';
 import { mailRouter } from './routes/mailRoutes.js';
 import { rateLimit, rateLimitHeaders } from './utils/rateLimit.js';
-
 // Shared Express app — used by:
 //  - server/server.ts (local dev: app.listen)
 //  - api/index.ts     (Vercel: exported as a serverless function)
@@ -22,6 +21,36 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
+// ---------------------------------------------------------------------------
+// Rate limiting — per-IP sliding window on the expensive / sensitive endpoints.
+// The util existed but was never wired up; these guards keep the free AI tier,
+// owner-verify, and mail endpoints from being hammered into quota exhaustion.
+// ---------------------------------------------------------------------------
+function clientIp(req: any): string {
+  return (
+    (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0].trim() ||
+    req.socket?.remoteAddress ||
+    'unknown'
+  );
+}
+
+const AI_TRIAL_LIMIT = 10;      // 10 analyze-fish calls/min per IP (free trial quota care)
+const AI_AUTHED_LIMIT = 30;     // 30/min with owner secret (builders/tests)
+const VERIFY_LIMIT = 10;        // 10 owner-verify attempts/min per IP
+const MAIL_LIMIT = 5;           // 5 mail sends/min per IP (spam guard on free Resend)
+
+function rateLimitMiddleware(limit: number, windowMs: number, label: string) {
+  return (req: any, res: any, next: any) => {
+    const key = `${label}:${clientIp(req)}`;
+    const lim = rateLimit(key, limit, windowMs);
+    for (const [k, v] of Object.entries(rateLimitHeaders(lim))) res.setHeader(k, v);
+    if (!lim.ok) {
+      return res.status(429).json({ error: 'Too many requests — slow down and try again shortly.', retryAfterSeconds: Math.ceil(lim.retryAfterMs / 1000) });
+    }
+    next();
+  };
+}
+
 // Health Check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', server: 'FishAI Multi-Modal Server', timestamp: new Date().toISOString() });
@@ -29,7 +58,7 @@ app.get('/api/health', (req, res) => {
 
 // Owner sign-in — verify the app password (timing-safe). Public endpoint:
 // it exists so the app can validate a password BEFORE storing it locally.
-app.post('/api/auth/owner-verify', (req, res) => {
+app.post('/api/auth/owner-verify', rateLimitMiddleware(VERIFY_LIMIT, 60_000, 'verify'), (req, res) => {
   if (!appSecret) {
     return res.status(503).json({
       error: 'API auth is not configured — set FISH_APP_SECRET in the server environment.',
@@ -57,7 +86,10 @@ app.post('/api/auth/owner-verify', (req, res) => {
 // no active entitlement. Without Stripe configured, only the owner secret
 // works (pre-launch behavior).
 const appSecret = process.env.FISH_APP_SECRET || '';
-app.use('/api/ai', async (req, res, next) => {
+const rateLimitAi = (req: any, res: any, next: any) =>
+  rateLimitMiddleware(req.get('x-fish-app-secret') === appSecret ? AI_AUTHED_LIMIT : AI_TRIAL_LIMIT, 60_000, 'ai')(req, res, next);
+
+app.use('/api/ai', rateLimitAi, async (req, res, next) => {
   if (!appSecret) {
     return res.status(503).json({
       error: 'API auth is not configured — set FISH_APP_SECRET in the server environment.',
