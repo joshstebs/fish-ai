@@ -49,17 +49,41 @@ export function hpaToInHg(hpa: number): number {
   return Math.round(hpa * 0.0295299830714 * 100) / 100;
 }
 
-/** Get the browser's geolocation. Resolves null when denied/unavailable. */
-export function getUserLocation(): Promise<{ latitude: number; longitude: number } | null> {
+export type LocationResult =
+  | { ok: true; latitude: number; longitude: number }
+  | { ok: false; reason: 'unsupported' | 'denied' | 'unavailable' | 'timeout' };
+
+/**
+ * Get the browser's geolocation. On failure returns a reason so the UI can show
+ * the right recovery path (e.g. a "tap to enable location" affordance) instead of
+ * silently dropping to the fallback. A retry re-opens the browser permission prompt
+ * even when a prior denial was cached as "dismissed".
+ */
+export function getUserLocation(opts?: { retry?: boolean }): Promise<LocationResult> {
   return new Promise((resolve) => {
     if (!('geolocation' in navigator)) {
-      resolve(null);
+      resolve({ ok: false, reason: 'unsupported' });
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      () => resolve(null),
-      { timeout: 8000, maximumAge: 10 * 60 * 1000 }
+      (pos) => resolve({ ok: true, latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      (err) => {
+        // err.code 1 = PERMISSION_DENIED. A retry resets browserUIState so the
+        // permission prompt re-appears (denial was previously cached as dismissed).
+        if (err.code === 1 && opts?.retry) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => resolve({ ok: true, latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+            (e2) => resolve({ ok: false, reason: e2.code === 1 ? 'denied' : e2.code === 3 ? 'timeout' : 'unavailable' }),
+            { timeout: 8000, maximumAge: 0 }
+          );
+          return;
+        }
+        resolve({
+          ok: false,
+          reason: err.code === 1 ? 'denied' : err.code === 3 ? 'timeout' : 'unavailable',
+        });
+      },
+      { timeout: 8000, maximumAge: 10 * 60 * 1000, ...(opts?.retry ? { maximumAge: 0 } : {}) }
     );
   });
 }
@@ -160,7 +184,7 @@ export async function fetchLiveWeather(lat: number, lon: number): Promise<LiveWe
 /** Try location, falling back to the first saved fishing spot's coordinates. */
 export async function resolveWeatherCoords(spots: { latitude?: number; longitude?: number }[]): Promise<{ latitude: number; longitude: number } | null> {
   const loc = await getUserLocation();
-  if (loc) return loc;
+  if (loc.ok) return loc;
   const spot = spots.find((s) => s.latitude && s.longitude);
   if (spot && spot.latitude && spot.longitude) return { latitude: spot.latitude, longitude: spot.longitude };
   return null;
