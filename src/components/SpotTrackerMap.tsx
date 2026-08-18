@@ -94,7 +94,7 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
       lon = mapPicked.lon;
     } else {
       const loc = await getUserLocation();
-      if (loc) {
+      if (loc.ok) {
         lat = loc.latitude;
         lon = loc.longitude;
       }
