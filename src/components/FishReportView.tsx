@@ -57,6 +57,19 @@ const CURATED_SPECIES = [
   'Muskellunge',
 ];
 
+/** Convert a "6:10 AM"-style clock string into a percent position across a 24h day. */
+function timeToPct(timeStr: string): number {
+  const m = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!m) return 0;
+  let hours = parseInt(m[1], 10);
+  const minutes = parseInt(m[2], 10);
+  const ampm = m[3].toUpperCase();
+  if (ampm === 'PM' && hours !== 12) hours += 12;
+  if (ampm === 'AM' && hours === 12) hours = 0;
+  const totalMinutes = Math.min(1439, hours * 60 + minutes);
+  return (totalMinutes / (24 * 60)) * 100;
+}
+
 const GRADE_STYLES: Record<FishingConditionsReport['grade'], string> = {
   EXCELLENT: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40',
   GOOD: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/40',
@@ -81,6 +94,53 @@ function impactIcon(impact: ReportFactor['impact']) {
   if (impact === 'HURTS') return <TrendingDown className="w-3 h-3" />;
   return <Minus className="w-3 h-3" />;
 }
+
+/**
+ * Mini area/line chart of the REAL hourly barometer observations from the
+ * LiveWeather object (never forecast, never invented). Renders only when the
+ * caller has at least two observed pressure points.
+ */
+const PressureSparkline: React.FC<{
+  points: { t: number; p: number }[];
+  trend: LiveWeather['pressureTrend'];
+}> = ({ points, trend }) => {
+  const W = 240;
+  const H = 40;
+  const padX = 5;
+  const padY = 5;
+  const minP = Math.min(...points.map((x) => x.p));
+  const maxP = Math.max(...points.map((x) => x.p));
+  const range = maxP - minP || 0.01;
+  const xAt = (i: number) => padX + (i / Math.max(1, points.length - 1)) * (W - padX * 2);
+  const yAt = (p: number) => H - padY - ((p - minP) / range) * (H - padY * 2);
+  const line = points.map((pt, i) => `${xAt(i).toFixed(1)},${yAt(pt.p).toFixed(1)}`).join(' ');
+  const baseline = H - 1;
+  const area = `${line} ${xAt(points.length - 1).toFixed(1)},${baseline} ${xAt(0).toFixed(1)},${baseline}`;
+  const stroke = trend === 'RISING' ? '#10B981' : trend === 'FALLING' ? '#F59E0B' : '#22D3EE';
+  const gradId = 'fishai-pressure-fill';
+  const lastX = xAt(points.length - 1);
+  const lastY = yAt(points[points.length - 1].p);
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-10 block" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={stroke} stopOpacity="0.35" />
+          <stop offset="100%" stopColor={stroke} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <polygon points={area} fill={`url(#${gradId})`} />
+      <polyline
+        points={line}
+        fill="none"
+        stroke={stroke}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx={lastX} cy={lastY} r="2" fill={stroke} />
+    </svg>
+  );
+};
 
 export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }) => {
   const [species, setSpecies] = useState<string>(() => suggestTargetSpecies(catches));
@@ -154,6 +214,39 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
     [catches, species, weather]
   );
 
+  // Real barometric-pressure history from the LiveWeather object: its hourly
+  // array includes the past 6 hours of observations (weather.ts requests
+  // past_hours=6). Filter to points at or before "now" — NEVER forecast
+  // entries — so the mini trend is honest data. Null when there aren't at
+  // least two observed points (then only the current-pressure stat is shown).
+  const pressureHistory = useMemo(() => {
+    if (!weather) return null;
+    const now = Date.now();
+    const observed = weather.hourly
+      .filter((h) => new Date(h.time).getTime() <= now)
+      .map((h) => ({ t: new Date(h.time).getTime(), p: h.pressureInHg }))
+      .sort((a, b) => a.t - b.t)
+      .slice(-7);
+    if (observed.length < 2) return null;
+    return {
+      points: observed,
+      spanHours: Math.max(1, Math.round((observed[observed.length - 1].t - observed[0].t) / 3.6e6)),
+    };
+  }, [weather]);
+
+  // Best bite window expressed as 24h-percent positions for the horizontal bar.
+  const biteWindow = useMemo(() => {
+    if (!report || !report.bestWindow) return null;
+    const startPct = Math.max(0, Math.min(100, timeToPct(report.bestWindow.start)));
+    const endPct = Math.max(0, Math.min(100, timeToPct(report.bestWindow.end)));
+    return {
+      start: report.bestWindow.start,
+      end: report.bestWindow.end,
+      startPct,
+      widthPct: Math.max(1.5, endPct - startPct),
+    };
+  }, [report]);
+
   // Species options: everything the user has actually caught, plus the curated list.
   const speciesOptions = useMemo(() => {
     const logged = catches.map((c) => speciesOf(c));
@@ -186,17 +279,17 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-3 py-1 bg-cyan-600 text-slate-950 font-black text-xs uppercase tracking-widest rounded">
-              Live Conditions
+              Today's Fish Report
             </span>
             <span className="text-xs font-mono text-emerald-400 font-bold uppercase flex items-center gap-1">
               <Gauge className="w-3.5 h-3.5" /> Live Data
             </span>
           </div>
-          <h2 className="text-3xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
-            Daily <span className="text-emerald-400">Fish Report</span>
+          <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight">
+            Your Daily Fish Report
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Your bite score from live weather, solunar math, and catch history.
+            Real conditions. Real times. Best bite window. Every day.
           </p>
         </div>
         <button
@@ -208,6 +301,26 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
           <span>{weatherLoading ? 'Refreshing...' : 'Refresh'}</span>
         </button>
       </div>
+
+      {/* Target Zones — real spot names from the user's saved spots, never invented */}
+      {spots.length > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-slate-900/70 border border-cyan-500/20 p-4 rounded-xl shadow-lg">
+          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5 shrink-0">
+            <Target className="w-3.5 h-3.5 text-cyan-400" /> Target Zones
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {spots.map((s) => (
+              <span
+                key={s.id}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-cyan-500/40 bg-cyan-500/5 text-cyan-300 font-mono text-[10px] font-bold uppercase tracking-wide"
+              >
+                <MapPin className="w-3 h-3 text-cyan-400 shrink-0" />
+                {s.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Control Toolbar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900 p-4 border border-white/10 rounded-xl shadow-lg">
@@ -306,15 +419,23 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 inline-flex items-center gap-1.5">
                 <Gauge className="w-3.5 h-3.5 text-emerald-400" /> Bite Confidence · {report.targetSpecies}
               </span>
-              <div className="mt-4 flex items-end justify-center gap-4">
-                <span className="text-5xl sm:text-6xl font-black font-mono leading-none text-emerald-400">
+              <div className="mt-4 flex items-end justify-center gap-4 flex-wrap">
+                <span className="text-6xl sm:text-7xl font-black font-mono leading-none text-emerald-400 tabular-nums">
                   {report.score}
+                  <span className="ml-0.5 text-2xl sm:text-3xl font-black text-white/90">%</span>
                 </span>
-                <span
-                  className={`px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded border mb-1 ${GRADE_STYLES[report.grade]}`}
-                >
-                  {report.grade}
-                </span>
+                <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                  <span
+                    className={`px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded-full border ${GRADE_STYLES[report.grade]}`}
+                  >
+                    {report.grade}
+                  </span>
+                  <span
+                    className={`px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded-full border ${CONFIDENCE_STYLES[report.confidence]}`}
+                  >
+                    {report.confidence} confidence
+                  </span>
+                </div>
               </div>
               <div className="mt-5 max-w-xs mx-auto">
                 <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
@@ -326,11 +447,6 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
               </div>
               <p className="text-sm text-slate-300 mt-4 max-w-xl mx-auto">{report.summary}</p>
               <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
-                <span
-                  className={`px-2.5 py-1 text-[10px] font-black uppercase tracking-widest rounded border ${CONFIDENCE_STYLES[report.confidence]}`}
-                >
-                  Confidence: {report.confidence}
-                </span>
                 <span className="text-[10px] font-mono text-slate-500 uppercase">
                   {weather ? 'with live weather' : 'solunar + history only'}
                 </span>
@@ -391,16 +507,47 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
                     {weather.current.windSpeedMph} mph {weather.current.windDirection}
                   </span>
                 </div>
-                <div className="bg-slate-900/60 border border-white/10 rounded-lg p-2.5 min-w-0">
-                  <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                    <Gauge className="w-3 h-3 text-purple-400" /> Pressure
-                  </span>
-                  <span className="text-sm font-black font-mono text-white block mt-1 truncate">
-                    {weather.current.pressureInHg} inHg
-                  </span>
-                  <span className={`text-[9px] font-mono font-black uppercase ${pressureTrendColor}`}>
-                    {weather.pressureTrend}
-                  </span>
+                <div className="col-span-2 sm:col-span-3 bg-slate-900/60 border border-white/10 rounded-lg p-3 min-w-0">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                      <Gauge className="w-3 h-3 text-purple-400" /> Pressure
+                      <span className="text-slate-600 normal-case font-mono">· current + trend</span>
+                    </span>
+                    <span
+                      className={`text-[9px] font-mono font-black uppercase flex items-center gap-1 ${pressureTrendColor}`}
+                    >
+                      {weather.pressureTrend === 'RISING' ? (
+                        <TrendingUp className="w-3 h-3" />
+                      ) : weather.pressureTrend === 'FALLING' ? (
+                        <TrendingDown className="w-3 h-3" />
+                      ) : (
+                        <Minus className="w-3 h-3" />
+                      )}
+                      {weather.pressureTrend}
+                      {pressureHistory
+                        ? ` · ${weather.pressureTrend === 'RISING' ? '+' : weather.pressureTrend === 'FALLING' ? '−' : ''}${Math.abs(weather.pressureDelta6h).toFixed(2)} inHg/6h`
+                        : ''}
+                    </span>
+                  </div>
+                  <div className="mt-1.5 flex items-baseline gap-1.5">
+                    <span className="text-2xl font-black font-mono leading-none text-white tabular-nums">
+                      {weather.current.pressureInHg.toFixed(2)}
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-500">inHg</span>
+                  </div>
+                  {pressureHistory ? (
+                    <div className="mt-2">
+                      <PressureSparkline points={pressureHistory.points} trend={weather.pressureTrend} />
+                      <div className="flex justify-between text-[8px] font-mono font-bold uppercase text-slate-600 mt-0.5">
+                        <span>{pressureHistory.spanHours}h ago</span>
+                        <span>Now</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-[9px] font-mono text-slate-500 mt-1">
+                      No hourly barometer history observed — showing the live reading only.
+                    </p>
+                  )}
                 </div>
                 <div className="bg-slate-900/60 border border-white/10 rounded-lg p-2.5 min-w-0">
                   <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
@@ -430,23 +577,42 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
             </div>
           )}
 
-          {/* Best Window — prominent */}
-          <div className="bg-slate-900 border border-white/10 border-l-4 border-l-emerald-500/70 rounded-xl shadow-xl p-5 flex items-center gap-4">
-            <Clock className="w-5 h-5 text-emerald-400 shrink-0" />
-            <div className="min-w-0">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                Best Window Today
+          {/* Best Bite Window — 24h horizontal bar */}
+          <div className="bg-slate-900 border border-white/10 border-l-4 border-l-cyan-500/70 rounded-xl shadow-xl p-5 space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-cyan-400" /> Best Bite Window
               </span>
-              {report.bestWindow ? (
-                <span className="text-xl font-black font-mono text-white">
-                  {report.bestWindow.start} – {report.bestWindow.end}
-                </span>
-              ) : (
-                <span className="text-sm font-mono text-slate-400">
-                  No standout window in the next few hours.
+              {biteWindow && (
+                <span className="text-[10px] font-mono font-black uppercase text-cyan-300/80 shrink-0">
+                  {biteWindow.start} – {biteWindow.end}
                 </span>
               )}
             </div>
+            {biteWindow ? (
+              <>
+                <div className="relative h-3 rounded-lg bg-slate-950 overflow-hidden">
+                  <div
+                    className="absolute inset-y-0 rounded-lg bg-gradient-to-r from-cyan-500 via-teal-400 to-cyan-300"
+                    style={{ left: `${biteWindow.startPct}%`, width: `${biteWindow.widthPct}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[9px] font-mono font-bold uppercase text-slate-600">
+                  <span>12am</span>
+                  <span>6am</span>
+                  <span>12pm</span>
+                  <span>6pm</span>
+                  <span>12am</span>
+                </div>
+              </>
+            ) : (
+              <div className="border border-dashed border-slate-700 rounded-lg p-4 flex items-center gap-3">
+                <Clock className="w-4 h-4 text-slate-500 shrink-0" />
+                <p className="text-xs font-mono text-slate-400">
+                  No standout window in the next few hours — watch for the next solunar shift.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Real astronomy strip (collapsible to keep the landing page tight) */}
@@ -532,9 +698,9 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
             </div>
           </Fold>
 
-          {/* Recommended Lures */}
+          {/* Equipment — real lure names, badged only on the user's personal history */}
           <Fold
-            title="Recommended Lures for Today"
+            title="Equipment"
             icon={<Anchor className="w-5 h-5" />}
             defaultOpen
           >
@@ -544,21 +710,20 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
                 recommendations — no guesses here.
               </p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex flex-wrap gap-2">
                 {lures.map((l, i) => (
-                  <div key={i} className="bg-slate-950 border border-slate-800 rounded-lg p-4 space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-black text-white flex items-center gap-1.5">
-                        <Fish className="w-3.5 h-3.5 text-amber-400 shrink-0" /> {l.name}
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/40 text-emerald-300 font-mono text-[11px] font-bold uppercase tracking-wide"
+                  >
+                    <Fish className="w-3 h-3 text-emerald-400 shrink-0" />
+                    <span>{l.name}</span>
+                    {l.catches > 0 && (
+                      <span className="px-1.5 py-0.5 text-[9px] font-mono font-black uppercase rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shrink-0">
+                        {l.catches} catch{l.catches === 1 ? '' : 'es'}
                       </span>
-                      {l.catches > 0 && (
-                        <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shrink-0">
-                          {l.catches} catch{l.catches === 1 ? '' : 'es'}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] font-mono text-slate-400 leading-relaxed">{l.reason}</p>
-                  </div>
+                    )}
+                  </span>
                 ))}
               </div>
             )}
