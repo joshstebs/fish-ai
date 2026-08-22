@@ -91,7 +91,8 @@ export async function fetchLiveWeather(lat: number, lon: number): Promise<LiveWe
     '&current=temperature_2m,relative_humidity_2m,is_day,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,precipitation,cloud_cover,dew_point_2m,visibility' +
     '&hourly=temperature_2m,weather_code,surface_pressure,wind_speed_10m,precipitation,cloud_cover' +
     '&past_hours=6&forecast_hours=36' +
-    '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=mm';
+    '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=mm' +
+    '&timezone=auto';
 
   try {
     const resp = await fetch(url);
@@ -103,9 +104,19 @@ export async function fetchLiveWeather(lat: number, lon: number): Promise<LiveWe
     const cur = data.current;
     const hours = data.hourly;
 
+    // Open-Meteo (timezone=auto) returns naive local-to-the-spot time strings.
+    // Convert each to a real UTC instant using the spot's utc_offset_seconds so
+    // labels/scores stay correct no matter what timezone the browser is in.
+    const utcOffsetSec: number = data.utc_offset_seconds ?? 0;
+    const spotTimeToUtc = (t: string): Date => {
+      // 'YYYY-MM-DDTHH:mm' -> treat as spot-wall-clock, subtract offset to get UTC
+      const asUtc = new Date(`${t}:00Z`); // parse naive string as if it were UTC
+      return new Date(asUtc.getTime() - utcOffsetSec * 1000);
+    };
+
     // Build hourly snapshots (current hour onward)
     const hourly = (hours.time as string[]).map((t, i) => ({
-      time: new Date(t).toISOString(),
+      time: spotTimeToUtc(t).toISOString(),
       temperatureF: Math.round(hours.temperature_2m[i]),
       windSpeedMph: Math.round(hours.wind_speed_10m[i]),
       pressureInHg: hpaToInHg(hours.surface_pressure[i]),
@@ -115,7 +126,7 @@ export async function fetchLiveWeather(lat: number, lon: number): Promise<LiveWe
     }));
 
     // Pressure trend over the past 6 hours (from past_hours data)
-    const nowIdx = hours.time.findIndex((t: string) => new Date(t).getTime() >= now.getTime());
+    const nowIdx = hours.time.findIndex((t: string) => spotTimeToUtc(t).getTime() >= now.getTime());
     const idx = nowIdx >= 0 ? nowIdx : hours.time.length - 1;
     const p6 = hours.surface_pressure.slice(Math.max(0, idx - 6), idx + 1) as number[];
     const pStart = p6[0];

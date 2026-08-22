@@ -111,6 +111,32 @@ button:hover:not(:disabled) {
   --radius: 0.75rem;
   --shadow-panel: 0 24px 60px -30px oklch(0 0 0 / 0.9);
   --shadow-teal: 0 0 40px -12px color-mix(in oklab, oklch(0.78 0.14 172) 55%, transparent);
+
+  /* Design-token color layer: the same Lovable oklch palette converted to
+     space-separated sRGB channels. Tailwind's semantic utilities read these
+     via rgb(var(--color-*) / <alpha-value>) in tailwind.config.js, and raw
+     CSS (e.g. DailyReport's SVG strokes: var(--color-primary)) reads them
+     directly. Values match the old oklch exactly (primary = #33d4ad teal). */
+  --color-background: 9 14 18;
+  --color-foreground: 240 242 244;
+  --color-card: 20 25 30;
+  --color-card-foreground: 240 242 244;
+  --color-panel: 29 34 40;
+  --color-popover: 20 25 30;
+  --color-popover-foreground: 240 242 244;
+  --color-primary: 51 212 173;
+  --color-primary-foreground: 7 20 19;
+  --color-secondary: 33 39 45;
+  --color-secondary-foreground: 240 242 244;
+  --color-muted: 33 39 45;
+  --color-muted-foreground: 147 153 160;
+  --color-accent: 51 212 173;
+  --color-accent-foreground: 7 20 19;
+  --color-destructive: 230 67 67;
+  --color-destructive-foreground: 248 248 248;
+  --color-border: 41 46 53;
+  --color-input: 41 46 53;
+  --color-ring: 51 212 173;
 }
 
 .headline {

@@ -88,8 +88,8 @@ function SeoLanding({ onStart }: { onStart: () => void }) {
       </div>
       <div className="mt-6 flex flex-wrap gap-3">
         <button onClick={onStart} className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg flex items-center gap-2"><Sparkles className="w-4 h-4" />open the app</button>
-        <a href="/blog" onClick={onStart} className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">read the blog</a>
-        <a href="/best-fishing-app" onClick={onStart} className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">why fishai wins</a>
+        <a href="/blog" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">read the blog</a>
+        <a href="/best-fishing-app" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">why fishai wins</a>
       </div>
     </div>
   );
@@ -108,7 +108,7 @@ function BlogIndex({ onStart }: { onStart: () => void }) {
       <p className="mt-2 text-slate-400 text-sm">short guides, comparisons, and real notes from the field.</p>
       <div className="mt-6 grid gap-3">
         {posts.map(p => (
-          <a key={p.slug} href={`/blog/${p.slug}`} onClick={onStart} className="block bg-slate-900 border border-white/10 rounded-2xl p-4 hover:border-emerald-500/40 transition-colors">
+          <a key={p.slug} href={`/blog/${p.slug}`} className="block bg-slate-900 border border-white/10 rounded-2xl p-4 hover:border-emerald-500/40 transition-colors">
             <div className="text-sm font-black text-white">{p.title}</div>
             <div className="mt-1 text-xs text-slate-400">open</div>
           </a>
@@ -160,7 +160,7 @@ function BlogPost({ slug, onStart }: { slug: string; onStart: () => void }) {
       <h1 className="text-2xl sm:text-4xl font-display font-black uppercase tracking-tight text-white">{post.title}</h1>
       <div className="mt-6 space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed">{post.body.map((p,i) => <p key={i}>{p}</p>)}</div>
       <div className="mt-8 flex gap-3">
-        <a href="/blog" onClick={onStart} className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">all posts</a>
+        <a href="/blog" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">all posts</a>
         <button onClick={onStart} className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg">open fishAI</button>
       </div>
     </div>
