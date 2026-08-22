@@ -3,7 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CatchLogItem, FishingSpot } from './types/catchLogTypes';
 import { loadStoredCatches, saveStoredCatches, loadStoredSpots, saveStoredSpots } from './utils/storage';
 import { OwnerSignInModal } from './components/OwnerSignInModal';
+import { SetupFlow } from './components/SetupFlow';
+import { DailyReport } from './components/DailyReport';
 import { isSignedIn, signOut } from './utils/apiAuth';
+import { loadProfile, saveProfile, hasHomeWater, AnglerProfile } from './utils/profile';
 import {
   Camera, BookOpen, MapPin, Sparkles, Fish, GraduationCap, Moon,
   TrendingDown, Package, Trophy, Timer, Gauge, Brain, Bot, Settings,
@@ -25,7 +28,6 @@ const BarometricTrackerView = React.lazy(() => import('./components/BarometricTr
 const TackleBoxInventoryView = React.lazy(() => import('./components/TackleBoxInventoryView').then(m => ({ default: m.TackleBoxInventoryView })));
 const TrophyWallView = React.lazy(() => import('./components/TrophyWallView').then(m => ({ default: m.TrophyWallView })));
 const LivewellTimerView = React.lazy(() => import('./components/LivewellTimerView').then(m => ({ default: m.LivewellTimerView })));
-const FishReportView = React.lazy(() => import('./components/FishReportView').then(m => ({ default: m.FishReportView })));
 const InsightsView = React.lazy(() => import('./components/InsightsView').then(m => ({ default: m.InsightsView })));
 const AssistantView = React.lazy(() => import('./components/AssistantView').then(m => ({ default: m.AssistantView })));
 const SettingsView = React.lazy(() => import('./components/SettingsView').then(m => ({ default: m.SettingsView })));
@@ -61,8 +63,10 @@ function useAppState() {
   const [showSignIn, setShowSignIn] = React.useState<boolean>(false);
   const [moreOpen, setMoreOpen] = React.useState<boolean>(false);
   const [proFromHeader, setProFromHeader] = React.useState<boolean>(false);
+  const [profile, setProfile] = React.useState<AnglerProfile>(() => loadProfile());
+  const [setupOpen, setSetupOpen] = React.useState<boolean>(false);
   React.useEffect(() => { setCatches(loadStoredCatches()); setSpots(loadStoredSpots()); }, []);
-  return { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen, proFromHeader, setProFromHeader };
+  return { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen, proFromHeader, setProFromHeader, profile, setProfile, setupOpen, setSetupOpen };
 }
 
 function SeoLanding({ onStart }: { onStart: () => void }) {
@@ -214,7 +218,7 @@ function AcademyIndex({ onStart }: { onStart: () => void }) {
 
 export function AppRoutes() {
   const state = useAppState();
-  const { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen, proFromHeader, setProFromHeader } = state;
+  const { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen, proFromHeader, setProFromHeader, profile, setProfile, setupOpen, setSetupOpen } = state;
 
   const handleSaveCatch = (newCatchData: Omit<CatchLogItem, 'id' | 'timestamp' | 'formattedDate'>) => {
     const now = new Date();
@@ -275,7 +279,34 @@ export function AppRoutes() {
       </header>
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 pb-28 md:pb-8">
         <Suspense fallback={<div className="py-24 text-center text-xs font-mono text-slate-500 uppercase tracking-widest">Loading…</div>}>
-          {activeTab === 'REPORT' && <FishReportView catches={catches} spots={spots} />}
+          {activeTab === 'REPORT' && (
+            hasHomeWater(profile) && !setupOpen ? (
+              <DailyReport profile={profile} onEdit={() => setSetupOpen(true)} />
+            ) : (
+              <div>
+                {!hasHomeWater(profile) && (
+                  <div className="mb-8 text-center">
+                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-primary">
+                      First run · 30 seconds
+                    </p>
+                    <h2 className="headline mx-auto mt-3 max-w-xl text-center text-3xl sm:text-5xl">
+                      Set your water, get your report.
+                    </h2>
+                  </div>
+                )}
+                <SetupFlow
+                  initial={{ location: profile.location, species: profile.species, tackle: profile.tackle }}
+                  onCancel={hasHomeWater(profile) ? () => setSetupOpen(false) : undefined}
+                  onComplete={(next) => {
+                    const fresh = { ...profile, ...next };
+                    saveProfile(fresh);
+                    setProfile(fresh);
+                    setSetupOpen(false);
+                  }}
+                />
+              </div>
+            )
+          )}
           {activeTab === 'VISION' && <FishDimensionEstimator onSaveCatchToLog={handleSaveCatch} onNavigateToLogbook={() => goTo('LOGBOOK')} openPro={proFromHeader} onProOpened={() => setProFromHeader(false)} />}
           {activeTab === 'LOGBOOK' && <CatchLogbookView catches={catches} spots={spots} onAddCatch={handleSaveCatch} onDeleteCatch={handleDeleteCatch} onNavigateToFishVision={() => goTo('VISION')} />}
           {activeTab === 'INSIGHTS' && <InsightsView catches={catches} />}

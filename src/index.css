@@ -102,6 +102,32 @@ button:hover:not(:disabled) {
   box-shadow: 0 0 25px -5px rgba(41, 216, 195, 0.25);
 }
 
+/* ============================================================
+   Lovable design utilities + tokens (carried over from the
+   lovable-project-a7525b… files) so ported components render
+   pixel-identically to the Lovable project.
+   ============================================================ */
+:root {
+  --radius: 0.75rem;
+  --shadow-panel: 0 24px 60px -30px oklch(0 0 0 / 0.9);
+  --shadow-teal: 0 0 40px -12px color-mix(in oklab, oklch(0.78 0.14 172) 55%, transparent);
+}
+
+.headline {
+  font-family: 'Oswald', ui-sans-serif, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.92;
+}
+
+.rule-teal {
+  display: block;
+  width: 4.5rem;
+  height: 3px;
+  background: oklch(0.78 0.14 172);
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

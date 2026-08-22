@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
@@ -38,6 +38,29 @@ export default {
           600: '#1ca184',
           700: '#15806a',
         },
+        // Lovable design tokens (from lovable-project-a7525b… styles.css) so the
+        // ported SetupFlow / UI use the exact same shadcn-style semantic colors.
+        // Values are the project's oklch palette (deep blue-charcoal + teal).
+        background: 'oklch(0.16 0.012 250)',
+        foreground: 'oklch(0.96 0.004 250)',
+        card: 'oklch(0.21 0.013 250)',
+        'card-foreground': 'oklch(0.96 0.004 250)',
+        panel: 'oklch(0.25 0.014 250)',
+        popover: 'oklch(0.21 0.013 250)',
+        'popover-foreground': 'oklch(0.96 0.004 250)',
+        primary: 'oklch(0.78 0.14 172)',
+        'primary-foreground': 'oklch(0.18 0.02 190)',
+        secondary: 'oklch(0.27 0.014 250)',
+        'secondary-foreground': 'oklch(0.96 0.004 250)',
+        muted: 'oklch(0.27 0.014 250)',
+        'muted-foreground': 'oklch(0.68 0.012 250)',
+        accent: 'oklch(0.78 0.14 172)',
+        'accent-foreground': 'oklch(0.18 0.02 190)',
+        destructive: 'oklch(0.62 0.2 25)',
+        'destructive-foreground': 'oklch(0.98 0 0)',
+        border: 'oklch(0.3 0.014 250)',
+        input: 'oklch(0.3 0.014 250)',
+        ring: 'oklch(0.78 0.14 172)',
       },
       fontFamily: {
         display: ['Oswald', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
@@ -46,4 +69,4 @@ export default {
     },
   },
   plugins: [],
-}
+};

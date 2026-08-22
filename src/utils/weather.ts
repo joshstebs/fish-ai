@@ -3,6 +3,7 @@
 // https://open-meteo.com/en/docs
 // ============================================================================
 import { LiveWeather } from '../types/catchLogTypes';
+import { loadProfile } from './profile';
 
 const WEATHER_CACHE_KEY = 'fish_ai_weather_cache';
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
@@ -87,7 +88,7 @@ export async function fetchLiveWeather(lat: number, lon: number): Promise<LiveWe
   const url =
     'https://api.open-meteo.com/v1/forecast' +
     `?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}` +
-    '&current=temperature_2m,relative_humidity_2m,is_day,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,precipitation,cloud_cover' +
+    '&current=temperature_2m,relative_humidity_2m,is_day,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,precipitation,cloud_cover,dew_point_2m,visibility' +
     '&hourly=temperature_2m,weather_code,surface_pressure,wind_speed_10m,precipitation,cloud_cover' +
     '&past_hours=6&forecast_hours=36' +
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=mm';
@@ -139,6 +140,9 @@ export async function fetchLiveWeather(lat: number, lon: number): Promise<LiveWe
         weatherCode: cur.weather_code,
         condition: weatherCodeToCondition(cur.weather_code),
         isDay: cur.is_day === 1,
+        relativeHumidityPct: cur.relative_humidity_2m ?? undefined,
+        dewPointF: cur.dew_point_2m ?? undefined,
+        visibilityMi: cur.visibility != null ? Math.round(cur.visibility * 0.000621371) : undefined,
       },
       hourly,
       pressureTrend,
@@ -157,8 +161,13 @@ export async function fetchLiveWeather(lat: number, lon: number): Promise<LiveWe
   }
 }
 
-/** Try location, falling back to the first saved fishing spot's coordinates. */
+/** Choose coordinates for live weather: the angler's saved home water first,
+ *  then browser geolocation, then the first saved spot with coordinates.
+ *  Preferring home water means the report/solunar/pressure views all anchor
+ *  to the exact water the angler set in onboarding. */
 export async function resolveWeatherCoords(spots: { latitude?: number; longitude?: number }[]): Promise<{ latitude: number; longitude: number } | null> {
+  const home = loadProfile().location;
+  if (home?.latitude != null && home?.longitude != null) return { latitude: home.latitude, longitude: home.longitude };
   const loc = await getUserLocation();
   if (loc) return loc;
   const spot = spots.find((s) => s.latitude && s.longitude);

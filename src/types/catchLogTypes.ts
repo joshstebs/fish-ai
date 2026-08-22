@@ -81,6 +81,9 @@ export interface LiveWeather {
     weatherCode: number;
     condition: string;
     isDay: boolean;
+    relativeHumidityPct?: number;
+    dewPointF?: number;
+    visibilityMi?: number;
   };
   /** Hourly forecast for today+tomorrow (ISO hour -> snapshot) */
   hourly: {
