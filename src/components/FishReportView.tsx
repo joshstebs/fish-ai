@@ -29,7 +29,7 @@ import {
   ReportFactor,
 } from '../types/catchLogTypes';
 import { buildFishReport, recommendLures, suggestTargetSpecies } from '../utils/report';
-import { fetchLiveWeather, resolveWeatherCoords } from '../utils/weather';
+import { fetchLiveWeather, resolveWeatherCoords, getUserLocation } from '../utils/weather';
 import { formatTime, getMoonInfo, getSolunarPeriods, getSunTimes } from '../utils/solunar';
 import { speciesOf } from '../utils/insights';
 import { Fold } from './Fold';
@@ -148,12 +148,23 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
   const [weather, setWeather] = useState<LiveWeather | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [weatherError, setWeatherError] = useState<string | null>(null);
+  const [locationDenied, setLocationDenied] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const loadWeather = useCallback(async () => {
     setWeatherLoading(true);
     setWeatherError(null);
-    const c = await resolveWeatherCoords(spots);
+    // Prefer live GPS first — a retry re-opens the browser permission prompt.
+    const loc = await getUserLocation({ retry: true });
+    let c: { latitude: number; longitude: number } | null = null;
+    if (loc.ok) {
+      c = loc;
+    } else {
+      // GPS unavailable/denied — fall back to a saved spot before giving up.
+      const spot = spots.find((s) => typeof s.latitude === 'number' && typeof s.longitude === 'number');
+      c = spot ? { latitude: spot.latitude, longitude: spot.longitude } : null;
+      setLocationDenied(loc.reason === 'denied');
+    }
     setCoords(c);
     if (!c) {
       setWeather(null);
@@ -359,7 +370,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
         <div className="bg-amber-950/40 border border-amber-500/30 p-5 rounded-xl text-amber-200 text-xs font-mono flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
           <div className="space-y-2">
-            <p className="font-bold">{weatherError || 'Live weather unavailable.'}</p>
+            <p className="font-bold">{weatherError || (locationDenied ? 'Location access is off.' : 'Live weather unavailable.')}</p>
             <p className="text-amber-300/70">
               Score uses solunar math and history only — no fake weather shown.
             </p>
@@ -367,7 +378,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
               onClick={handleRefresh}
               className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-black text-[10px] uppercase tracking-wider rounded border border-amber-500/40 flex items-center gap-1.5 transition-all"
             >
-              <RefreshCw className="w-3 h-3" /> Retry Weather
+              <RefreshCw className="w-3 h-3" /> {locationDenied ? 'Enable Location' : 'Retry Weather'}
             </button>
           </div>
         </div>
