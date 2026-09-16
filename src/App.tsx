@@ -13,6 +13,8 @@ import {
   ChevronDown, LayoutGrid, PlusCircle, ArrowRight,
 } from 'lucide-react';
 import { GlobalSeo } from './components/SeoHead';
+import { LandingHero } from './components/LandingHero';
+import { HowItWorks, ModulesStrip } from './components/HowItWorks';
 import { ListiclePage } from './pages/ListiclePage';
 import { HowToChoosePage } from './pages/HowToChoosePage';
 import { CompareFishbrainPage } from './pages/CompareFishbrainPage';
@@ -40,10 +42,10 @@ const PRIMARY_TABS: TabDef[] = [
   { id: 'VISION', label: 'Vision', icon: Camera, color: 'bg-emerald-500 text-slate-950' },
   { id: 'LOGBOOK', label: 'Logbook', icon: BookOpen, color: 'bg-blue-600 text-white' },
   { id: 'INSIGHTS', label: 'Insights', icon: Brain, color: 'bg-violet-600 text-white' },
-  { id: 'ASSISTANT', label: 'Assistant', icon: Bot, color: 'bg-fuchsia-600 text-white' },
+  { id: 'SPOTS', label: 'Spot Map', icon: MapPin, color: 'bg-cyan-500 text-slate-950' },
 ];
 const MORE_TABS: TabDef[] = [
-  { id: 'SPOTS', label: 'Spot Map', icon: MapPin, color: 'bg-cyan-500 text-slate-950' },
+  { id: 'ASSISTANT', label: 'Assistant', icon: Bot, color: 'bg-fuchsia-600 text-white' },
   { id: 'TACKLE', label: 'Tackle AI', icon: Sparkles, color: 'bg-amber-500 text-slate-950' },
   { id: 'SOLUNAR', label: 'Solunar', icon: Moon, color: 'bg-purple-600 text-white' },
   { id: 'PRESSURE', label: 'Pressure', icon: TrendingDown, color: 'bg-red-500 text-white' },
@@ -257,7 +259,7 @@ export function AppRoutes() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={() => goTo('VISION')}>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-400 via-emerald-400 to-cyan-500 flex items-center justify-center text-slate-950 shadow-lg glow-emerald"><Fish className="w-6 h-6 stroke-[2.5]" /></div>
-            <div><div className="flex items-center gap-1.5"><h1 className="text-lg font-display font-black tracking-tight text-white uppercase leading-none">Fish<span className="text-emerald-400">AI</span></h1></div><span className="text-[10px] font-mono text-slate-400 block -mt-0.5 hidden sm:block">Fish smarter. Log every catch.</span></div>
+            <div><div className="flex items-center gap-1.5"><h1 className="text-lg font-display font-black tracking-tight text-white uppercase leading-none">Fish<span className="text-emerald-400">AI</span></h1></div><span className="text-[10px] font-mono text-slate-400 block -mt-0.5 hidden sm:block">Snap it. Know it. Fish smarter.</span></div>
           </div>
           <nav className="hidden md:flex items-center gap-1 flex-1 min-w-0 justify-end">
             {PRIMARY_TABS.map(renderTabButton)}
@@ -278,14 +280,16 @@ export function AppRoutes() {
         </div>
       </header>
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 pb-28 md:pb-8">
-        <Suspense fallback={<div className="py-24 text-center text-xs font-mono text-slate-500 uppercase tracking-widest">Loading…</div>}>
+        <Suspense fallback={<div className="grid gap-4 lg:grid-cols-2 py-8" aria-busy="true"><div className="h-44 rounded-xl border border-border fishai-skeleton" /><div className="h-44 rounded-xl border border-border fishai-skeleton" /><div className="h-44 rounded-xl border border-border fishai-skeleton" /><div className="h-44 rounded-xl border border-border fishai-skeleton" /></div>}>
           {activeTab === 'REPORT' && (
             hasHomeWater(profile) && !setupOpen ? (
               <DailyReport profile={profile} onEdit={() => setSetupOpen(true)} />
             ) : (
-              <div>
+              <div className="space-y-8">
+                <LandingHero onOpenVision={() => goTo('VISION')} onOpenReport={() => setSetupOpen(false)} />
+                <div>
                 {!hasHomeWater(profile) && (
-                  <div className="mb-8 text-center">
+                  <div className="mb-6 text-center">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-primary">
                       First run · 30 seconds
                     </p>
@@ -304,10 +308,19 @@ export function AppRoutes() {
                     setSetupOpen(false);
                   }}
                 />
+                </div>
+                <HowItWorks onOpenLogbook={() => goTo('LOGBOOK')} />
+                <ModulesStrip />
               </div>
             )
           )}
-          {activeTab === 'VISION' && <FishDimensionEstimator onSaveCatchToLog={handleSaveCatch} onNavigateToLogbook={() => goTo('LOGBOOK')} openPro={proFromHeader} onProOpened={() => setProFromHeader(false)} />}
+          {activeTab === 'VISION' && (
+            <div className="space-y-8">
+              <FishDimensionEstimator onSaveCatchToLog={handleSaveCatch} onNavigateToLogbook={() => goTo('LOGBOOK')} openPro={proFromHeader} onProOpened={() => setProFromHeader(false)} />
+              <HowItWorks onOpenLogbook={() => goTo('LOGBOOK')} />
+              <ModulesStrip />
+            </div>
+          )}
           {activeTab === 'LOGBOOK' && <CatchLogbookView catches={catches} spots={spots} onAddCatch={handleSaveCatch} onDeleteCatch={handleDeleteCatch} onNavigateToFishVision={() => goTo('VISION')} />}
           {activeTab === 'INSIGHTS' && <InsightsView catches={catches} />}
           {activeTab === 'ASSISTANT' && <AssistantView catches={catches} spots={spots} />}
@@ -324,8 +337,8 @@ export function AppRoutes() {
       </main>
       <footer className="bg-slate-900 border-t border-white/10 py-6 text-center text-xs font-mono text-slate-500 pb-24 md:pb-6">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-emerald-400" /><span className="font-bold text-slate-400">FishAI</span></div>
-          <span>Free core app. AI estimator: 7-day free trial, $7.99/mo after, cancel anytime.</span>
+          <div className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-emerald-400" /><span className="font-bold text-slate-400">FishAI — Snap it. Know it. Fish smarter.</span></div>
+          <span>13 integrated modules · Free core app. AI estimator: 7-day free trial, $7.99/mo after, cancel anytime.</span>
         </div>
       </footer>
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-white/10 pb-[env(safe-area-inset-bottom)]">

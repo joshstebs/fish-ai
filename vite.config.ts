@@ -12,4 +12,16 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    // lovable-style speed: keep first paint light, split heavy deps
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          map: ['leaflet'],
+        },
+      },
+    },
+  },
 });

@@ -172,3 +172,47 @@ button:hover:not(:disabled) {
 ::-webkit-scrollbar-thumb:hover {
   background: #2a4a41;
 }
+
+/* ============================================================
+   Lovable-parity glow-up: speed + responsive + a11y
+   ============================================================ */
+
+/* sized icons (lucide size-4.5 isn't a default utility) */
+.size-4\.5 { width: 1.125rem; height: 1.125rem; }
+
+/* soft primary tint used by hero / how-it-works cards */
+.bg-primary\/12 { background-color: rgb(var(--color-primary) / 0.12); }
+
+/* skeleton shimmer for lazy views */
+@keyframes fishai-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.fishai-skeleton {
+  background: linear-gradient(90deg, rgb(var(--color-card)) 25%, rgb(var(--color-panel)) 50%, rgb(var(--color-card)) 75%);
+  background-size: 800px 100%;
+  animation: fishai-shimmer 1.4s ease-in-out infinite;
+}
+
+/* visible focus for keyboard users */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 2px solid rgb(var(--color-primary));
+  outline-offset: 2px;
+}
+
+/* media shouldn't blow out cards on small screens */
+img, svg, canvas { max-width: 100%; }
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .fishai-skeleton { animation: none; }
+}
