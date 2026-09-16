@@ -145,8 +145,10 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
   openPro,
   onProOpened,
 }) => {
-  const [selectedImage, setSelectedImage] = useState<string>(SAMPLE_FISH_PHOTOS[0].url);
-  const [refHint, setRefHint] = useState<string>(SAMPLE_FISH_PHOTOS[0].refHint);
+  const [selectedImage, setSelectedImage] = useState<string>('');
+  const [refHint, setRefHint] = useState<string>('');
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [result, setResult] = useState<FishAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -236,16 +238,38 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
     setShowCorrection(false);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const ingestFile = (file: File) => {
+    if (!file.type.startsWith('image/')) return;
     compressImageForUpload(file)
-      .then(setSelectedImage)
+      .then((data) => {
+        setSelectedImage(data);
+        setResult(null);
+        setError(null);
+      })
       .catch((err) => console.error('Image load failed:', err));
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) ingestFile(file);
+    e.target.value = '';
+  };
+
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      const item = Array.from(e.clipboardData?.items || []).find((i) => i.type.startsWith('image/'));
+      const file = item?.getAsFile();
+      if (file) ingestFile(file);
+    };
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+  }, []);
+
   const handleAnalyzePhoto = async () => {
+    if (!selectedImage) {
+      setError('Add a photo first — upload, paste, or pick a demo.');
+      return;
+    }
     setIsLoading(true);
     setError(null);
 
@@ -397,34 +421,33 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
     : 0;
 
   return (
-    <div className="fishai-premium-vision space-y-6 font-sans text-slate-900">
-      {/* Header Banner */}
-      <div className="bg-slate-900 border-l-4 border-emerald-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-3 py-1 bg-emerald-600 text-slate-950 font-black text-xs uppercase tracking-widest rounded">
-              FishAI Multi-Modal Vision
-            </span>
-            <span className="text-xs font-mono text-cyan-400 font-bold uppercase flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" /> Spatial Calibration Scale Active
-            </span>
-          </div>
-          <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
-            Catch <span className="text-emerald-400">Snapshot</span>
-          </h2>
-          <p className="text-slate-400 text-sm mt-1">
-            Snap a photo — species ID, size estimate, and harvest rules in seconds.
-          </p>
-        </div>
+    <div id="vision-board" className="fishai-premium-vision space-y-6 animate-in">
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-primary">Vision</p>
+        <h2 className="headline mt-2 text-3xl sm:text-5xl">Snap it and know what you caught.</h2>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
+          Upload, paste or shoot a photo. FishAI names the species and estimates length, girth and weight — then files it in your logbook.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Image Selector & Interactive Canvas Calibration */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-slate-900 border border-white/10 p-5 rounded-xl space-y-4 shadow-xl">
+          <div
+            className={`bg-card border p-5 rounded-xl space-y-4 ${isDraggingFile ? 'border-primary' : 'border-border'}`}
+            style={{ boxShadow: 'var(--shadow-panel)' }}
+            onDragOver={(e) => { e.preventDefault(); setIsDraggingFile(true); }}
+            onDragLeave={() => setIsDraggingFile(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDraggingFile(false);
+              const file = e.dataTransfer.files?.[0];
+              if (file) ingestFile(file);
+            }}
+          >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                <Camera className="w-4 h-4 text-emerald-400" /> Photo & Ruler
+              <span className="text-xs font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                <Camera className="w-4 h-4 text-primary" /> Catch photo
               </span>
               <button
                 onClick={() => setIsOverlayActive(!isOverlayActive)}
@@ -441,16 +464,22 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
               ref={photoContainerRef}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
-              className="relative aspect-4/3 rounded-lg overflow-hidden bg-black border border-slate-800 flex items-center justify-center select-none touch-none"
+              className="relative aspect-4/3 rounded-lg overflow-hidden bg-secondary border border-border flex items-center justify-center select-none touch-none"
             >
+              {selectedImage ? (
               <img
                 src={selectedImage}
                 alt="Selected Catch"
                 className="w-full h-full object-cover"
               />
+              ) : (
+                <div className="px-6 text-center text-sm text-muted-foreground">
+                  Drop a photo, paste with Ctrl/⌘ V, or pick one below.
+                </div>
+              )}
 
               {/* Interactive Scale Ruler Overlay */}
-              {isOverlayActive && rulerPoints.start && rulerPoints.end && (
+              {selectedImage && isOverlayActive && rulerPoints.start && rulerPoints.end && (
                 <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
                   {/* Calibrated Line */}
                   <line
@@ -478,7 +507,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
               )}
 
               {/* Interactive Handles */}
-              {isOverlayActive && rulerPoints.start && rulerPoints.end && (
+              {selectedImage && isOverlayActive && rulerPoints.start && rulerPoints.end && (
                 <>
                   <div
                     onPointerDown={handlePointerDown('start')}
@@ -498,12 +527,14 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
               )}
 
               {/* Calibration Hint Banner */}
+              {selectedImage && (
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 flex items-center justify-between z-10">
                 <span className="text-[11px] font-mono font-bold text-emerald-400 flex items-center gap-1">
                   <Crosshair className="w-3.5 h-3.5" /> Span: {rulerDistance}% Photo Vector
                 </span>
                 <span className="text-[10px] text-slate-400 font-mono">Drag A & B to align nose to tail</span>
               </div>
+              )}
             </div>
 
             {/* Preset Samples Selector */}
@@ -518,6 +549,8 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                     onClick={() => {
                       setSelectedImage(sample.url);
                       setRefHint(sample.refHint);
+                      setResult(null);
+                      setError(null);
                     }}
                     className={`relative rounded-lg overflow-hidden border transition-all ${
                       selectedImage === sample.url
@@ -556,23 +589,27 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
 
             {/* Custom File Upload */}
             <div className="flex gap-2">
-              <label className="flex-1 py-2.5 bg-slate-950 hover:bg-slate-800 text-slate-300 font-bold text-xs uppercase tracking-wider rounded-lg border border-slate-800 text-center cursor-pointer transition-all flex items-center justify-center gap-2">
-                <Upload className="w-4 h-4 text-emerald-400" />
-                <span>Upload Photo</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
+              <label className="flex-1 py-2.5 bg-secondary hover:bg-muted text-foreground font-semibold text-xs uppercase tracking-widest rounded-lg border border-border text-center cursor-pointer flex items-center justify-center gap-2">
+                <Upload className="w-4 h-4 text-primary" />
+                <span>Upload photo</span>
+                <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
               </label>
+              <button
+                type="button"
+                onClick={() => cameraInputRef.current?.click()}
+                className="flex-1 py-2.5 bg-secondary hover:bg-muted text-foreground font-semibold text-xs uppercase tracking-widest rounded-lg border border-border flex items-center justify-center gap-2"
+              >
+                <Camera className="w-4 h-4 text-primary" />
+                Take photo
+              </button>
+              <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
             </div>
 
             {/* Run Analysis CTA */}
             <button
               onClick={handleAnalyzePhoto}
-              disabled={isLoading}
-              className="w-full py-3.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-600 hover:from-emerald-400 hover:to-blue-500 text-slate-950 font-black uppercase text-xs tracking-wider rounded-lg shadow-xl flex items-center justify-center gap-2 transition-all active:scale-95"
+              disabled={isLoading || !selectedImage}
+              className="w-full py-3.5 bg-primary text-primary-foreground font-semibold uppercase text-xs tracking-widest rounded-lg shadow-lg flex items-center justify-center gap-2 disabled:opacity-40"
             >
               {isLoading ? (
                 <>
@@ -712,13 +749,11 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
           )}
 
           {!result && !isLoading && !error && (
-            <div className="bg-slate-900 border border-white/10 rounded-xl p-12 text-center space-y-4 shadow-xl">
-              <Eye className="w-12 h-12 text-slate-600 mx-auto animate-pulse" />
-              <h3 className="text-base font-black uppercase tracking-wider text-white">
-                Ready to Analyze
-              </h3>
-              <p className="text-slate-400 text-xs max-w-md mx-auto font-mono">
-                Upload a catch photo or try a demo — get species ID, size estimate, and harvest rules.
+            <div className="bg-card border border-border rounded-xl p-12 text-center space-y-3" style={{ boxShadow: 'var(--shadow-panel)' }}>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-primary">Identification</p>
+              <h3 className="headline text-2xl">Add a photo.</h3>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                FishAI will name the species and estimate its length, girth and weight.
               </p>
             </div>
           )}

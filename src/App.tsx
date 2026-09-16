@@ -10,9 +10,11 @@ import { loadProfile, saveProfile, hasHomeWater, AnglerProfile } from './utils/p
 import {
   Camera, BookOpen, MapPin, Sparkles, Fish, GraduationCap, Moon,
   TrendingDown, Package, Trophy, Timer, Gauge, Brain, Bot, Settings,
-  ChevronDown, LayoutGrid, PlusCircle, ArrowRight,
+  ChevronDown, LayoutGrid,
 } from 'lucide-react';
 import { GlobalSeo } from './components/SeoHead';
+import { LandingHero } from './components/LandingHero';
+import { LearningLoop } from './components/LearningLoop';
 import { ListiclePage } from './pages/ListiclePage';
 import { HowToChoosePage } from './pages/HowToChoosePage';
 import { CompareFishbrainPage } from './pages/CompareFishbrainPage';
@@ -36,27 +38,27 @@ type TabId = 'REPORT' | 'VISION' | 'LOGBOOK' | 'SPOTS' | 'TACKLE' | 'GUIDE' | 'S
 interface TabDef { id: TabId; label: string; icon: React.ComponentType<{ className?: string }>; color: string; }
 
 const PRIMARY_TABS: TabDef[] = [
-  { id: 'REPORT', label: 'Fish Report', icon: Gauge, color: 'bg-teal-500 text-slate-950' },
-  { id: 'VISION', label: 'Vision', icon: Camera, color: 'bg-emerald-500 text-slate-950' },
-  { id: 'LOGBOOK', label: 'Logbook', icon: BookOpen, color: 'bg-blue-600 text-white' },
-  { id: 'INSIGHTS', label: 'Insights', icon: Brain, color: 'bg-violet-600 text-white' },
-  { id: 'ASSISTANT', label: 'Assistant', icon: Bot, color: 'bg-fuchsia-600 text-white' },
+  { id: 'REPORT', label: 'Fish Report', icon: Gauge, color: 'bg-primary text-primary-foreground' },
+  { id: 'VISION', label: 'Vision', icon: Camera, color: 'bg-primary text-primary-foreground' },
+  { id: 'LOGBOOK', label: 'Logbook', icon: BookOpen, color: 'bg-primary text-primary-foreground' },
+  { id: 'INSIGHTS', label: 'Insights', icon: Brain, color: 'bg-primary text-primary-foreground' },
+  { id: 'SPOTS', label: 'Spot Map', icon: MapPin, color: 'bg-primary text-primary-foreground' },
 ];
 const MORE_TABS: TabDef[] = [
-  { id: 'SPOTS', label: 'Spot Map', icon: MapPin, color: 'bg-cyan-500 text-slate-950' },
-  { id: 'TACKLE', label: 'Tackle AI', icon: Sparkles, color: 'bg-amber-500 text-slate-950' },
-  { id: 'SOLUNAR', label: 'Solunar', icon: Moon, color: 'bg-purple-600 text-white' },
-  { id: 'PRESSURE', label: 'Pressure', icon: TrendingDown, color: 'bg-red-500 text-white' },
-  { id: 'BOX', label: 'Tackle Box', icon: Package, color: 'bg-amber-400 text-slate-950' },
-  { id: 'TROPHY', label: 'Trophies', icon: Trophy, color: 'bg-amber-300 text-slate-950' },
-  { id: 'LIVEWELL', label: 'Livewell', icon: Timer, color: 'bg-teal-500 text-slate-950' },
-  { id: 'GUIDE', label: 'Academy', icon: GraduationCap, color: 'bg-emerald-400 text-slate-950' },
-  { id: 'SETTINGS', label: 'Settings', icon: Settings, color: 'bg-sky-500 text-slate-950' },
+  { id: 'ASSISTANT', label: 'Assistant', icon: Bot, color: 'bg-primary text-primary-foreground' },
+  { id: 'TACKLE', label: 'Tackle AI', icon: Sparkles, color: 'bg-primary text-primary-foreground' },
+  { id: 'SOLUNAR', label: 'Solunar', icon: Moon, color: 'bg-primary text-primary-foreground' },
+  { id: 'PRESSURE', label: 'Pressure', icon: TrendingDown, color: 'bg-primary text-primary-foreground' },
+  { id: 'BOX', label: 'Tackle Box', icon: Package, color: 'bg-primary text-primary-foreground' },
+  { id: 'TROPHY', label: 'Trophies', icon: Trophy, color: 'bg-primary text-primary-foreground' },
+  { id: 'LIVEWELL', label: 'Livewell', icon: Timer, color: 'bg-primary text-primary-foreground' },
+  { id: 'GUIDE', label: 'Academy', icon: GraduationCap, color: 'bg-primary text-primary-foreground' },
+  { id: 'SETTINGS', label: 'Settings', icon: Settings, color: 'bg-primary text-primary-foreground' },
 ];
 const MORE_IDS = new Set(MORE_TABS.map(t => t.id));
 
 function useAppState() {
-  const [activeTab, setActiveTab] = React.useState<TabId>('REPORT');
+  const [activeTab, setActiveTab] = React.useState<TabId>('VISION');
   const [catches, setCatches] = React.useState<CatchLogItem[]>([]);
   const [spots, setSpots] = React.useState<FishingSpot[]>([]);
   const [signedIn, setSignedIn] = React.useState<boolean>(isSignedIn());
@@ -242,8 +244,8 @@ export function AppRoutes() {
     const Icon = tab.icon;
     const isActive = activeTab === tab.id;
     return (
-      <button key={tab.id} onClick={() => goTo(tab.id)} className={`px-3 py-1.5 sm:px-3 sm:py-2 rounded-lg font-black text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${isActive ? `${tab.color} shadow-lg font-black scale-105` : 'text-slate-400 hover:text-white hover:bg-slate-800/60'}`}>
-        <Icon className="w-3.5 h-3.5 shrink-0" /><span className="text-[10px] sm:text-xs whitespace-nowrap">{tab.label}</span>
+      <button key={tab.id} onClick={() => goTo(tab.id)} className={`px-3 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors flex items-center gap-1.5 shrink-0 ${isActive ? `${tab.color} shadow-md` : 'text-muted-foreground hover:text-foreground hover:bg-secondary'}`}>
+        <Icon className="w-3.5 h-3.5 shrink-0" /><span className="text-[11px] sm:text-xs whitespace-nowrap">{tab.label}</span>
       </button>
     );
   };
@@ -253,32 +255,33 @@ export function AppRoutes() {
   return (
     <>
       <GlobalSeo />
-      <header className="sticky top-0 z-40 bg-dusk backdrop-blur-md border-b border-white/10 shadow-2xl">
+      <header className="sticky top-0 z-40 border-b border-border/80 bg-background/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={() => goTo('VISION')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-400 via-emerald-400 to-cyan-500 flex items-center justify-center text-slate-950 shadow-lg glow-emerald"><Fish className="w-6 h-6 stroke-[2.5]" /></div>
-            <div><div className="flex items-center gap-1.5"><h1 className="text-lg font-display font-black tracking-tight text-white uppercase leading-none">Fish<span className="text-emerald-400">AI</span></h1></div><span className="text-[10px] font-mono text-slate-400 block -mt-0.5 hidden sm:block">Fish smarter. Log every catch.</span></div>
+            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground glow-emerald"><Fish className="w-5 h-5 stroke-[2.5]" /></div>
+            <div><h1 className="text-base font-display font-bold tracking-tight text-foreground leading-none">FishAI</h1><span className="text-[10px] text-muted-foreground hidden sm:block">Snap it. Know it.</span></div>
           </div>
           <nav className="hidden md:flex items-center gap-1 flex-1 min-w-0 justify-end">
             {PRIMARY_TABS.map(renderTabButton)}
             <div className="relative">
-              <button onClick={() => setMoreOpen(v => !v)} className={`px-3 py-1.5 sm:px-3 sm:py-2 rounded-lg font-black text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shrink-0 ${moreActive || moreOpen ? 'bg-slate-700 text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'}`}>
-                <LayoutGrid className="w-3.5 h-3.5 shrink-0" /><span className="text-[10px] sm:text-xs whitespace-nowrap">More</span><ChevronDown className={`w-3 h-3 transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
+              <button onClick={() => setMoreOpen(v => !v)} className={`px-3 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors flex items-center gap-1.5 shrink-0 ${moreActive || moreOpen ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'}`}>
+                <LayoutGrid className="w-3.5 h-3.5 shrink-0" /><span className="text-[11px] sm:text-xs whitespace-nowrap">More</span><ChevronDown className={`w-3 h-3 transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
               </button>
-              {moreOpen && (<><div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} /><div className="absolute right-0 top-full mt-2 z-20 w-64 bg-slate-900 border border-white/10 rounded-xl shadow-2xl p-2 grid grid-cols-3 gap-1">{MORE_TABS.map(tab => { const Icon = tab.icon; const isActive = activeTab === tab.id; return <button key={tab.id} onClick={() => goTo(tab.id)} className={`flex flex-col items-center gap-1.5 px-2 py-3 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all ${isActive ? `${tab.color} shadow-lg` : 'text-slate-400 hover:text-white hover:bg-slate-800/60'}`}><Icon className="w-4 h-4" /><span className="whitespace-nowrap">{tab.label}</span></button>; })}</div></>)}
+              {moreOpen && (<><div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} /><div className="absolute right-0 top-full mt-2 z-20 w-72 bg-card border border-border rounded-xl shadow-2xl p-2 grid grid-cols-3 gap-1">{MORE_TABS.map(tab => { const Icon = tab.icon; const isActive = activeTab === tab.id; return <button key={tab.id} onClick={() => goTo(tab.id)} className={`flex flex-col items-center gap-1.5 px-2 py-3 rounded-lg text-[10px] font-semibold uppercase tracking-wider ${isActive ? `${tab.color}` : 'text-muted-foreground hover:text-foreground hover:bg-secondary'}`}><Icon className="w-4 h-4" /><span className="whitespace-nowrap">{tab.label}</span></button>; })}</div></>)}
             </div>
           </nav>
           <div className="hidden md:flex items-center gap-2 shrink-0">
-            {!signedIn && (<button onClick={() => { goTo('VISION'); setProFromHeader(true); }} className="px-3 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:from-emerald-300 hover:to-teal-300 transition-all shadow-lg"><Sparkles className="w-3.5 h-3.5" />Try PRO Free</button>)}
-            {signedIn ? (<button onClick={() => { if (window.confirm('Sign out of owner mode? AI analysis will be locked until you sign in again.')) { signOut(); setSignedIn(false); }}} className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:bg-emerald-500/25 transition-all" title="Tap to sign out"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />Owner</button>) : (<button onClick={() => setShowSignIn(true)} className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 hover:from-emerald-400 hover:to-teal-400 transition-all shadow-lg">Sign In</button>)}
+            {!signedIn && (<button onClick={() => { goTo('VISION'); setProFromHeader(true); }} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-widest flex items-center gap-1.5 hover:brightness-110"><Sparkles className="w-3.5 h-3.5" />Try PRO</button>)}
+            {signedIn ? (<button onClick={() => { if (window.confirm('Sign out of owner mode? AI analysis will be locked until you sign in again.')) { signOut(); setSignedIn(false); }}} className="px-3 py-2 rounded-lg border border-primary/40 text-primary text-xs font-semibold uppercase tracking-widest flex items-center gap-1.5" title="Tap to sign out"><span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />Owner</button>) : (<button onClick={() => setShowSignIn(true)} className="px-3 py-2 rounded-lg border border-border text-foreground text-xs font-semibold uppercase tracking-widest hover:border-primary">Sign In</button>)}
           </div>
           <div className="md:hidden flex items-center gap-2 shrink-0">
-            {signedIn ? (<button onClick={() => { if (window.confirm('Sign out of owner mode?')) { signOut(); setSignedIn(false); }}} className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />Owner</button>) : (<button onClick={() => { goTo('VISION'); setProFromHeader(true); }} className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-lg flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" />Try PRO</button>)}
+            {signedIn ? (<button onClick={() => { if (window.confirm('Sign out of owner mode?')) { signOut(); setSignedIn(false); }}} className="px-2.5 py-1.5 rounded-lg border border-primary/40 text-primary font-semibold text-[10px] uppercase tracking-widest flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />Owner</button>) : (<button onClick={() => { goTo('VISION'); setProFromHeader(true); }} className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold text-[10px] uppercase tracking-widest flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" />Try PRO</button>)}
           </div>
         </div>
       </header>
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 pb-28 md:pb-8">
-        <Suspense fallback={<div className="py-24 text-center text-xs font-mono text-slate-500 uppercase tracking-widest">Loading…</div>}>
+        {activeTab === 'VISION' && <LandingHero onSnap={() => document.getElementById('vision-board')?.scrollIntoView({ behavior: 'smooth' })} />}
+        <Suspense fallback={<div className="py-24 text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">Loading…</div>}>
           {activeTab === 'REPORT' && (
             hasHomeWater(profile) && !setupOpen ? (
               <DailyReport profile={profile} onEdit={() => setSetupOpen(true)} />
@@ -321,22 +324,23 @@ export function AppRoutes() {
           {activeTab === 'LIVEWELL' && <LivewellTimerView />}
           {activeTab === 'GUIDE' && <BeginnerGuideView />}
         </Suspense>
+        {activeTab === 'VISION' && <LearningLoop />}
       </main>
-      <footer className="bg-slate-900 border-t border-white/10 py-6 text-center text-xs font-mono text-slate-500 pb-24 md:pb-6">
+      <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground pb-24 md:pb-6">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-emerald-400" /><span className="font-bold text-slate-400">FishAI</span></div>
-          <span>Free core app. AI estimator: 7-day free trial, $7.99/mo after, cancel anytime.</span>
+          <div className="flex items-center gap-2"><Fish className="w-4 h-4 text-primary" /><span className="font-semibold text-foreground">FishAI</span></div>
+          <span>13 integrated fishing modules · Real weather, solunar math & a personal learning loop</span>
         </div>
       </footer>
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-white/10 pb-[env(safe-area-inset-bottom)]">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur-xl border-t border-border pb-[env(safe-area-inset-bottom)]">
         <div className="grid grid-cols-5">
-          {PRIMARY_TABS.slice(0, 4).map(tab => { const Icon = tab.icon; const isActive = activeTab === tab.id; return <button key={tab.id} onClick={() => goTo(tab.id)} className={`flex flex-col items-center gap-0.5 py-2.5 text-[9px] font-black uppercase tracking-wider transition-all ${isActive ? 'text-emerald-400' : 'text-slate-500 hover:text-slate-300'}`}><Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''}`} />{tab.label}</button>; })}
-          <button onClick={() => setMoreOpen(v => !v)} className={`flex flex-col items-center gap-0.5 py-2.5 text-[9px] font-black uppercase tracking-wider transition-all ${moreActive || moreOpen ? 'text-emerald-400' : 'text-slate-500 hover:text-slate-300'}`}><LayoutGrid className="w-5 h-5" />More</button>
+          {PRIMARY_TABS.slice(0, 4).map(tab => { const Icon = tab.icon; const isActive = activeTab === tab.id; return <button key={tab.id} onClick={() => goTo(tab.id)} className={`flex flex-col items-center gap-0.5 py-2.5 text-[9px] font-semibold uppercase tracking-wider ${isActive ? 'text-primary' : 'text-muted-foreground'}`}><Icon className="w-5 h-5" />{tab.label}</button>; })}
+          <button onClick={() => setMoreOpen(v => !v)} className={`flex flex-col items-center gap-0.5 py-2.5 text-[9px] font-semibold uppercase tracking-wider ${moreActive || moreOpen ? 'text-primary' : 'text-muted-foreground'}`}><LayoutGrid className="w-5 h-5" />More</button>
         </div>
-        {moreOpen && (<div className="absolute bottom-full inset-x-0 bg-slate-900 border-t border-white/10 rounded-t-2xl shadow-2xl p-3 pb-4 max-h-[60vh] overflow-y-auto">
-          <div className="flex items-center justify-between px-1 pb-2"><span className="text-[10px] font-black uppercase tracking-widest text-slate-400">All Tools</span><button onClick={() => setMoreOpen(false)} className="text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-white px-2 py-1">Close ✕</button></div>
-          <div className="grid grid-cols-3 gap-1.5">{MORE_TABS.map(tab => { const Icon = tab.icon; const isActive = activeTab === tab.id; return <button key={tab.id} onClick={() => goTo(tab.id)} className={`flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all ${isActive ? `${tab.color} shadow-lg` : 'text-slate-400 hover:text-white hover:bg-slate-800/70'}`}><Icon className="w-5 h-5" /><span className="whitespace-nowrap">{tab.label}</span></button>; })}</div>
-          {!signedIn && <button onClick={() => { setMoreOpen(false); setShowSignIn(true); }} className="mt-2 w-full py-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-black text-[10px] uppercase tracking-wider hover:bg-emerald-500/25 transition-all">Owner Sign In</button>}
+        {moreOpen && (<div className="absolute bottom-full inset-x-0 bg-card border-t border-border rounded-t-2xl shadow-2xl p-3 pb-4 max-h-[60vh] overflow-y-auto">
+          <div className="flex items-center justify-between px-1 pb-2"><span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">All tools</span><button onClick={() => setMoreOpen(false)} className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-2 py-1">Close</button></div>
+          <div className="grid grid-cols-3 gap-1.5">{[...PRIMARY_TABS.slice(4), ...MORE_TABS].map(tab => { const Icon = tab.icon; const isActive = activeTab === tab.id; return <button key={tab.id} onClick={() => goTo(tab.id)} className={`flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl text-[10px] font-semibold uppercase tracking-wider ${isActive ? `${tab.color}` : 'text-muted-foreground hover:bg-secondary'}`}><Icon className="w-5 h-5" /><span className="whitespace-nowrap">{tab.label}</span></button>; })}</div>
+          {!signedIn && <button onClick={() => { setMoreOpen(false); setShowSignIn(true); }} className="mt-2 w-full py-2.5 rounded-xl border border-primary/40 text-primary font-semibold text-[10px] uppercase tracking-widest">Owner Sign In</button>}
         </div>)}
       </nav>
       <OwnerSignInModal open={showSignIn} onClose={() => setShowSignIn(false)} onSignedIn={() => setSignedIn(true)} />
