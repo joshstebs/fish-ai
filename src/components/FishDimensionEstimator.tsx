@@ -110,6 +110,7 @@ interface FishAnalysisResult {
   commonName: string;
   scientificName: string;
   confidence: number;
+  visionProvider?: string;
   estimatedLength: {
     minInches: number;
     maxInches: number;
@@ -302,8 +303,8 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
         }
         if (resp.status === 503) {
           serverMsg =
-            'Real AI vision isn\u2019t configured on the server yet (GEMINI_API_KEY missing). ' +
-            'Set the key to enable real fish identification — FishAI never fakes an analysis. ' +
+            'Real AI vision isn\u2019t configured yet. Set OPENAI_API_KEY (preferred), ANTHROPIC_API_KEY, or GEMINI_API_KEY. ' +
+            'FishAI never fakes an analysis. ' +
             'You can still log a catch manually from the Logbook tab.';
         }
         throw new Error(serverMsg);
@@ -749,6 +750,11 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                   <p className="text-sm italic font-mono text-slate-400">
                     {result.scientificName}
                   </p>
+                  {result.visionProvider && (
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-slate-500">
+                      via {result.visionProvider}
+                    </p>
+                  )}
                   <div className="pt-2">
                     <span className="inline-flex items-center gap-1.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full px-3 py-1 text-xs font-black uppercase tracking-wider">
                       <Sparkles className="w-3 h-3" /> High Confidence
