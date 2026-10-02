@@ -1,6 +1,5 @@
 // FishAI merch catalog — prices in CAD.
-// Payment links are NOT live yet: MERCH_PAYMENT_LINKS holds clearly-marked
-// placeholders the parent fills in after Stripe payment links are created.
+// Stripe payment links — live.
 
 export type MerchCategory = 'tee' | 'hoodie' | 'hat';
 
@@ -97,25 +96,25 @@ export const MERCH_PRODUCTS: MerchProduct[] = [
 // found" page, so replace every value before announcing the shop publicly.
 // ---------------------------------------------------------------------------
 export const MERCH_PAYMENT_LINKS: Record<string, string> = {
-  'tee-lake-ontario-forever': 'https://buy.stripe.com/PLACEHOLDER-tee-lake-ontario-forever',
-  'tee-winter-is-biting': 'https://buy.stripe.com/PLACEHOLDER-tee-winter-is-biting',
-  'tee-walleye-after-dark': 'https://buy.stripe.com/PLACEHOLDER-tee-walleye-after-dark',
-  'tee-great-lakes-smallmouth': 'https://buy.stripe.com/PLACEHOLDER-tee-great-lakes-smallmouth',
-  'tee-muskie-hunter': 'https://buy.stripe.com/PLACEHOLDER-tee-muskie-hunter',
-  'tee-ice-hole-bandit': 'https://buy.stripe.com/PLACEHOLDER-tee-ice-hole-bandit',
-  'tee-ontario-slam': 'https://buy.stripe.com/PLACEHOLDER-tee-ontario-slam',
-  'tee-reel-therapy': 'https://buy.stripe.com/PLACEHOLDER-tee-reel-therapy',
-  'tee-fishai-brand-lockup': 'https://buy.stripe.com/PLACEHOLDER-tee-fishai-brand-lockup',
-  'tee-bucketmouth': 'https://buy.stripe.com/PLACEHOLDER-tee-bucketmouth',
-  'tee-chrome-steelhead': 'https://buy.stripe.com/PLACEHOLDER-tee-chrome-steelhead',
-  'hoodie-lake-ontario-forever': 'https://buy.stripe.com/PLACEHOLDER-hoodie-lake-ontario-forever',
-  'hoodie-winter-is-biting': 'https://buy.stripe.com/PLACEHOLDER-hoodie-winter-is-biting',
-  'hoodie-walleye-after-dark': 'https://buy.stripe.com/PLACEHOLDER-hoodie-walleye-after-dark',
-  'hoodie-muskie-hunter': 'https://buy.stripe.com/PLACEHOLDER-hoodie-muskie-hunter',
-  'hoodie-great-lakes-smallmouth': 'https://buy.stripe.com/PLACEHOLDER-hoodie-great-lakes-smallmouth',
-  'hat-fishai-brand-lockup': 'https://buy.stripe.com/PLACEHOLDER-hat-fishai-brand-lockup',
-  'hat-lake-ontario-forever': 'https://buy.stripe.com/PLACEHOLDER-hat-lake-ontario-forever',
-  'hat-winter-is-biting': 'https://buy.stripe.com/PLACEHOLDER-hat-winter-is-biting',
+  'tee-lake-ontario-forever': 'https://buy.stripe.com/dRmdRa1oc6J10F4gen1Jm00',
+  'tee-winter-is-biting': 'https://buy.stripe.com/3cI3cw2sg5EX73saU31Jm01',
+  'tee-walleye-after-dark': 'https://buy.stripe.com/7sY28s1oc4AT0F4aU31Jm02',
+  'tee-great-lakes-smallmouth': 'https://buy.stripe.com/00w8wQ0k87N5evUaU31Jm03',
+  'tee-muskie-hunter': 'https://buy.stripe.com/4gM6oIc2Q7N52Nc7HR1Jm04',
+  'tee-ice-hole-bandit': 'https://buy.stripe.com/9B64gA7MAd7pbjI8LV1Jm05',
+  'tee-ontario-slam': 'https://buy.stripe.com/dRmdRa5Es3wPafE0fp1Jm06',
+  'tee-reel-therapy': 'https://buy.stripe.com/bJe9AUff2d7pcnM6DN1Jm07',
+  'tee-fishai-brand-lockup': 'https://buy.stripe.com/fZu28sff27N54Vke6f1Jm08',
+  'tee-bucketmouth': 'https://buy.stripe.com/8x228s2sggjB2Nce6f1Jm09',
+  'tee-chrome-steelhead': 'https://buy.stripe.com/8x24gA3wk0kDgE26DN1Jm0a',
+  'hoodie-lake-ontario-forever': 'https://buy.stripe.com/cNi28s9UI9VdfzY1jt1Jm0b',
+  'hoodie-winter-is-biting': 'https://buy.stripe.com/8x24gA3wk5EXgE22nx1Jm0c',
+  'hoodie-walleye-after-dark': 'https://buy.stripe.com/4gMcN6d6U4AT0F48LV1Jm0d',
+  'hoodie-muskie-hunter': 'https://buy.stripe.com/4gM5kE9UI8R9evU1jt1Jm0e',
+  'hoodie-great-lakes-smallmouth': 'https://buy.stripe.com/00w00k4Ao6J1afE6DN1Jm0f',
+  'hat-fishai-brand-lockup': 'https://buy.stripe.com/3cI28saYMebt1J88LV1Jm0g',
+  'hat-lake-ontario-forever': 'https://buy.stripe.com/5kQ9AU0k82sLevUfaj1Jm0h',
+  'hat-winter-is-biting': 'https://buy.stripe.com/5kQ3cw9UI0kDgE29PZ1Jm0i',
 };
 
 export function paymentLinkFor(productId: string): string {
