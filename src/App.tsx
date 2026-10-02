@@ -10,7 +10,7 @@ import { loadProfile, saveProfile, hasHomeWater, AnglerProfile } from './utils/p
 import {
   Camera, BookOpen, MapPin, Sparkles, Fish, GraduationCap, Moon,
   TrendingDown, Package, Trophy, Timer, Gauge, Brain, Bot, Settings,
-  ChevronDown, LayoutGrid, PlusCircle, ArrowRight,
+  ChevronDown, LayoutGrid, PlusCircle, ArrowRight, ShoppingBag,
 } from 'lucide-react';
 import { GlobalSeo } from './components/SeoHead';
 import { ListiclePage } from './pages/ListiclePage';
@@ -31,8 +31,9 @@ const LivewellTimerView = React.lazy(() => import('./components/LivewellTimerVie
 const InsightsView = React.lazy(() => import('./components/InsightsView').then(m => ({ default: m.InsightsView })));
 const AssistantView = React.lazy(() => import('./components/AssistantView').then(m => ({ default: m.AssistantView })));
 const SettingsView = React.lazy(() => import('./components/SettingsView').then(m => ({ default: m.SettingsView })));
+const ShopView = React.lazy(() => import('./components/ShopView').then(m => ({ default: m.ShopView })));
 
-type TabId = 'REPORT' | 'VISION' | 'LOGBOOK' | 'SPOTS' | 'TACKLE' | 'GUIDE' | 'SOLUNAR' | 'PRESSURE' | 'BOX' | 'TROPHY' | 'LIVEWELL' | 'INSIGHTS' | 'ASSISTANT' | 'SETTINGS';
+type TabId = 'REPORT' | 'VISION' | 'LOGBOOK' | 'SPOTS' | 'TACKLE' | 'GUIDE' | 'SOLUNAR' | 'PRESSURE' | 'BOX' | 'TROPHY' | 'LIVEWELL' | 'INSIGHTS' | 'ASSISTANT' | 'SETTINGS' | 'SHOP';
 interface TabDef { id: TabId; label: string; icon: React.ComponentType<{ className?: string }>; color: string; }
 
 const PRIMARY_TABS: TabDef[] = [
@@ -41,6 +42,7 @@ const PRIMARY_TABS: TabDef[] = [
   { id: 'LOGBOOK', label: 'Logbook', icon: BookOpen, color: 'bg-blue-600 text-white' },
   { id: 'INSIGHTS', label: 'Insights', icon: Brain, color: 'bg-violet-600 text-white' },
   { id: 'ASSISTANT', label: 'Assistant', icon: Bot, color: 'bg-fuchsia-600 text-white' },
+  { id: 'SHOP', label: 'Shop', icon: ShoppingBag, color: 'bg-amber-500 text-slate-950' },
 ];
 const MORE_TABS: TabDef[] = [
   { id: 'SPOTS', label: 'Spot Map', icon: MapPin, color: 'bg-cyan-500 text-slate-950' },
@@ -320,6 +322,7 @@ export function AppRoutes() {
           {activeTab === 'TROPHY' && <TrophyWallView catches={catches} />}
           {activeTab === 'LIVEWELL' && <LivewellTimerView />}
           {activeTab === 'GUIDE' && <BeginnerGuideView />}
+          {activeTab === 'SHOP' && <ShopView />}
         </Suspense>
       </main>
       <footer className="bg-slate-900 border-t border-white/10 py-6 text-center text-xs font-mono text-slate-500 pb-24 md:pb-6">
@@ -335,7 +338,7 @@ export function AppRoutes() {
         </div>
         {moreOpen && (<div className="absolute bottom-full inset-x-0 bg-slate-900 border-t border-white/10 rounded-t-2xl shadow-2xl p-3 pb-4 max-h-[60vh] overflow-y-auto">
           <div className="flex items-center justify-between px-1 pb-2"><span className="text-[10px] font-black uppercase tracking-widest text-slate-400">All Tools</span><button onClick={() => setMoreOpen(false)} className="text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-white px-2 py-1">Close ✕</button></div>
-          <div className="grid grid-cols-3 gap-1.5">{MORE_TABS.map(tab => { const Icon = tab.icon; const isActive = activeTab === tab.id; return <button key={tab.id} onClick={() => goTo(tab.id)} className={`flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all ${isActive ? `${tab.color} shadow-lg` : 'text-slate-400 hover:text-white hover:bg-slate-800/70'}`}><Icon className="w-5 h-5" /><span className="whitespace-nowrap">{tab.label}</span></button>; })}</div>
+          <div className="grid grid-cols-3 gap-1.5">{[...PRIMARY_TABS.slice(4), ...MORE_TABS].map(tab => { const Icon = tab.icon; const isActive = activeTab === tab.id; return <button key={tab.id} onClick={() => goTo(tab.id)} className={`flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all ${isActive ? `${tab.color} shadow-lg` : 'text-slate-400 hover:text-white hover:bg-slate-800/70'}`}><Icon className="w-5 h-5" /><span className="whitespace-nowrap">{tab.label}</span></button>; })}</div>
           {!signedIn && <button onClick={() => { setMoreOpen(false); setShowSignIn(true); }} className="mt-2 w-full py-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-black text-[10px] uppercase tracking-wider hover:bg-emerald-500/25 transition-all">Owner Sign In</button>}
         </div>)}
       </nav>
