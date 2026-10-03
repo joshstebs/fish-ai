@@ -18,4 +18,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run check
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Tests, integrity, typecheck, build, prerender
+        run: npm run check
