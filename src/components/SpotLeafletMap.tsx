@@ -13,6 +13,15 @@ interface SpotLeafletMapProps {
 
 // Real interactive map (Leaflet + OpenStreetMap/Carto dark tiles — free, no API key).
 // Click anywhere to drop a pin → parent opens the add-spot modal with real coords.
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export const SpotLeafletMap: React.FC<SpotLeafletMapProps> = ({
   spots,
   selectedSpotId,
@@ -24,6 +33,7 @@ export const SpotLeafletMap: React.FC<SpotLeafletMapProps> = ({
   const markersRef = useRef<L.LayerGroup | null>(null);
   const pickMarkerRef = useRef<L.Marker | null>(null);
   const pickRef = useRef({ lat: 0, lon: 0 });
+  const lastReverseGeocodeAtRef = useRef(0);
 
   // Init map once
   useEffect(() => {
@@ -61,17 +71,21 @@ export const SpotLeafletMap: React.FC<SpotLeafletMapProps> = ({
       }).addTo(map);
 
       let placeName: string | undefined;
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat.toFixed(5)}&lon=${lng.toFixed(5)}`,
-          { headers: { 'User-Agent': 'FishAI-app/1.0 (fishing spot tracker)' } }
-        );
-        if (res.ok) {
-          const data = await res.json();
-          placeName = data?.display_name?.split(',')?.slice(0, 2)?.join(',');
+      const now = Date.now();
+      if (now - lastReverseGeocodeAtRef.current >= 1100) {
+        lastReverseGeocodeAtRef.current = now;
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat.toFixed(5)}&lon=${lng.toFixed(5)}`,
+            { headers: { 'Accept-Language': 'en' } }
+          );
+          if (res.ok) {
+            const data = await res.json();
+            placeName = data?.display_name?.split(',')?.slice(0, 2)?.join(',');
+          }
+        } catch {
+          /* reverse geocode is best-effort */
         }
-      } catch {
-        /* reverse geocode is best-effort */
       }
       onPickLocation(lat, lng, placeName);
     });
@@ -102,9 +116,9 @@ export const SpotLeafletMap: React.FC<SpotLeafletMapProps> = ({
       const marker = L.marker([spot.latitude, spot.longitude], { icon }).addTo(layer);
       marker.bindPopup(
         `<div style="font-family:monospace;font-size:11px;color:#0f172a;">
-          <b style="font-size:12px;">${spot.name}</b><br/>
-          ${spot.waterBody}<br/>
-          <span style="color:#0d9488;">${spot.totalCatches} catches</span>
+          <b style="font-size:12px;">${escapeHtml(spot.name)}</b><br/>
+          ${escapeHtml(spot.waterBody)}<br/>
+          <span style="color:#0d9488;">${Number.isFinite(spot.totalCatches) ? spot.totalCatches : 0} catches</span>
         </div>`
       );
       marker.on('click', () => onSelectSpot(spot.id));

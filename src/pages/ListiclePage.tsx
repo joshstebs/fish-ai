@@ -1,17 +1,32 @@
 import React from 'react';
 
 export function ListiclePage({ onStart }: { onStart?: () => void } = {}) {
+  const criteria = [
+    ['Social discovery', 'Choose a product with a large community if public catches, follows, and shared spots are the main goal.'],
+    ['Private personal log', 'Choose local-first storage if you want your own catch history to remain the center of the workflow.'],
+    ['Weather and timing', 'Check whether conditions are live, where they come from, and whether timing is calculated for your actual coordinates.'],
+    ['AI image analysis', 'Treat species and dimension output as estimates. Look for confidence, failure states, and clear limits rather than guaranteed accuracy.'],
+    ['Regulations', 'Use current official jurisdiction sources for legal decisions. An AI fishing app should not replace them.'],
+  ];
+
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
-      <h1 className="text-2xl sm:text-4xl font-display font-black uppercase tracking-tight text-white">best fishing apps 2026: the complete list</h1>
-      <p className="mt-3 text-slate-300 text-sm sm:text-base">we tested every major fishing app. here is the actual list, ranked by what matters most to anglers.</p>
-      <ol className="mt-6 space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed list-decimal list-inside">
-        <li><span className="font-black text-white">fishAI</span> — best all-in-one fishing app. AI fish ID, logbook, insights, solunar, pressure, and a spot map that respects your privacy. the only app that learns from your catches.</li>
-        <li><span className="font-black text-white">fishbrain</span> — best social fishing map. huge user base, good spot sharing, but the feed is noisy and your data is public by default.</li>
-        <li><span className="font-black text-white">fishangler</span> — best free forecast + map combo. solid for basics, weak on AI and personal insights.</li>
-        <li><span className="font-black text-white">tide charts + weather apps</span> — best for minimalist anglers. no logbook, no AI, just numbers.</li>
-      </ol>
-      <p className="mt-6 text-slate-400 text-xs">updated august 2026. we test each app for at least 30 days before ranking.</p>
+      <h1 className="text-2xl sm:text-4xl font-display font-black uppercase tracking-tight text-white">How to compare fishing apps in 2026</h1>
+      <p className="mt-3 text-slate-300 text-sm sm:text-base">
+        A criteria-based checklist instead of an unverifiable ranking.
+      </p>
+      <div className="mt-6 space-y-3">
+        {criteria.map(([title, detail]) => (
+          <div key={title} className="bg-slate-900 border border-white/10 rounded-2xl p-4">
+            <div className="text-xs font-black uppercase tracking-widest text-emerald-400">{title}</div>
+            <div className="mt-1 text-sm text-slate-300">{detail}</div>
+          </div>
+        ))}
+      </div>
+      <p className="mt-6 text-slate-400 text-xs">
+        FishAI focuses on a local-first logbook, live weather, computed solunar timing, saved spots, and optional AI image analysis. Verify current competitor features and prices directly with those providers.
+      </p>
+      {onStart && <button onClick={onStart} className="mt-5 px-4 py-2.5 rounded-lg bg-emerald-500 text-slate-950 font-black text-xs uppercase tracking-wider">Open FishAI</button>}
     </div>
   );
 }

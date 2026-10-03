@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { FishingSpot, CatchLogItem, SpotPrivacyLevel, SolunarPeriod } from '../types/catchLogTypes';
+import { FishingSpot, CatchLogItem, SolunarPeriod } from '../types/catchLogTypes';
 import {
   MapPin,
   Compass,
@@ -53,12 +53,11 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
   // New Spot Form State
   const [newSpotName, setNewSpotName] = useState('');
   const [newWaterBody, setNewWaterBody] = useState('');
-  const [newTopSpecies, setNewTopSpecies] = useState('Largemouth Bass');
-  const [newBestBait, setNewBestBait] = useState('Wacky Senko');
-  const [newClarity, setNewClarity] = useState<'CLEAR' | 'STAINED' | 'MUDDY'>('STAINED');
-  const [newDepth, setNewDepth] = useState(8);
+  const [newTopSpecies, setNewTopSpecies] = useState('');
+  const [newBestBait, setNewBestBait] = useState('');
+  const [newClarity, setNewClarity] = useState<'' | 'CLEAR' | 'STAINED' | 'MUDDY'>('');
+  const [newDepth, setNewDepth] = useState(0);
   const [newNotes, setNewNotes] = useState('');
-  const [newPrivacy, setNewPrivacy] = useState<SpotPrivacyLevel>('PRIVATE');
   const [privacyError, setPrivacyError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -155,7 +154,12 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
 
   // Real GPS coordinates from the browser — never random fabricated coords.
   const handleCreateSpot = async () => {
-    if (!newSpotName) return;
+    const spotName = newSpotName.trim();
+    const waterBody = newWaterBody.trim();
+    if (!spotName || !waterBody || !newClarity || !Number.isFinite(newDepth) || newDepth <= 0) {
+      setPrivacyError('Enter a real spot name, water body, water clarity, and a positive depth. FishAI will not invent missing spot facts.');
+      return;
+    }
     setPrivacyError(null);
     setIsCreating(true);
 
@@ -181,21 +185,26 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
     }
 
     onAddSpot({
-      name: newSpotName,
-      waterBody: newWaterBody || 'Local Lake',
+      name: spotName,
+      waterBody,
       latitude: lat,
       longitude: lon,
-      rating: 5.0,
-      topSpecies: newTopSpecies,
-      bestBait: newBestBait,
+      rating: 0,
+      topSpecies: newTopSpecies.trim(),
+      bestBait: newBestBait.trim(),
       waterClarity: newClarity,
       averageDepthFeet: newDepth,
-      notes: newNotes || 'Newly added spot.',
-      privacyLevel: newPrivacy,
+      notes: newNotes.trim(),
+      privacyLevel: 'PRIVATE',
     });
 
     setIsAddModalOpen(false);
     setNewSpotName('');
+    setNewWaterBody('');
+    setNewTopSpecies('');
+    setNewBestBait('');
+    setNewClarity('');
+    setNewDepth(0);
     setNewNotes('');
     setMapPicked(null);
     setIsCreating(false);
@@ -222,7 +231,7 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
           </p>
           <p className="text-slate-400 text-xs font-mono mt-2 flex items-center gap-1.5">
             <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            Your spots stay on your device. Nothing is shared.
+            Saved spot records stay in this browser by default. Network map, weather, and geocoding features can receive the coordinates you ask them to use.
           </p>
         </div>
 
@@ -245,10 +254,10 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
             </div>
             <div className="min-w-0">
               <h3 className="text-sm font-black uppercase text-white tracking-tight">
-                100% Private. Your Data.
+                Local-first spot storage
               </h3>
               <p className="text-slate-400 text-sm mt-1">
-                Your spots stay on your device. We never sell your data.
+                FishAI does not upload a spot database. Coordinates can still be sent to map, weather, or geocoding providers when you use those features.
               </p>
             </div>
           </div>
@@ -278,7 +287,7 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
                     {spot.waterBody}
                   </span>
                   <span className="text-xs font-mono font-bold text-amber-400 flex items-center gap-1">
-                    <Star className="w-3 h-3 fill-amber-400" /> {spot.rating}
+                    <Star className="w-3 h-3 fill-amber-400" /> {spot.rating > 0 ? spot.rating : '—'}
                   </span>
                 </div>
                 <h4 className="text-sm font-black text-white uppercase tracking-tight truncate flex items-center gap-1.5">
@@ -368,14 +377,14 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
                 <div className="bg-slate-950 p-3 rounded border border-slate-800 space-y-1">
                   <span className="text-[10px] uppercase font-bold text-slate-400 block">Top Species</span>
                   <span className="text-sm font-black text-emerald-400 truncate block">
-                    {activeSpot.topSpecies}
+                    {activeSpot.topSpecies || 'Not recorded'}
                   </span>
                 </div>
 
                 <div className="bg-slate-950 p-3 rounded border border-slate-800 space-y-1">
                   <span className="text-[10px] uppercase font-bold text-slate-400 block">Best Lure / Bait</span>
                   <span className="text-sm font-black text-amber-400 truncate block">
-                    {activeSpot.bestBait}
+                    {activeSpot.bestBait || 'Not recorded'}
                   </span>
                 </div>
 
@@ -516,9 +525,10 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
                   <label className="font-bold uppercase text-slate-400">Water Clarity:</label>
                   <select
                     value={newClarity}
-                    onChange={(e) => setNewClarity(e.target.value as any)}
+                    onChange={(e) => setNewClarity(e.target.value as '' | 'CLEAR' | 'STAINED' | 'MUDDY')}
                     className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-white font-mono focus:outline-none"
                   >
+                    <option value="">Select real clarity</option>
                     <option value="CLEAR">Clear</option>
                     <option value="STAINED">Stained</option>
                     <option value="MUDDY">Muddy</option>
@@ -529,7 +539,9 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
                   <label className="font-bold uppercase text-slate-400">Average Depth (ft):</label>
                   <input
                     type="number"
-                    value={newDepth}
+                    value={newDepth || ''}
+                    min="0.1"
+                    step="0.1"
                     onChange={(e) => setNewDepth(Number(e.target.value))}
                     className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-white font-mono focus:outline-none focus:border-cyan-500"
                   />
@@ -547,26 +559,19 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
                 />
               </div>
               <div className="space-y-1">
-                <label className="font-bold uppercase text-slate-400">Spot Privacy:</label>
-                <select
-                  value={newPrivacy}
-                  onChange={(e) => setNewPrivacy(e.target.value as SpotPrivacyLevel)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-white font-mono focus:outline-none"
-                >
-                  <option value="PRIVATE">🔒 Private — exact location, only on this device</option>
-                  <option value="FRIENDS">👥 Friends — shared with anglers you choose (future)</option>
-                  <option value="APPROXIMATE">👁️ Approximate — general area, exact spot hidden</option>
-                  <option value="PUBLIC">🌍 Public — visible to everyone (use with care)</option>
-                </select>
+                <label className="font-bold uppercase text-slate-400">Storage:</label>
+                <div className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-slate-300 font-mono">
+                  🔒 Local-first — new spots are saved as PRIVATE in this browser.
+                </div>
                 <p className="text-[10px] text-slate-500 font-mono">
-                  Your exact coordinates are never shared anywhere unless you pick Public.
+                  FishAI has no implemented friends/public sharing backend. Map tiles, reverse geocoding, and weather requests may send coordinates to their respective service providers when used.
                 </p>
               </div>
 
               <div className="bg-slate-950 border border-slate-800 rounded-lg p-3 text-[11px] font-mono text-slate-300 space-y-1">
                 <span className="text-[10px] uppercase font-bold text-cyan-400 block">GPS Capture</span>
                 <span>
-                  Saving uses your real GPS position from this device.
+                  Saving uses the map pin you selected or this device's real GPS position. No coordinates are synthesized.
                 </span>
               </div>
 
@@ -587,7 +592,7 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
                 className="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-slate-950 font-black text-xs uppercase tracking-wider rounded-lg shadow-lg flex items-center gap-2"
               >
                 {isCreating && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                <span>{isCreating ? 'Getting GPS...' : 'Save Spot Marker'}</span>
+                <span>{isCreating ? 'Saving...' : 'Save Spot Marker'}</span>
               </button>
             </div>
           </div>

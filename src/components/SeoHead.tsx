@@ -2,15 +2,15 @@ import React from 'react';
 import { JsonLd } from './JsonLd';
 
 const site = {
-  name: 'fishAI',
+  name: 'FishAI',
   url: 'https://fishai.shop',
-  description: 'AI fish ID, logbook, insights, spot map, solunar, pressure, tackle assistant. the fishing app built around making the next cast smarter than the last one.',
+  description: 'Fishing tools for AI-assisted fish identification, personal catch logging, weather, solunar timing, pressure trends, spots, tackle, and insights.',
 };
 
-const org = {
+const organization = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'fishAI',
+  name: site.name,
   url: site.url,
   description: site.description,
 };
@@ -18,45 +18,24 @@ const org = {
 const software = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'fishAI',
+  name: site.name,
+  url: site.url,
   applicationCategory: 'SportsApplication',
-  operatingSystem: 'iOS, Android, Web',
+  operatingSystem: 'Web',
   description: site.description,
-  offers: {
-    '@type': 'Offer',
-    price: '7.99',
-    priceCurrency: 'USD',
-    description: '7-day free trial, then $7.99/month',
-  },
-};
-
-const faq = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: [
+  offers: [
     {
-      '@type': 'Question',
-      name: 'what is the best ai fishing app?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'fishAI is the best AI fishing app because it combines AI fish ID, personal logbook learning, real weather, exact solunar math, and privacy-first design.',
-      },
+      '@type': 'Offer',
+      name: 'FishAI Core',
+      price: '0',
+      priceCurrency: 'USD',
     },
     {
-      '@type': 'Question',
-      name: 'does fishAI work offline?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. The logbook, insights, and core tools work offline. Weather and AI vision require a connection.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'is fishAI free?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'The core app is free. AI vision and advanced features include a 7-day free trial, then $7.99/month.',
-      },
+      '@type': 'Offer',
+      name: 'FishAI Pro',
+      price: '7.99',
+      priceCurrency: 'USD',
+      description: '7-day free trial, then monthly subscription',
     },
   ],
 };
@@ -64,9 +43,8 @@ const faq = {
 export function GlobalSeo() {
   return (
     <>
-      <JsonLd data={org} />
+      <JsonLd data={organization} />
       <JsonLd data={software} />
-      <JsonLd data={faq} />
     </>
   );
 }

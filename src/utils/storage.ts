@@ -4,27 +4,39 @@ const CATCHES_STORAGE_KEY = 'fish_ai_catch_logbook';
 const SPOTS_STORAGE_KEY = 'fish_ai_fishing_spots';
 const TACKLE_STORAGE_KEY = 'fish_ai_tackle_box';
 
+function csvCell(value: unknown): string {
+  let text = String(value ?? '').replace(/"/g, '""');
+  // Prevent spreadsheet applications from interpreting user-controlled values
+  // as formulas when the exported CSV is opened.
+  if (/^[=+\-@]/.test(text)) text = "'" + text;
+  return `"${text}"`;
+}
+
 export function exportCatchesToCSV(catches: CatchLogItem[]): void {
   if (catches.length === 0) return;
+
   const headers = ['Date', 'Species', 'Length', 'Weight', 'Location', 'Bait', 'Water Temp', 'Notes'];
-  const rows = catches.map((c) => [
-    `"${c.formattedDate}"`,
-    `"${c.species}"`,
-    `"${c.estimatedLength}"`,
-    `"${c.estimatedWeight}"`,
-    `"${c.locationName}"`,
-    `"${c.baitUsed}"`,
-    `"${c.weather?.waterTempF || ''}"`,
-    `"${(c.notes || '').replace(/"/g, '""')}"`,
+  const rows = catches.map((catchItem) => [
+    csvCell(catchItem.formattedDate),
+    csvCell(catchItem.species),
+    csvCell(catchItem.estimatedLength),
+    csvCell(catchItem.estimatedWeight),
+    csvCell(catchItem.locationName),
+    csvCell(catchItem.baitUsed),
+    csvCell(catchItem.weather?.waterTempF ?? ''),
+    csvCell(catchItem.notes),
   ]);
-  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-  const encodedUri = encodeURI(csvContent);
+
+  const csv = [headers.map(csvCell).join(','), ...rows.map((row) => row.join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.setAttribute('href', encodedUri);
-  link.setAttribute('download', `FishAI_Catch_Logbook_${new Date().toISOString().slice(0, 10)}.csv`);
+  link.href = url;
+  link.download = `FishAI_Catch_Logbook_${new Date().toISOString().slice(0, 10)}.csv`;
   document.body.appendChild(link);
   link.click();
-  document.body.removeChild(link);
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function safeLoad<T>(key: string): T | null {

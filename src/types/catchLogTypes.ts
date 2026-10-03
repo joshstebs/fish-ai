@@ -49,7 +49,7 @@ export interface FishingSpot {
   waterClarity: 'CLEAR' | 'STAINED' | 'MUDDY';
   averageDepthFeet: number;
   notes: string;
-  /** Privacy level — exact coordinates are never shared without the user choosing PUBLIC */
+  /** Legacy/local privacy label. FishAI currently has no implemented spot-sharing backend. */
   privacyLevel?: SpotPrivacyLevel;
 }
 
