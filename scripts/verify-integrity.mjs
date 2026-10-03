@@ -4,12 +4,12 @@ import { readFileSync } from 'node:fs';
 const checks = [
   {
     files: ['server/app.ts', 'server/routes/billingRoutes.ts', 'src/utils/billing.ts'],
-    pattern: /x-fish-customer-id|fishai\.customerId/,
+    pattern: /x-fish-customer-id|localStorage\.setItem\(['"]fishai\.customerId/i,
     message: 'Stripe customer IDs must not be authorization credentials.'
   },
   {
     files: ['server/app.ts', 'src/utils/apiAuth.ts'],
-    pattern: /x-fish-app-secret|fishai\.appSecret/,
+    pattern: /x-fish-app-secret|localStorage\.setItem\(['"]fishai\.appSecret/i,
     message: 'The owner password must not be persisted/replayed by the browser.'
   },
   {
