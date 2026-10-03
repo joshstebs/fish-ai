@@ -16,7 +16,9 @@ test('session encryption round-trips valid claims', () => {
 test('tampered session tokens are rejected', () => {
   const token = issueSession('owner', 'owner', 300);
   const parts = token.split('.');
-  parts[2] = parts[2].slice(0, -1) + (parts[2].endsWith('A') ? 'B' : 'A');
+  const ciphertext = Buffer.from(parts[2], 'base64url');
+  ciphertext[0] ^= 0x01;
+  parts[2] = ciphertext.toString('base64url');
   assert.equal(verifySession(parts.join('.'), ['owner']), null);
 });
 
