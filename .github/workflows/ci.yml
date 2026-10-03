@@ -1,0 +1,24 @@
+name: FishAI CI
+on:
+  pull_request:
+    branches: [master]
+permissions:
+  contents: read
+concurrency:
+  group: fishai-ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Tests, integrity, typecheck, build, prerender
+        run: npm run check

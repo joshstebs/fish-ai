@@ -95,12 +95,9 @@ export const MERCH_PRODUCTS: MerchProduct[] = [
     'Adjustable snapback — one size fits most'),
 ];
 
-// ---------------------------------------------------------------------------
-// Stripe payment links — PLACEHOLDERS. The parent fills these in after the
-// Stripe payment links are created in the FishAI Stripe account. The Shop UI
-// renders the Buy button regardless; placeholder links open a Stripe "not
-// found" page, so replace every value before announcing the shop publicly.
-// ---------------------------------------------------------------------------
+// Stripe-hosted payment links. The UI only enables checkout for links that
+// match Stripe's expected buy.stripe.com format. Product fulfillment/variant
+// details must be confirmed in the Stripe checkout before payment.
 export const MERCH_PAYMENT_LINKS: Record<string, string> = {
   'tee-lake-ontario-forever': 'https://buy.stripe.com/dRmdRa1oc6J10F4gen1Jm00',
   'tee-winter-is-biting': 'https://buy.stripe.com/3cI3cw2sg5EX73saU31Jm01',
@@ -130,8 +127,8 @@ export function paymentLinkFor(productId: string): string {
   return MERCH_PAYMENT_LINKS[productId] ?? '#';
 }
 
-export function isPlaceholderLink(url: string): boolean {
-  return url.includes('PLACEHOLDER');
+export function isValidPaymentLink(url: string): boolean {
+  return /^https:\/\/buy\.stripe\.com\/[A-Za-z0-9]+$/.test(url);
 }
 
 export function formatCad(n: number): string {

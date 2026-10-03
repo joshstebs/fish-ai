@@ -17,12 +17,28 @@ export type PlaceResult = {
 
 const SEARCH_URL = 'https://nominatim.openstreetmap.org/search';
 const REVERSE_URL = 'https://nominatim.openstreetmap.org/reverse';
+const MIN_REQUEST_INTERVAL_MS = 1100;
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+let nextRequestAt = 0;
+const responseCache = new Map<string, { expiresAt: number; value: null | Record<string, unknown> | Record<string, unknown>[] }>();
 
 async function nomJson(url: string): Promise<null | Record<string, unknown> | Record<string, unknown>[]> {
+  const cached = responseCache.get(url);
+  if (cached && cached.expiresAt > Date.now()) return cached.value;
+
+  const waitMs = Math.max(0, nextRequestAt - Date.now());
+  if (waitMs > 0) {
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
+  }
+  nextRequestAt = Date.now() + MIN_REQUEST_INTERVAL_MS;
+
   try {
     const resp = await fetch(url, { headers: { 'Accept-Language': 'en' } });
     if (!resp.ok) return null;
-    return (await resp.json()) as ReturnType<typeof nomJson>;
+    const value = await resp.json() as null | Record<string, unknown> | Record<string, unknown>[];
+    responseCache.set(url, { expiresAt: Date.now() + CACHE_TTL_MS, value });
+    return value;
   } catch {
     return null;
   }
