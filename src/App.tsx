@@ -16,7 +16,8 @@ import { GlobalSeo } from './components/SeoHead';
 import { ListiclePage } from './pages/ListiclePage';
 import { HowToChoosePage } from './pages/HowToChoosePage';
 import { CompareFishbrainPage } from './pages/CompareFishbrainPage';
-import { CompareFishAnglerPage } from './pages/CompareFishAnglerPage';\nimport { ProductLandingPage } from './pages/ProductLandingPage';
+import { CompareFishAnglerPage } from './pages/CompareFishAnglerPage';
+import { ProductLandingPage } from './pages/ProductLandingPage';
 
 const FishDimensionEstimator = React.lazy(() => import('./components/FishDimensionEstimator').then(m => ({ default: m.FishDimensionEstimator })));
 const CatchLogbookView = React.lazy(() => import('./components/CatchLogbookView').then(m => ({ default: m.CatchLogbookView })));
