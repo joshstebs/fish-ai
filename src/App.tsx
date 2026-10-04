@@ -16,7 +16,7 @@ import { GlobalSeo } from './components/SeoHead';
 import { ListiclePage } from './pages/ListiclePage';
 import { HowToChoosePage } from './pages/HowToChoosePage';
 import { CompareFishbrainPage } from './pages/CompareFishbrainPage';
-import { CompareFishAnglerPage } from './pages/CompareFishAnglerPage';
+import { CompareFishAnglerPage } from './pages/CompareFishAnglerPage';\nimport { ProductLandingPage } from './pages/ProductLandingPage';
 
 const FishDimensionEstimator = React.lazy(() => import('./components/FishDimensionEstimator').then(m => ({ default: m.FishDimensionEstimator })));
 const CatchLogbookView = React.lazy(() => import('./components/CatchLogbookView').then(m => ({ default: m.CatchLogbookView })));
@@ -359,7 +359,7 @@ export default function App() {
         <Route path="/how-to-choose" element={<HowToChoosePage onStart={() => window.location.assign('/')} />} />
         <Route path="/fishai-vs-fishbrain" element={<CompareFishbrainPage onStart={() => window.location.assign('/')} />} />
         <Route path="/fishai-vs-fishangler" element={<CompareFishAnglerPage onStart={() => window.location.assign('/')} />} />
-        <Route path="/academy" element={<AcademyIndex onStart={() => window.location.assign('/')} />} />
+        <Route path="/shop" element={<div className="min-h-screen bg-slate-950 px-4 py-8"><div className="max-w-7xl mx-auto"><Suspense fallback={<div className="text-slate-400">Loading shop…</div>}><ShopView /></Suspense></div></div>} />\n        <Route path="/shop/:productId" element={<ProductLandingPage productId={window.location.pathname.replace('/shop/','')} />} />\n        <Route path="/academy" element={<AcademyIndex onStart={() => window.location.assign('/')} />} />
         <Route path="/seo" element={<SeoLanding onStart={() => window.location.assign('/')} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
