@@ -359,7 +359,9 @@ export default function App() {
         <Route path="/how-to-choose" element={<HowToChoosePage onStart={() => window.location.assign('/')} />} />
         <Route path="/fishai-vs-fishbrain" element={<CompareFishbrainPage onStart={() => window.location.assign('/')} />} />
         <Route path="/fishai-vs-fishangler" element={<CompareFishAnglerPage onStart={() => window.location.assign('/')} />} />
-        <Route path="/shop" element={<div className="min-h-screen bg-slate-950 px-4 py-8"><div className="max-w-7xl mx-auto"><Suspense fallback={<div className="text-slate-400">Loading shop…</div>}><ShopView /></Suspense></div></div>} />\n        <Route path="/shop/:productId" element={<ProductLandingPage productId={window.location.pathname.replace('/shop/','')} />} />\n        <Route path="/academy" element={<AcademyIndex onStart={() => window.location.assign('/')} />} />
+        <Route path="/shop" element={<div className="min-h-screen bg-slate-950 px-4 py-8"><div className="max-w-7xl mx-auto"><Suspense fallback={<div className="text-slate-400">Loading shop…</div>}><ShopView /></Suspense></div></div>} />
+        <Route path="/shop/:productId" element={<ProductLandingPage productId={window.location.pathname.replace('/shop/','')} />} />
+        <Route path="/academy" element={<AcademyIndex onStart={() => window.location.assign('/')} />} />
         <Route path="/seo" element={<SeoLanding onStart={() => window.location.assign('/')} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
