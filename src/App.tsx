@@ -254,7 +254,6 @@ export function AppRoutes() {
 
   return (
     <>
-      <GlobalSeo />
       <header className="sticky top-0 z-40 bg-dusk backdrop-blur-md border-b border-white/10 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={() => goTo('VISION')}>
@@ -350,6 +349,7 @@ export function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <GlobalSeo />
       <Routes>
         <Route path="/" element={<AppRoutes />} />
         <Route path="/blog" element={<BlogIndex onStart={() => window.location.assign('/')} />} />
