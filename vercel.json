@@ -7,6 +7,50 @@
       "destination": "/api/index"
     },
     {
+      "source": "/shop",
+      "destination": "/shop.html"
+    },
+    {
+      "source": "/shop/:productId",
+      "destination": "/shop/:productId.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog.html"
+    },
+    {
+      "source": "/blog/:slug",
+      "destination": "/blog/:slug.html"
+    },
+    {
+      "source": "/best-fishing-app",
+      "destination": "/best-fishing-app.html"
+    },
+    {
+      "source": "/fishai-vs-fishbrain",
+      "destination": "/fishai-vs-fishbrain.html"
+    },
+    {
+      "source": "/fishai-vs-fishangler",
+      "destination": "/fishai-vs-fishangler.html"
+    },
+    {
+      "source": "/listicle",
+      "destination": "/listicle.html"
+    },
+    {
+      "source": "/how-to-choose",
+      "destination": "/how-to-choose.html"
+    },
+    {
+      "source": "/academy",
+      "destination": "/academy.html"
+    },
+    {
+      "source": "/seo",
+      "destination": "/seo.html"
+    },
+    {
       "source": "/merch",
       "destination": "/merch.html"
     },
