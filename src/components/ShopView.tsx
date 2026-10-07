@@ -21,9 +21,10 @@ const FILTERS: { id: Filter; label: string }[] = [
 
 function ProductCard({ product, onOpen }: { product: MerchProduct; onOpen: () => void }) {
   return (
-    <button
-      onClick={onOpen}
-      className="group text-left bg-white rounded-2xl border border-slate-200/80 shadow-[0_18px_50px_-24px_rgba(15,42,51,0.35)] overflow-hidden transition-all hover:-translate-y-1 hover:shadow-[0_28px_60px_-24px_rgba(15,42,51,0.45)]"
+    <a
+      href={`/shop/${product.id}`}
+      onClick={(event) => { event.preventDefault(); onOpen(); }}
+      className="group block text-left bg-white rounded-2xl border border-slate-200/80 shadow-[0_18px_50px_-24px_rgba(15,42,51,0.35)] overflow-hidden transition-all hover:-translate-y-1 hover:shadow-[0_28px_60px_-24px_rgba(15,42,51,0.45)]"
     >
       <div className="aspect-square overflow-hidden bg-slate-950">
         <img
@@ -41,7 +42,7 @@ function ProductCard({ product, onOpen }: { product: MerchProduct; onOpen: () =>
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-teal-700 transition-colors">View →</span>
         </div>
       </div>
-    </button>
+    </a>
   );
 }
 
