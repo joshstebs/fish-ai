@@ -17,6 +17,7 @@ import { ListiclePage } from './pages/ListiclePage';
 import { HowToChoosePage } from './pages/HowToChoosePage';
 import { CompareFishbrainPage } from './pages/CompareFishbrainPage';
 import { CompareFishAnglerPage } from './pages/CompareFishAnglerPage';
+import { ProductLandingPage } from './pages/ProductLandingPage';
 
 const FishDimensionEstimator = React.lazy(() => import('./components/FishDimensionEstimator').then(m => ({ default: m.FishDimensionEstimator })));
 const CatchLogbookView = React.lazy(() => import('./components/CatchLogbookView').then(m => ({ default: m.CatchLogbookView })));
@@ -91,8 +92,8 @@ function SeoLanding({ onStart }: { onStart: () => void }) {
       <div className="mt-6 flex flex-wrap gap-3">
         <button onClick={onStart} className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg flex items-center gap-2"><Sparkles className="w-4 h-4" />open the app</button>
         <a href="/blog" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">read the blog</a>
-        <a href="/best-fishing-app" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">why fishai wins</a>
         <a href="/merch" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">shop merch</a>
+        <a href="/best-fishing-app" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">why fishai wins</a>
       </div>
     </div>
   );
@@ -360,6 +361,8 @@ export default function App() {
         <Route path="/how-to-choose" element={<HowToChoosePage onStart={() => window.location.assign('/')} />} />
         <Route path="/fishai-vs-fishbrain" element={<CompareFishbrainPage onStart={() => window.location.assign('/')} />} />
         <Route path="/fishai-vs-fishangler" element={<CompareFishAnglerPage onStart={() => window.location.assign('/')} />} />
+        <Route path="/shop" element={<div className="min-h-screen bg-slate-950 px-4 py-8"><div className="max-w-7xl mx-auto"><Suspense fallback={<div className="text-slate-400">Loading shop…</div>}><ShopView /></Suspense></div></div>} />
+        <Route path="/shop/:productId" element={<ProductLandingPage productId={window.location.pathname.replace('/shop/','')} />} />
         <Route path="/academy" element={<AcademyIndex onStart={() => window.location.assign('/')} />} />
         <Route path="/seo" element={<SeoLanding onStart={() => window.location.assign('/')} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
