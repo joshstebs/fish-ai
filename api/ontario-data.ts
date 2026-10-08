@@ -48,9 +48,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   } else {
     const name = (p.get('q') || '').trim();
     if (!/^[a-zA-Z0-9 '-]{2,50}$/.test(name)) return send(res, 400, { error: 'Enter 2 to 50 letters/numbers for a lake-name search' });
-    q.set('where', "OFFICIAL_NAME LIKE '%" + name.replace(/'/g, "''") + "%'");
+    q.set('where', "(ENTITY_TYPE LIKE '%Lake%' OR ENTITY_TYPE LIKE '%Reservoir%') AND OFFICIAL_NAME LIKE '%" + name.replace(/'/g, "''") + "%'");
     q.set('outFields', 'OFFICIAL_NAME,ENTITY_TYPE,LATITUDE_DECIMAL_DEGREES,LONGITUDE_DECIMAL_DEGREES,GEONAME_STATUS');
     q.set('returnGeometry', 'false');
+    q.set('orderByFields', 'OFFICIAL_NAME ASC');
   }
   try {
     const upstream = await fetch(SOURCE[mode] + '?' + q.toString(), { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(10000) });
