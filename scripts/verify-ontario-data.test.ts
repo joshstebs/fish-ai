@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import handler from '../api/ontario-data.js';
+import handler from '../api/ontario-data.ts';
 
 async function request(url: string, method = 'GET') {
   const headers: Record<string, string> = {};
