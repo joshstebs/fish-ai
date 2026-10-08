@@ -334,6 +334,13 @@ export function AppRoutes() {
           <div className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-emerald-400" /><span className="font-bold text-slate-400">FishAI</span></div>
           <span>Free core app. AI estimator: 7-day free trial, $7.99/mo after, cancel anytime.</span>
         </div>
+        <nav aria-label="Fishing resources" className="max-w-7xl mx-auto px-4 mt-5 flex flex-wrap justify-center gap-x-6 gap-y-3 text-slate-300">
+          <a href="/guides/best-fishing-app-ontario" className="hover:text-emerald-400 focus-visible:underline">Ontario fishing guide</a>
+          <a href="/blog" className="hover:text-emerald-400 focus-visible:underline">Fishing journal</a>
+          <a href="/academy" className="hover:text-emerald-400 focus-visible:underline">Beginner fishing guides</a>
+          <a href="/how-to-choose" className="hover:text-emerald-400 focus-visible:underline">Choosing a fishing app</a>
+          <a href="/shop" className="hover:text-emerald-400 focus-visible:underline">FishAI fishing merch</a>
+        </nav>
       </footer>
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-white/10 pb-[env(safe-area-inset-bottom)]">
         <div className="grid grid-cols-5">
