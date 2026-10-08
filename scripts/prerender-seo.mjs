@@ -1,5 +1,6 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
+import { createServer } from 'vite';
 
 const DIST = path.resolve('dist');
 const SITE = 'https://fishai.shop';
@@ -61,72 +62,93 @@ function decodeStory(value) {
 }
 
 const template = await readFile(path.join(DIST, 'index.html'), 'utf8');
+const renderer = await createServer({
+  server: { middlewareMode: true },
+  appType: 'custom',
+  optimizeDeps: { noDiscovery: true, include: [] },
+  // Vite 5's SSR resolver predates React Router's module-sync exports.
+  resolve: { alias: [
+    { find: /^react-router-dom$/, replacement: path.resolve('node_modules/react-router-dom/dist/index.mjs') },
+    { find: /^react-router$/, replacement: path.resolve('node_modules/react-router/dist/development/index.mjs') },
+  ] },
+});
+try {
+  const { renderPublicSeo } = await renderer.ssrLoadModule('/src/renderPublicSeo.tsx');
+  function withPublicContent(html, route) {
+    if (!html.includes('<div id="root"></div>')) throw new Error('Missing empty React root in build template');
+    return html.replace('<div id="root"></div>', () => `<div id="root">${renderPublicSeo(route)}</div>`);
+  }
+  await writeFile(path.join(DIST, 'index.html'), withPublicContent(template, '/'));
 
-for (const page of pages) {
-  const html = pageHtml(template, page);
-  const target = path.join(DIST, page.path.replace(/^\//, '') + '.html');
-  await mkdir(path.dirname(target), { recursive: true });
-  await writeFile(target, html);
+  for (const page of pages) {
+    const html = withPublicContent(pageHtml(template, page), page.path);
+    const target = path.join(DIST, page.path.replace(/^\//, '') + '.html');
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, html);
+  }
+
+  const merchSource = await readFile(path.resolve('src/data/merch.ts'), 'utf8');
+  const productPattern = /p\(\s*'([^']+)'\s*,\s*'([^']+)'\s*,\s*'(tee|hoodie|hat)'\s*,\s*([\d.]+)\s*,\s*'((?:\\.|[^'])*)'/gms;
+  const categoryLabels = { tee: 'T-shirt', hoodie: 'Hoodie', hat: 'Trucker Hat' };
+  const products = [];
+  let match;
+
+  while ((match = productPattern.exec(merchSource)) !== null) {
+    const [, id, title, category, price, rawStory] = match;
+    products.push({ id, title, category, price: Number(price).toFixed(2), story: decodeStory(rawStory) });
+  }
+
+  for (const product of products) {
+    const page = {
+      path: `/shop/${product.id}`,
+      title: `${product.title} | FishAI Fishing Merch`,
+      description: `${product.story} ${categoryLabels[product.category]} printed to order in Canada.`,
+    };
+
+    let html = pageHtml(template, page)
+      .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/gi, '');
+
+    const image = `${SITE}/merch/${product.id}.jpg`;
+    html = replaceTag(html, 'ogImage', `<meta property="og:image" content="${image}" />`);
+
+    const productJsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: product.title,
+      image: [image],
+      description: product.story,
+      sku: product.id,
+      brand: { '@type': 'Brand', name: 'FishAI' },
+      offers: {
+        '@type': 'Offer',
+        url: SITE + page.path,
+        price: product.price,
+        priceCurrency: 'CAD',
+        availability: 'https://schema.org/InStock',
+        itemCondition: 'https://schema.org/NewCondition',
+      },
+    };
+
+    html = html.replace('</head>', `    <script type="application/ld+json">${JSON.stringify(productJsonLd)}</script>\n  </head>`);
+    html = withPublicContent(html, page.path);
+    const target = path.join(DIST, page.path.replace(/^\//, '') + '.html');
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, html);
+  }
+
+  const sitemapPath = path.join(DIST, 'sitemap.xml');
+  let sitemap = await readFile(sitemapPath, 'utf8');
+
+  if (!sitemap.includes('<loc>https://fishai.shop/shop</loc>')) {
+    const shopEntries = [
+      `  <url><loc>${SITE}/shop</loc><lastmod>${TODAY}</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>`,
+      ...products.map((product) => `  <url><loc>${SITE}/shop/${product.id}</loc><lastmod>${TODAY}</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>`),
+    ].join('\n');
+    sitemap = sitemap.replace('</urlset>', shopEntries + '\n</urlset>');
+    await writeFile(sitemapPath, sitemap);
+  }
+
+  console.log(`Generated ${pages.length} SEO pages and ${products.length} product landing pages.`);
+} finally {
+  await renderer.close();
 }
-
-const merchSource = await readFile(path.resolve('src/data/merch.ts'), 'utf8');
-const productPattern = /p\(\s*'([^']+)'\s*,\s*'([^']+)'\s*,\s*'(tee|hoodie|hat)'\s*,\s*([\d.]+)\s*,\s*'((?:\\.|[^'])*)'/gms;
-const categoryLabels = { tee: 'T-shirt', hoodie: 'Hoodie', hat: 'Trucker Hat' };
-const products = [];
-let match;
-
-while ((match = productPattern.exec(merchSource)) !== null) {
-  const [, id, title, category, price, rawStory] = match;
-  products.push({ id, title, category, price: Number(price).toFixed(2), story: decodeStory(rawStory) });
-}
-
-for (const product of products) {
-  const page = {
-    path: `/shop/${product.id}`,
-    title: `${product.title} | FishAI Fishing Merch`,
-    description: `${product.story} ${categoryLabels[product.category]} printed to order in Canada.`,
-  };
-
-  let html = pageHtml(template, page)
-    .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/gi, '');
-
-  const image = `${SITE}/merch/${product.id}.jpg`;
-  html = replaceTag(html, 'ogImage', `<meta property="og:image" content="${image}" />`);
-
-  const productJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: product.title,
-    image: [image],
-    description: product.story,
-    sku: product.id,
-    brand: { '@type': 'Brand', name: 'FishAI' },
-    offers: {
-      '@type': 'Offer',
-      url: SITE + page.path,
-      price: product.price,
-      priceCurrency: 'CAD',
-      availability: 'https://schema.org/InStock',
-      itemCondition: 'https://schema.org/NewCondition',
-    },
-  };
-
-  html = html.replace('</head>', `    <script type="application/ld+json">${JSON.stringify(productJsonLd)}</script>\n  </head>`);
-  const target = path.join(DIST, page.path.replace(/^\//, '') + '.html');
-  await mkdir(path.dirname(target), { recursive: true });
-  await writeFile(target, html);
-}
-
-const sitemapPath = path.join(DIST, 'sitemap.xml');
-let sitemap = await readFile(sitemapPath, 'utf8');
-
-if (!sitemap.includes('<loc>https://fishai.shop/shop</loc>')) {
-  const shopEntries = [
-    `  <url><loc>${SITE}/shop</loc><lastmod>${TODAY}</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>`,
-    ...products.map((product) => `  <url><loc>${SITE}/shop/${product.id}</loc><lastmod>${TODAY}</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>`),
-  ].join('\n');
-  sitemap = sitemap.replace('</urlset>', shopEntries + '\n</urlset>');
-  await writeFile(sitemapPath, sitemap);
-}
-
-console.log(`Generated ${pages.length} SEO pages and ${products.length} product landing pages.`);
