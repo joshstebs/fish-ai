@@ -7,6 +7,7 @@ import { ListiclePage } from './pages/ListiclePage';
 import { HowToChoosePage } from './pages/HowToChoosePage';
 import { CompareFishbrainPage } from './pages/CompareFishbrainPage';
 import { CompareFishAnglerPage } from './pages/CompareFishAnglerPage';
+import { OntarioFishingGuidePage } from './pages/OntarioFishingGuidePage';
 
 // Render the same public components as the client. Personal app state stays on
 // the device; the homepage renders only its default signed-out setup screen.
@@ -15,6 +16,7 @@ export function renderPublicSeo(path: string): string {
   const pages: Record<string, React.ReactElement> = {
     '/': <AppRoutes />,
     '/blog': <BlogIndex onStart={onStart} />,
+    '/guides/best-fishing-app-ontario': <OntarioFishingGuidePage />,
     '/best-fishing-app': <BestFishingApp onStart={onStart} />,
     '/listicle': <ListiclePage onStart={onStart} />,
     '/how-to-choose': <HowToChoosePage onStart={onStart} />,
