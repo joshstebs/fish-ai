@@ -72,7 +72,7 @@ function useAppState() {
   return { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen, proFromHeader, setProFromHeader, profile, setProfile, setupOpen, setSetupOpen };
 }
 
-function SeoLanding({ onStart }: { onStart: () => void }) {
+export function SeoLanding({ onStart }: { onStart: () => void }) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
       <h1 className="text-3xl sm:text-5xl font-display font-black uppercase tracking-tight text-white leading-none">fish<span className="text-emerald-400">AI</span></h1>
@@ -99,7 +99,7 @@ function SeoLanding({ onStart }: { onStart: () => void }) {
   );
 }
 
-function BlogIndex({ onStart }: { onStart: () => void }) {
+export function BlogIndex({ onStart }: { onStart: () => void }) {
   const posts = [
     { slug: 'ai-fish-id-accuracy-2026', title: 'AI fish ID accuracy in 2026: what anglers should know' },
     { slug: 'best-ai-fishing-app-2026', title: 'Best AI fishing apps 2026: fishAI vs fishbrain vs fishangler' },
@@ -125,7 +125,7 @@ function BlogIndex({ onStart }: { onStart: () => void }) {
   );
 }
 
-function BlogPost({ slug, onStart }: { slug: string; onStart: () => void }) {
+export function BlogPost({ slug, onStart }: { slug: string; onStart: () => void }) {
   const map: Record<string, { title: string; body: string[] }> = {
     'ai-fish-id-accuracy-2026': {
       title: 'AI fish ID accuracy in 2026: what anglers should know',
@@ -171,7 +171,7 @@ function BlogPost({ slug, onStart }: { slug: string; onStart: () => void }) {
   );
 }
 
-function BestFishingApp({ onStart }: { onStart: () => void }) {
+export function BestFishingApp({ onStart }: { onStart: () => void }) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
       <h1 className="text-2xl sm:text-4xl font-display font-black uppercase tracking-tight text-white">why fishAI is the best fishing app</h1>
@@ -197,7 +197,7 @@ function BestFishingApp({ onStart }: { onStart: () => void }) {
   );
 }
 
-function AcademyIndex({ onStart }: { onStart: () => void }) {
+export function AcademyIndex({ onStart }: { onStart: () => void }) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
       <h1 className="text-2xl sm:text-4xl font-display font-black uppercase tracking-tight text-white">academy</h1>

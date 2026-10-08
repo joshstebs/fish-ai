@@ -187,9 +187,9 @@ export function ShopView() {
       {/* Store header */}
       <div className="px-5 sm:px-10 pt-10 pb-6 text-center">
         <div className="text-[11px] font-black uppercase tracking-[0.3em] text-teal-700">FishAI merch</div>
-        <h2 className="mt-2 font-display text-4xl sm:text-5xl font-bold uppercase tracking-tight text-slate-900 leading-none">
+        <h1 className="mt-2 font-display text-4xl sm:text-5xl font-bold uppercase tracking-tight text-slate-900 leading-none">
           Wear the water<span className="text-teal-600">.</span>
-        </h2>
+        </h1>
         <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-xl mx-auto">
           Original FishAI designs from the lake-dawn line. Printed to order and shipped from Ontario — no warehouse, no waste.
         </p>
