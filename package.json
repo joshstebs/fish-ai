@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "server": "tsx --env-file-if-exists=.env server/server.ts",
     "dev:all": "concurrently \"npm run server\" \"npm run dev\"",
-    "verify:ontario": "node --import tsx --test scripts/verify-ontario-data.test.ts"
+    "verify:ontario": "tsx --test scripts/verify-ontario-data.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.16.0",
