@@ -1,4 +1,5 @@
 import express from 'express';
+import ontarioDataHandler from '../api/ontario-data.js';
 import cors from 'cors';
 import crypto from 'crypto';
 import { aiRouter } from './routes/aiRoutes.js';
@@ -50,6 +51,9 @@ function rateLimitMiddleware(limit: number, windowMs: number, label: string) {
     next();
   };
 }
+
+// Public read-only Ontario open data endpoint, separate from private app AI routes.
+app.get('/api/ontario-data', (req, res) => { void ontarioDataHandler(req, res); });
 
 // Health Check
 app.get('/api/health', (req, res) => {

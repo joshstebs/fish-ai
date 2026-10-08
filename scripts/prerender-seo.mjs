@@ -4,9 +4,10 @@ import { createServer } from 'vite';
 
 const DIST = path.resolve('dist');
 const SITE = 'https://fishai.shop';
-const TODAY = '2026-10-04';
+const TODAY = '2026-10-08';
 
 const pages = [
+  { path: '/guides/best-fishing-app-ontario', title: 'Ontario Fishing Apps Compared: Fish ON-Line, Fishbrain and FishAI', description: 'Compare Ontario fishing tools and search official open data for lake names and fishing access. Includes licences, source dates and safety cautions.' },
   { path: '/shop', title: 'FishAI Fishing Merch — T-Shirts, Hoodies & Hats', description: 'Original FishAI fishing apparel and hats, printed to order and shipped from Ontario, Canada.' },
   { path: '/best-fishing-app', title: 'FishAI — AI Fishing App with Fish ID, Weather & Logbook', description: 'Compare the tools that make FishAI a practical fishing companion: AI fish ID, weather, solunar timing, private catch logbook, spot map and insights.' },
   { path: '/fishai-vs-fishbrain', title: 'FishAI vs Fishbrain — Fishing App Comparison', description: 'Compare FishAI and Fishbrain across AI fish identification, weather, private catch logging, spot tools and angler-focused features.' },

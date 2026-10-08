@@ -211,7 +211,7 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
               Spot Map
             </span>
             <span className="text-xs font-mono text-emerald-400 font-bold uppercase flex items-center gap-1">
-              <Compass className="w-3.5 h-3.5" /> GPS Active
+              <Compass className="w-3.5 h-3.5" /> Location tools
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-display font-black uppercase text-white tracking-tight">
@@ -235,6 +235,11 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
         </button>
       </div>
 
+      <div className="bg-slate-900 border border-white/10 rounded-xl p-4 text-slate-300 text-sm flex flex-wrap items-center gap-3 justify-between">
+        <div><strong className="text-white">Explore Ontario waters</strong><p className="text-xs text-slate-400 mt-1">Find government-published lake names and fishing access records. Listings do not guarantee access or legal permission.</p></div>
+        <a className="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 font-bold text-xs uppercase" href="/guides/best-fishing-app-ontario">Ontario lake and access lookup</a>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Visual Map Simulation & Pinned Spot Cards */}
         <div className="lg:col-span-7 space-y-4">
@@ -245,7 +250,7 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
             </div>
             <div className="min-w-0">
               <h3 className="text-sm font-black uppercase text-white tracking-tight">
-                100% Private. Your Data.
+                Your Spots. Your Privacy Choices.
               </h3>
               <p className="text-slate-400 text-sm mt-1">
                 Your spots stay on your device. We never sell your data.

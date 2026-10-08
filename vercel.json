@@ -15,6 +15,10 @@
       "destination": "/shop/:productId.html"
     },
     {
+      "source": "/guides/best-fishing-app-ontario",
+      "destination": "/guides/best-fishing-app-ontario.html"
+    },
+    {
       "source": "/blog",
       "destination": "/blog.html"
     },

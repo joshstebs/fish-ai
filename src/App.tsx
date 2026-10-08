@@ -18,6 +18,7 @@ import { HowToChoosePage } from './pages/HowToChoosePage';
 import { CompareFishbrainPage } from './pages/CompareFishbrainPage';
 import { CompareFishAnglerPage } from './pages/CompareFishAnglerPage';
 import { ProductLandingPage } from './pages/ProductLandingPage';
+import { OntarioFishingGuidePage } from './pages/OntarioFishingGuidePage';
 
 const FishDimensionEstimator = React.lazy(() => import('./components/FishDimensionEstimator').then(m => ({ default: m.FishDimensionEstimator })));
 const CatchLogbookView = React.lazy(() => import('./components/CatchLogbookView').then(m => ({ default: m.CatchLogbookView })));
@@ -91,9 +92,10 @@ export function SeoLanding({ onStart }: { onStart: () => void }) {
       </div>
       <div className="mt-6 flex flex-wrap gap-3">
         <button onClick={onStart} className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg flex items-center gap-2"><Sparkles className="w-4 h-4" />open the app</button>
+        <a href="/guides/best-fishing-app-ontario" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">Ontario fishing guide</a>
         <a href="/blog" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">read the blog</a>
         <a href="/merch" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">shop merch</a>
-        <a href="/best-fishing-app" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">why fishai wins</a>
+        <a href="/best-fishing-app" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">compare fishing tools</a>
       </div>
     </div>
   );
@@ -174,12 +176,12 @@ export function BlogPost({ slug, onStart }: { slug: string; onStart: () => void 
 export function BestFishingApp({ onStart }: { onStart: () => void }) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
-      <h1 className="text-2xl sm:text-4xl font-display font-black uppercase tracking-tight text-white">why fishAI is the best fishing app</h1>
-      <p className="mt-3 text-slate-300 text-sm sm:text-base">most fishing apps sell maps. fishAI sells answers.</p>
+      <h1 className="text-2xl sm:text-4xl font-display font-black uppercase tracking-tight text-white">How to evaluate a fishing app</h1>
+      <p className="mt-3 text-slate-300 text-sm sm:text-base">Compare different fishing app features and verify them on a real trip.</p>
       <div className="mt-6 grid gap-3">
         {[
           ['real weather + solunar', 'open-meteo + exact astronomical math for your spot and date.'],
-          ['personal logbook', 'every catch improves your predictions. private by default.'],
+          ['personal logbook', 'record catches and inspect privacy and storage options before depending on them.'],
           ['AI vision', 'species, size, and a confidence score. honest when it is unsure.'],
           ['assistant', 'answers from your data, not generic articles.'],
           ['tackle + pressure + academy', 'gear inventory, live barometric trend, beginner guides.'],
@@ -354,6 +356,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<AppRoutes />} />
+        <Route path="/guides/best-fishing-app-ontario" element={<OntarioFishingGuidePage />} />
         <Route path="/blog" element={<BlogIndex onStart={() => window.location.assign('/')} />} />
         <Route path="/blog/:slug" element={<BlogPost slug={window.location.pathname.replace('/blog/','')} onStart={() => window.location.assign('/')} />} />
         <Route path="/best-fishing-app" element={<BestFishingApp onStart={() => window.location.assign('/')} />} />
