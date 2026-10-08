@@ -18,6 +18,7 @@ import { HowToChoosePage } from './pages/HowToChoosePage';
 import { CompareFishbrainPage } from './pages/CompareFishbrainPage';
 import { CompareFishAnglerPage } from './pages/CompareFishAnglerPage';
 import { ProductLandingPage } from './pages/ProductLandingPage';
+import { OntarioFishingGuidePage } from './pages/OntarioFishingGuidePage';
 
 const FishDimensionEstimator = React.lazy(() => import('./components/FishDimensionEstimator').then(m => ({ default: m.FishDimensionEstimator })));
 const CatchLogbookView = React.lazy(() => import('./components/CatchLogbookView').then(m => ({ default: m.CatchLogbookView })));
@@ -91,6 +92,7 @@ export function SeoLanding({ onStart }: { onStart: () => void }) {
       </div>
       <div className="mt-6 flex flex-wrap gap-3">
         <button onClick={onStart} className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg flex items-center gap-2"><Sparkles className="w-4 h-4" />open the app</button>
+        <a href="/guides/best-fishing-app-ontario" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">Ontario fishing guide</a>
         <a href="/blog" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">read the blog</a>
         <a href="/merch" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">shop merch</a>
         <a href="/best-fishing-app" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">why fishai wins</a>
@@ -354,6 +356,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<AppRoutes />} />
+        <Route path="/guides/best-fishing-app-ontario" element={<OntarioFishingGuidePage />} />
         <Route path="/blog" element={<BlogIndex onStart={() => window.location.assign('/')} />} />
         <Route path="/blog/:slug" element={<BlogPost slug={window.location.pathname.replace('/blog/','')} onStart={() => window.location.assign('/')} />} />
         <Route path="/best-fishing-app" element={<BestFishingApp onStart={() => window.location.assign('/')} />} />
