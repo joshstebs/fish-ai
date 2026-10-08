@@ -8,11 +8,12 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && node scripts/prerender-seo.mjs && npm run verify:seo",
+    "build": "tsc && vite build && node scripts/prerender-seo.mjs && npm run verify:seo && npm run verify:ontario",
     "verify:seo": "node --test scripts/verify-public-seo.test.mjs",
     "preview": "vite preview",
     "server": "tsx --env-file-if-exists=.env server/server.ts",
-    "dev:all": "concurrently \"npm run server\" \"npm run dev\""
+    "dev:all": "concurrently \"npm run server\" \"npm run dev\"",
+    "verify:ontario": "node --import tsx --test scripts/verify-ontario-data.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.16.0",
