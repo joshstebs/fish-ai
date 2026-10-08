@@ -3,6 +3,10 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/api/ontario-data",
+      "destination": "/api/ontario-data"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/index"
     },
@@ -13,6 +17,10 @@
     {
       "source": "/shop/:productId",
       "destination": "/shop/:productId.html"
+    },
+    {
+      "source": "/guides/best-fishing-app-ontario",
+      "destination": "/guides/best-fishing-app-ontario.html"
     },
     {
       "source": "/blog",
