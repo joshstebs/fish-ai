@@ -23,6 +23,7 @@ import { OntarioFishingGuidePage } from './pages/OntarioFishingGuidePage';
 const FishDimensionEstimator = React.lazy(() => import('./components/FishDimensionEstimator').then(m => ({ default: m.FishDimensionEstimator })));
 const CatchLogbookView = React.lazy(() => import('./components/CatchLogbookView').then(m => ({ default: m.CatchLogbookView })));
 const SpotTrackerMap = React.lazy(() => import('./components/SpotTrackerMap').then(m => ({ default: m.SpotTrackerMap })));
+const PopularFishingAreasMap = React.lazy(() => import('./components/PopularFishingAreasMap').then(m => ({ default: m.PopularFishingAreasMap })));
 const TackleAssistantView = React.lazy(() => import('./components/TackleAssistantView').then(m => ({ default: m.TackleAssistantView })));
 const BeginnerGuideView = React.lazy(() => import('./components/BeginnerGuideView').then(m => ({ default: m.BeginnerGuideView })));
 const SolunarActivityView = React.lazy(() => import('./components/SolunarActivityView').then(m => ({ default: m.SolunarActivityView })));
@@ -35,7 +36,7 @@ const AssistantView = React.lazy(() => import('./components/AssistantView').then
 const SettingsView = React.lazy(() => import('./components/SettingsView').then(m => ({ default: m.SettingsView })));
 const ShopView = React.lazy(() => import('./components/ShopView').then(m => ({ default: m.ShopView })));
 
-type TabId = 'REPORT' | 'VISION' | 'LOGBOOK' | 'SPOTS' | 'TACKLE' | 'GUIDE' | 'SOLUNAR' | 'PRESSURE' | 'BOX' | 'TROPHY' | 'LIVEWELL' | 'INSIGHTS' | 'ASSISTANT' | 'SETTINGS' | 'SHOP';
+type TabId = 'REPORT' | 'VISION' | 'LOGBOOK' | 'SPOTS' | 'AREAS' | 'TACKLE' | 'GUIDE' | 'SOLUNAR' | 'PRESSURE' | 'BOX' | 'TROPHY' | 'LIVEWELL' | 'INSIGHTS' | 'ASSISTANT' | 'SETTINGS' | 'SHOP';
 interface TabDef { id: TabId; label: string; icon: React.ComponentType<{ className?: string }>; color: string; }
 
 const PRIMARY_TABS: TabDef[] = [
@@ -47,6 +48,7 @@ const PRIMARY_TABS: TabDef[] = [
   { id: 'SHOP', label: 'Shop', icon: ShoppingBag, color: 'bg-amber-500 text-slate-950' },
 ];
 const MORE_TABS: TabDef[] = [
+  { id: 'AREAS', label: 'Explore Map', icon: MapPin, color: 'bg-emerald-500 text-slate-950' },
   { id: 'SPOTS', label: 'Spot Map', icon: MapPin, color: 'bg-cyan-500 text-slate-950' },
   { id: 'TACKLE', label: 'Tackle AI', icon: Sparkles, color: 'bg-amber-500 text-slate-950' },
   { id: 'SOLUNAR', label: 'Solunar', icon: Moon, color: 'bg-purple-600 text-white' },
@@ -317,6 +319,7 @@ export function AppRoutes() {
           {activeTab === 'LOGBOOK' && <CatchLogbookView catches={catches} spots={spots} onAddCatch={handleSaveCatch} onDeleteCatch={handleDeleteCatch} onNavigateToFishVision={() => goTo('VISION')} />}
           {activeTab === 'INSIGHTS' && <InsightsView catches={catches} />}
           {activeTab === 'ASSISTANT' && <AssistantView catches={catches} spots={spots} />}
+          {activeTab === 'AREAS' && <PopularFishingAreasMap />}
           {activeTab === 'SPOTS' && <SpotTrackerMap spots={spots} catches={catches} onAddSpot={handleAddSpot} onSelectSpotFilter={() => goTo('LOGBOOK')} />}
           {activeTab === 'TACKLE' && <TackleAssistantView />}
           {activeTab === 'SETTINGS' && <SettingsView />}
