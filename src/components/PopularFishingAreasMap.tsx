@@ -66,18 +66,26 @@ export const PopularFishingAreasMap: React.FC = () => {
       });
       setLoading(true);
       try {
-        const [waterRes, accessRes] = await Promise.all([
+        const [waterRes, riverRes, accessRes] = await Promise.all([
           fetch(SERVICE + '/2/query?' + params, { signal }),
+          fetch(SERVICE + '/1/query?' + params, { signal }),
           fetch(SERVICE + '/15/query?' + params, { signal }),
         ]);
-        if (!waterRes.ok || !accessRes.ok) throw new Error('Ontario open data is temporarily unavailable.');
-        const [water, access] = await Promise.all([waterRes.json(), accessRes.json()]);
+        if (!waterRes.ok || !riverRes.ok || !accessRes.ok) throw new Error('Ontario open data is temporarily unavailable.');
+        const [water, rivers, access] = await Promise.all([waterRes.json(), riverRes.json(), accessRes.json()]);
         if (!alive || signal.aborted) return;
         if (water.features) L.geoJSON(water, {
           style: { color: '#41d9c0', weight: 1, opacity: 0.8, fillColor: '#168f86', fillOpacity: 0.18 },
           onEachFeature: (feature, item) => {
             const p = feature.properties || {};
             item.bindPopup('<b>' + escapeHtml(p.OFFICIAL_WATERBODY_NAME || p.CORPORATE_WATERBODY_NAME || 'Ontario waterbody') + '</b><br>' + escapeHtml(p.WATERBODY_TYPE || 'Lake or river') + '<br>Ontario Fish ON-Line open data');
+          },
+        }).addTo(layer);
+        if (rivers.features) L.geoJSON(rivers, {
+          style: { color: '#73b8ff', weight: 2, opacity: 0.9 },
+          onEachFeature: (feature, item) => {
+            const p = feature.properties || {};
+            item.bindPopup('<b>' + escapeHtml(p.OFFICIAL_WATERBODY_NAME || p.CORPORATE_WATERBODY_NAME || 'Ontario river or stream') + '</b><br>River or stream · Ontario Fish ON-Line open data');
           },
         }).addTo(layer);
         if (access.features) L.geoJSON(access, {
@@ -103,7 +111,7 @@ export const PopularFishingAreasMap: React.FC = () => {
     <div className="mb-5">
       <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400 flex items-center gap-2"><MapPinned className="w-4 h-4" /> Explore fishing areas</p>
       <h2 className="headline mt-2 text-3xl sm:text-5xl">Find water worth exploring</h2>
-      <p className="mt-3 max-w-3xl text-sm text-slate-300">Browse mapped Ontario lakes, rivers and fishing access. U.S. featured fisheries link to government sources. Featured does not mean a live bite report or a catch-rate ranking.</p>
+      <p className="mt-3 max-w-3xl text-sm text-slate-300">Browse mapped Ontario lakes, rivers, streams and fishing access. U.S. featured fisheries link to government sources. Featured does not mean a live bite report or a catch-rate ranking.</p>
     </div>
     <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-slate-900 p-3">
       <div className="flex gap-2" role="group" aria-label="Map region">
