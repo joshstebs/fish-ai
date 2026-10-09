@@ -19,7 +19,7 @@ const FEATURES = [
   'AI fish species recognition',
   'Size and weight estimation',
   'Catch confidence scoring',
-  'Length and legality checks',
+  'Typical size limit reminders',
 ];
 
 /**

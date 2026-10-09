@@ -879,13 +879,13 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                 </div>
               </div>
 
-              {/* Harvest / Legality Status Row */}
+              {/* Typical Size Guidance Row */}
               {result.regulatoryInfo && (
                 <div className="bg-slate-900 border border-white/10 rounded-xl px-5 py-4 shadow-xl flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
                     <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                      Harvest Legality
+                      Typical Size Guidance (AI-generated)
                     </span>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -902,8 +902,8 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                         : 'bg-amber-500/15 text-amber-400 border-amber-500/30'
                     }`}>
                       {result.estimatedLength.minInches >= result.regulatoryInfo.minLegalLengthInches
-                        ? '✓ Meets Min Size'
-                        : '⚠ Below Legal Size'}
+                        ? '✓ Above typical minimum'
+                        : '⚠ Below typical minimum'}
                     </span>
                   </div>
                 </div>
@@ -969,35 +969,39 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                   <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
                     <ShieldCheck className="w-5 h-5 text-amber-400" />
                     <h4 className="text-sm font-black uppercase tracking-wider text-white">
-                      Harvest Rules
+                      Typical Size Limits
                     </h4>
                   </div>
+                  
+                  <p className="text-[11px] text-slate-400 italic">
+                    AI-generated guidance based on typical regulations for this species. Not legal advice. Verify current rules for your exact location and season.
+                  </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
                     <div className="bg-slate-950 p-3 rounded border border-slate-800 space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Min Legal Size</span>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Typical Min Size</span>
                       <span className="text-base font-black text-white">
                         {result.regulatoryInfo.minLegalLengthInches}″ ({Math.round(result.regulatoryInfo.minLegalLengthInches * 2.54)} cm)
                       </span>
                     </div>
 
                     <div className="bg-slate-950 p-3 rounded border border-slate-800 space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Daily Bag Limit</span>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Typical Bag Limit</span>
                       <span className="text-xs font-bold text-emerald-400">
                         {result.regulatoryInfo.dailyBagLimit}
                       </span>
                     </div>
 
                     <div className="bg-slate-950 p-3 rounded border border-slate-800 space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Legality Check</span>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Size Check</span>
                       <span className={`text-xs font-black flex items-center gap-1 ${
                         result.estimatedLength.minInches >= result.regulatoryInfo.minLegalLengthInches
                           ? 'text-emerald-400'
                           : 'text-amber-400'
                       }`}>
                         {result.estimatedLength.minInches >= result.regulatoryInfo.minLegalLengthInches
-                          ? '✓ Meets Min Size Limit'
-                          : '⚠ Below Legal Size Limit'}
+                          ? '✓ Above typical minimum'
+                          : '⚠ Below typical minimum'}
                       </span>
                     </div>
                   </div>
