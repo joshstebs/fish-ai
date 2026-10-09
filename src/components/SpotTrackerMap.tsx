@@ -175,7 +175,7 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
     }
 
     if (lat === null || lon === null) {
-      setPrivacyError('Could not get your position — tap the map to pin the spot, or allow browser location access. Spots are never saved at made-up coordinates.');
+      setPrivacyError('Could not get your position. Tap the map to pin the spot, or allow browser location access. Spots are never saved at made-up coordinates.');
       setIsCreating(false);
       return;
     }
@@ -465,7 +465,7 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
 
             {mapPicked && (
               <div className="bg-emerald-950/30 border border-emerald-500/30 rounded-lg px-3 py-2 font-mono text-[10px] text-emerald-300">
-                📍 Pin: {mapPicked.lat.toFixed(5)}, {mapPicked.lon.toFixed(5)} — saved exactly where you tapped
+                📍 Pin: {mapPicked.lat.toFixed(5)}, {mapPicked.lon.toFixed(5)} (saved exactly where you tapped)
               </div>
             )}
 
@@ -558,10 +558,10 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
                   onChange={(e) => setNewPrivacy(e.target.value as SpotPrivacyLevel)}
                   className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-white font-mono focus:outline-none"
                 >
-                  <option value="PRIVATE">🔒 Private — exact location, only on this device</option>
-                  <option value="FRIENDS">👥 Friends — shared with anglers you choose (future)</option>
-                  <option value="APPROXIMATE">👁️ Approximate — general area, exact spot hidden</option>
-                  <option value="PUBLIC">🌍 Public — visible to everyone (use with care)</option>
+                  <option value="PRIVATE">🔒 Private (exact location, only on this device)</option>
+                  <option value="FRIENDS">👥 Friends (shared with anglers you choose, future)</option>
+                  <option value="APPROXIMATE">👁️ Approximate (general area, exact spot hidden)</option>
+                  <option value="PUBLIC">🌍 Public (visible to everyone, use with care)</option>
                 </select>
                 <p className="text-[10px] text-slate-500 font-mono">
                   Your exact coordinates are never shared anywhere unless you pick Public.

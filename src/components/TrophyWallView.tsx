@@ -123,7 +123,7 @@ export const TrophyWallView: React.FC<TrophyWallProps> = ({ catches }) => {
             🏆 Catch Leaderboard & Trophy Wall
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Badges unlock only from catches you actually logged. No fake trophies — every award is earned.
+            Badges unlock only from catches you actually logged. No fake trophies; every award is earned.
           </p>
         </div>
         <div className="bg-slate-950 px-4 py-3 rounded-xl border border-amber-500/30 text-center shrink-0">
@@ -226,7 +226,7 @@ export const TrophyWallView: React.FC<TrophyWallProps> = ({ catches }) => {
 
       <p className="text-[10px] text-slate-500 font-mono flex items-center gap-1.5">
         <Sparkles className="w-3 h-3 text-amber-400" />
-        All badges and records are computed live from your logged catches — nothing is pre-unlocked.
+        All badges and records are computed live from your logged catches (nothing is pre-unlocked).
       </p>
     </div>
   );

@@ -12,9 +12,9 @@ export const aiRouter = Router();
 // the cheap tier and the weak link for bass-vs-sunfish calls and strict JSON.
 //
 // Order when a key exists:
-//   1. OpenAI gpt-4.1-mini  — vision + reliable JSON, stronger than flash-lite
-//   2. Anthropic Sonnet     — careful IDs, honest low confidence
-//   3. Gemini 2.5 Flash     — same Google key, much better than flash-lite;
+//   1. OpenAI gpt-4.1-mini (vision + reliable JSON, stronger than flash-lite)
+//   2. Anthropic Sonnet (careful IDs, honest low confidence)
+//   3. Gemini 2.5 Flash (same Google key, much better than flash-lite)
 //      flash-lite is only the fallback if 2.5 Flash rejects the model name
 //   4. OpenRouter free VLMs
 //   5. Groq
@@ -196,7 +196,7 @@ aiRouter.post('/analyze-fish', async (req, res) => {
   const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '');
 
   if (cleanBase64.length < 2000) {
-    return res.status(400).json({ error: 'Image data is too small to analyze — upload a real photo.' });
+    return res.status(400).json({ error: 'Image data is too small to analyze. Upload a real photo.' });
   }
 
   const prompt = `You are FishAI, an expert fisheries biologist and fishing guide.
@@ -218,7 +218,7 @@ Analyze the fish photo and return STRICT JSON (no markdown fences, no thinking b
 
 RULES:
 - If you cannot identify the species with reasonable confidence (<50%), set confidence to your best estimate and say so in proportionalAnalysis: "species uncertain".
-- Keep regulatory info generic (typical state regulations) and flag in protectionNotice that regulations vary by state/province — never state a specific jurisdiction as fact.
+- Keep regulatory info generic (typical state regulations) and flag in protectionNotice that regulations vary by state/province. Never state a specific jurisdiction as fact.
 - The user may provide a scale reference hint: "${referenceObjectHint || 'none'}". Use it if visible.
 - Length/weight must be ESTIMATES clearly derived from proportions; use realistic ranges.`;
 

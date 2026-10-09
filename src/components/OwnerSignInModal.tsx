@@ -71,7 +71,7 @@ export const OwnerSignInModal: React.FC<OwnerSignInModalProps> = ({ open, onClos
             </div>
             <div>
               <h3 className="text-sm font-black uppercase tracking-wider text-white">Owner Sign In</h3>
-              <p className="text-[11px] font-mono text-slate-400 mt-0.5">Unlocks AI analysis — free, no subscription</p>
+              <p className="text-[11px] font-mono text-slate-400 mt-0.5">Unlocks AI analysis (free, no subscription)</p>
             </div>
           </div>
           <button
@@ -112,7 +112,7 @@ export const OwnerSignInModal: React.FC<OwnerSignInModalProps> = ({ open, onClos
 
         {success && (
           <div className="flex items-center gap-2 bg-emerald-950/40 border border-emerald-500/30 rounded-lg px-3 py-2.5 text-emerald-300 text-xs font-mono">
-            <CheckCircle2 className="w-4 h-4 shrink-0" /> Signed in — AI analysis unlocked
+            <CheckCircle2 className="w-4 h-4 shrink-0" /> Signed in (AI analysis unlocked)
           </div>
         )}
         {error && !success && (

@@ -122,12 +122,12 @@ function ProductModal({ product, onClose }: { product: MerchProduct; onClose: ()
               rel="noopener noreferrer"
               className="mt-6 w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-display font-bold uppercase tracking-wider text-lg shadow-[0_16px_40px_-12px_rgba(245,158,11,0.7)] transition-all"
             >
-              <ShoppingBag className="w-5 h-5" /> Buy now — {formatCad(product.priceCad)}
+              <ShoppingBag className="w-5 h-5" /> Buy now: {formatCad(product.priceCad)}
             </a>
           ) : !reqSent ? (
             <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <div className="text-xs font-black uppercase tracking-[0.18em] text-slate-600">Request this item</div>
-              <p className="mt-1 text-xs text-slate-500">Online checkout is being wired up — send a request and Josh will confirm your order by email.</p>
+              <p className="mt-1 text-xs text-slate-500">Online checkout is being wired up. Send a request and Josh will confirm your order by email.</p>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <input
                   value={reqName}
@@ -191,7 +191,7 @@ export function ShopView() {
           Wear the water<span className="text-teal-600">.</span>
         </h1>
         <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-xl mx-auto">
-          Original FishAI designs from the lake-dawn line. Printed to order and shipped from Ontario — no warehouse, no waste.
+          Original FishAI designs from the lake-dawn line. Printed to order and shipped from Ontario (no warehouse, no waste).
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           {FILTERS.map((f) => (
@@ -218,7 +218,7 @@ export function ShopView() {
           ))}
         </div>
         {visible.length === 0 && (
-          <div className="py-16 text-center text-sm text-slate-500">Nothing here yet — check back soon.</div>
+          <div className="py-16 text-center text-sm text-slate-500">Nothing here yet. Check back soon.</div>
         )}
         <div className="mt-10 text-center text-xs text-slate-400 max-w-lg mx-auto leading-relaxed">
           Every piece is printed to order in small batches. Prices in Canadian dollars, taxes calculated at checkout.

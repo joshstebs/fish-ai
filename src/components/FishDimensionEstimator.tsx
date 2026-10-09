@@ -414,7 +414,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
             Catch <span className="text-emerald-400">Snapshot</span>
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Snap a photo — species ID, size estimate, and harvest rules in seconds.
+            Snap a photo: species ID, size estimate, and harvest rules in seconds.
           </p>
         </div>
       </div>
@@ -719,7 +719,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                 Ready to Analyze
               </h3>
               <p className="text-slate-400 text-xs max-w-md mx-auto font-mono">
-                Upload a catch photo or try a demo — get species ID, size estimate, and harvest rules.
+                Upload a catch photo or try a demo to get species ID, size estimate, and harvest rules.
               </p>
             </div>
           )}
@@ -788,7 +788,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                     <RefreshCw className="w-4 h-4 text-amber-400" /> Correct the Species
                   </h4>
                   <p className="text-xs text-slate-400 font-mono">
-                    AI identification can be wrong. Pick the actual species — your correction improves your personal stats.
+                    AI identification can be wrong. Pick the actual species; your correction improves your personal stats.
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {CORRECTABLE_SPECIES.map((s) => (

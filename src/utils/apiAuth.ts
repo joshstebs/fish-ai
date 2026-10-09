@@ -54,6 +54,6 @@ export async function verifyOwnerPassword(
     }
     return { ok: false, error: msg };
   } catch {
-    return { ok: false, error: 'Could not reach the server — check your connection.' };
+    return { ok: false, error: 'Could not reach the server. Check your connection.' };
   }
 }

@@ -269,7 +269,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
             No Patterns Yet
           </h3>
           <p className="text-slate-400 text-xs max-w-md mx-auto">
-            Log a catch to start learning your patterns — best hours, top lures, and spots.
+            Log a catch to start learning your patterns: best hours, top lures, and spots.
           </p>
         </div>
       ) : (
@@ -364,7 +364,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
                 </>
               ) : (
                 <span className="text-base font-black text-slate-500 font-mono block">
-                  Not enough data yet — log trips with times.
+                  Not enough data yet. Log trips with times.
                 </span>
               )}
             </div>
@@ -384,7 +384,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
                 </>
               ) : (
                 <span className="text-base font-black text-slate-500 font-mono block">
-                  No lure data yet — log bait on your next catch.
+                  No lure data yet. Log bait on your next catch.
                 </span>
               )}
             </div>
@@ -423,7 +423,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
                     No catch dates yet
                   </p>
                   <p className="text-[10px] font-mono text-slate-500 max-w-sm mx-auto">
-                    Log a catch and your bite-frequency area chart — how many bites you log per day —
+                    Log a catch and your bite-frequency area chart (how many bites you log per day)
                     will appear here.
                   </p>
                 </div>
@@ -440,7 +440,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
             </h3>
             {report.patterns.length === 0 ? (
               <p className="text-slate-400 text-xs font-mono">
-                Not enough data for pattern detection yet — keep logging catches and patterns will
+                Not enough data for pattern detection yet. Keep logging catches and patterns will
                 start to emerge.
               </p>
             ) : (
@@ -550,7 +550,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
             </h3>
             {personalBests.length === 0 ? (
               <p className="text-slate-400 text-xs font-mono">
-                No weight data logged yet — add estimated weights to track your personal bests.
+                No weight data logged yet. Add estimated weights to track your personal bests.
               </p>
             ) : (
               <div className="space-y-3">
@@ -594,7 +594,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ catches }) => {
       <div className="bg-slate-900 border border-white/10 rounded-xl p-4 flex items-start gap-2.5 shadow-xl">
         <ShieldCheck className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
         <p className="text-[11px] font-mono text-slate-500 leading-relaxed">
-          Insights are based only on your logged data — small samples are marked low confidence.
+          Insights are based only on your logged data. Small samples are marked low confidence.
         </p>
       </div>
     </div>

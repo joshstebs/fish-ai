@@ -21,7 +21,7 @@ export const SolunarActivityView: React.FC<SolunarActivityViewProps> = ({ spots 
         if (c) {
           setCoords(c);
         } else {
-          setCoordsNote('No location available — add a spot with coordinates or allow browser location for sunrise/solunar times. Moon phase is shown below regardless.');
+          setCoordsNote('No location available. Add a spot with coordinates or allow browser location for sunrise/solunar times. Moon phase is shown below regardless.');
         }
       }
     })();
@@ -58,7 +58,7 @@ export const SolunarActivityView: React.FC<SolunarActivityViewProps> = ({ spots 
             🌙 Solunar Peak Feeding & Moon Phase Calculator
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Real astronomical calculations: moon phase, sunrise/sunset, and solunar major/minor feeding windows — computed from actual orbital math for your date and location.
+            Real astronomical calculations: moon phase, sunrise/sunset, and solunar major/minor feeding windows. Computed from actual orbital math for your date and location.
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export const SolunarActivityView: React.FC<SolunarActivityViewProps> = ({ spots 
           <div className="bg-slate-950 p-2.5 rounded border border-slate-800 text-[11px] font-mono text-slate-300">
             {daysToFull >= 0 && daysToFull <= 14
               ? `Full moon in ~${daysToFull} day${daysToFull === 1 ? '' : 's'}. Nighttime feeding activity often spikes around full moons.`
-              : `New moon in ~${daysToNew} day${daysToNew === 1 ? '' : 's'}. Dark nights — low-light predators are more active.`}
+              : `New moon in ~${daysToNew} day${daysToNew === 1 ? '' : 's'}. Dark nights; low-light predators are more active.`}
           </div>
         </div>
 
@@ -124,7 +124,7 @@ export const SolunarActivityView: React.FC<SolunarActivityViewProps> = ({ spots 
           </div>
 
           <div className="bg-slate-950 p-2.5 rounded border border-slate-800 text-[11px] font-mono text-slate-300">
-            Solunar periods mark moon overhead/underfoot (major) and moonrise/set (minor) — classic peak-feeding times used by anglers worldwide.
+            Solunar periods mark moon overhead/underfoot (major) and moonrise/set (minor). Classic peak-feeding times used by anglers worldwide.
           </div>
         </div>
 
@@ -152,7 +152,7 @@ export const SolunarActivityView: React.FC<SolunarActivityViewProps> = ({ spots 
             </div>
           ) : (
             <div className="bg-slate-950 p-3 rounded border border-slate-800 text-[11px] text-slate-400">
-              Sunrise/sunset need coordinates — {coords ? 'unavailable for this latitude' : 'allow location or add a spot.'}
+              Sunrise/sunset need coordinates. {coords ? 'Unavailable for this latitude' : 'Allow location or add a spot.'}
             </div>
           )}
 
@@ -208,7 +208,7 @@ export const SolunarActivityView: React.FC<SolunarActivityViewProps> = ({ spots 
 
       <p className="text-[10px] text-slate-500 font-mono">
         <Sparkles className="w-3 h-3 inline text-purple-400 mr-1" />
-        All values computed from orbital mechanics for the selected date — no stored or fabricated data. Solunar theory is a tradition, not a guarantee; use it as a tie-breaker, not gospel.
+        All values computed from orbital mechanics for the selected date (no stored or fabricated data). Solunar theory is a tradition, not a guarantee; use it as a tie-breaker, not gospel.
       </p>
     </div>
   );
