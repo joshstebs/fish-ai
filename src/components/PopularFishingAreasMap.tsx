@@ -23,6 +23,7 @@ export const PopularFishingAreasMap: React.FC = () => {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const features = useRef<L.LayerGroup | null>(null);
+  const lastRegion = useRef<Region | null>(null);
   const [region, setRegion] = useState<Region>('ontario');
   const [showRivers, setShowRivers] = useState(true);
   const [showLakes, setShowLakes] = useState(true);
@@ -57,6 +58,7 @@ export const PopularFishingAreasMap: React.FC = () => {
       controller?.abort();
       controller = new AbortController();
       const signal = controller.signal;
+      layer.clearLayers();
       const b = map.getBounds();
       const geometry = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].join(',');
       const common = {
@@ -118,7 +120,7 @@ export const PopularFishingAreasMap: React.FC = () => {
             const rivers = collections[collectionIndex++];
             if (rivers.features) L.geoJSON(rivers, {
               style: { color: '#73b8ff', weight: 2, opacity: 0.88 },
-              onEachFeature: (feature, item) => item.bindPopup('<b>' + escapeHtml(feature.properties?.GNIS_NAME || 'U.S. river or stream') + '</b><br>USGS National Hydrography Dataset'),
+              onEachFeature: (feature, item) => item.bindPopup('<b>' + escapeHtml(feature.properties?.gnis_name || feature.properties?.GNIS_NAME || 'U.S. river or stream') + '</b><br>USGS National Hydrography Dataset'),
             }).addTo(layer);
           }
           if (showLakes) {
@@ -136,8 +138,11 @@ export const PopularFishingAreasMap: React.FC = () => {
       }
     };
     const schedule = () => { if (timer) clearTimeout(timer); timer = setTimeout(load, 350); };
-    if (region === 'ontario') map.setView([44.2, -79.5], 6);
-    else map.setView([39.1, -96.2], 4);
+    if (lastRegion.current !== region) {
+      if (region === 'ontario') map.setView([44.2, -79.5], 6);
+      else map.setView([39.1, -96.2], 4);
+      lastRegion.current = region;
+    }
     schedule();
     map.on('moveend', schedule);
     return () => {
