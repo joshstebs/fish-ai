@@ -180,7 +180,8 @@ aiRouter.get('/status', (_req, res) => {
 });
 
 aiRouter.post('/analyze-fish', async (req, res) => {
-  const { imageBase64, mimeType = 'image/jpeg', referenceObjectHint } = req.body;
+  const { imageBase64, mimeType = 'image/jpeg', referenceObjectHint, location } = req.body;
+  // location: 'ontario' | 'us' | undefined (defaults to generic)
 
   if (!imageBase64) {
     return res.status(400).json({ error: 'Image base64 data is required for computer vision analysis.' });
@@ -200,6 +201,9 @@ aiRouter.post('/analyze-fish', async (req, res) => {
   }
 
   const prompt = `You are FishAI, an expert fisheries biologist and fishing guide.
+${location === 'ontario'
+    ? 'The user is fishing in ONTARIO, CANADA. Use Ontario Fishing Regulations Summary 2026 for regulatory info (sport/conservation license limits, size restrictions, seasons). Note that rules vary by Fisheries Management Zone (FMZ).'
+    : 'The user is fishing in the UNITED STATES. Use typical US state fishing regulations for regulatory info. Note that rules vary by state.'}
 
 Analyze the fish photo and return STRICT JSON (no markdown fences, no thinking blocks) with this exact shape:
 {
@@ -218,7 +222,7 @@ Analyze the fish photo and return STRICT JSON (no markdown fences, no thinking b
 
 RULES:
 - If you cannot identify the species with reasonable confidence (<50%), set confidence to your best estimate and say so in proportionalAnalysis: "species uncertain".
-- Keep regulatory info generic (typical state regulations) and flag in protectionNotice that regulations vary by state/province. Never state a specific jurisdiction as fact.
+- Keep regulatory info based on the user's location. If location is "ontario", use Ontario Fishing Regulations Summary 2026 (sport/conservation limits, FMZ variations). If location is "us" or unspecified, use typical US state regulations. Always flag in protectionNotice that regulations vary by jurisdiction and the user should verify current rules. Never present estimates as legal advice.
 - The user may provide a scale reference hint: "${referenceObjectHint || 'none'}". Use it if visible.
 - Length/weight must be ESTIMATES clearly derived from proportions; use realistic ranges.`;
 
