@@ -210,13 +210,13 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ catches, spots }) 
           <Bot className="w-6 h-6 text-emerald-400" /> Fishing Assistant
         </h2>
         <p className="text-slate-400 text-sm mt-1">
-          Ask about spots, lures, timing, or conditions — from your data.
+          Ask about spots, lures, timing, or conditions (from your data).
         </p>
         {/* Honest data-source label */}
         <div className="mt-3 flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-slate-500 border-t border-slate-800 pt-3">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
           <span>
-            Your data only — no fake answers, ever.
+            Your data only. No fake answers, ever.
           </span>
         </div>
       </div>

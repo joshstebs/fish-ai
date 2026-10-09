@@ -1,6 +1,6 @@
 import { app } from './app.js';
 
-// Local dev entry point only — on Vercel, api/index.ts exports `app` as a
+// Local dev entry point only. On Vercel, api/index.ts exports `app` as a
 // serverless function and nothing listens on a port.
 const PORT = process.env.PORT || 3002;
 

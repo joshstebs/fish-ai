@@ -174,7 +174,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
     const w = await fetchLiveWeather(c.latitude, c.longitude);
     setWeather(w);
     if (!w) {
-      setWeatherError('Weather service unreachable — check your connection.');
+      setWeatherError('Weather service unreachable. Check your connection.');
     }
     setWeatherLoading(false);
   }, [spots]);
@@ -372,7 +372,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
           <div className="space-y-2">
             <p className="font-bold">{weatherError || (locationDenied ? 'Location access is off.' : 'Live weather unavailable.')}</p>
             <p className="text-amber-300/70">
-              Score uses solunar math and history only — no fake weather shown.
+              Score uses solunar math and history only (no fake weather shown).
             </p>
             <button
               onClick={handleRefresh}
@@ -475,7 +475,7 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
             </div>
             <p className="text-sm sm:text-base text-slate-100 font-medium leading-relaxed max-w-2xl">
               {report.grade === 'POOR'
-                ? 'Tough bite ahead — take your time, downsize your presentation, and fish the slow windows.'
+                ? 'Tough bite ahead. Take your time, downsize your presentation, and fish the slow windows.'
                 : `Best bite ${report.bestWindow ? `from ${report.bestWindow.start} to ${report.bestWindow.end}` : 'later in the day'}${lures[0] ? ` — lead with a ${lures[0].name.toLowerCase()}` : ''}${weather ? `, ${weather.current.condition.toLowerCase()} and ${pressureTrendLabel}` : ''}.`}
             </p>
             {lures.length > 0 && (

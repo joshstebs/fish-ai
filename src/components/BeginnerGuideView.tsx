@@ -107,7 +107,7 @@ const LURES_DATA: LureGuide[] = [
     bestForSpecies: ['Largemouth Bass', 'Smallmouth Bass'],
     waterDepth: 'Shallow to Mid-Water (1-10 ft)',
     technique: 'Wacky Rig (hook in middle) or Texas Rig (weedless). Let sink on slack line.',
-    beginnerTip: '#1 most productive bass lure worldwide. Do not shake it—just let it fall naturally.',
+    beginnerTip: '#1 most productive bass lure worldwide. Do not shake it; just let it fall naturally.',
     image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&auto=format&fit=crop&q=80',
   },
   {

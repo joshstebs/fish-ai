@@ -6,11 +6,11 @@ A personal fishing assistant that helps you **plan → fish → record → learn
 
 | Tab | What it does |
 |---|---|
-| **Fish Report** | Honest, personalized conditions score for your target species — real live weather (Open-Meteo), real solunar math, and **your** catch history. Every factor is shown with why it helps or hurts, plus confidence and a caveat. |
+| **Fish Report** | Honest, personalized conditions score for your target species: real live weather (Open-Meteo), real solunar math, and **your** catch history. Every factor is shown with why it helps or hurts, plus confidence and a caveat. |
 | **Vision** | AI fish identification + size/weight estimation via Gemini vision (needs `GEMINI_API_KEY`). Never fakes results: without a key it returns an honest error, and you can correct the species. |
 | **Logbook** | Catch log with search/filter/CSV export, plus **Quick Log** for fast manual entry with optional live-weather attach. |
-| **Insights** | The personal learning loop: best hours, top lures, top spots, best conditions, species stats, personal bests — every insight shows its sample size and confidence. |
-| **Assistant** | Chat that answers from **your** data: where to fish, what lure, when to go, why you're not catching. Offline rule-based — no fake advice. |
+| **Insights** | The personal learning loop: best hours, top lures, top spots, best conditions, species stats, personal bests. Every insight shows its sample size and confidence. |
+| **Assistant** | Chat that answers from **your** data: where to fish, what lure, when to go, why you're not catching. Offline rule-based, no fake advice. |
 | **Spot Map** | Saved spots with real GPS capture, privacy levels (Private/Friends/Approximate/Public), catch history per spot. |
 | Tackle AI, Solunar, Pressure, Tackle Box, Trophies, Livewell, Academy | Rule-based tackle matching; **real** astronomical calculations; **live** barometric pressure + trend; persisted gear inventory (starts empty); achievements computed from real catches; timers; beginner guides. |
 
@@ -18,7 +18,7 @@ A personal fishing assistant that helps you **plan → fish → record → learn
 
 - **No fabricated data.** A new user starts with an empty logbook, empty spots, empty tackle box.
 - Weather is live from [Open-Meteo](https://open-meteo.com) (free, no key). If unavailable, the app says so instead of inventing conditions.
-- Moon phase, sunrise/sunset, and solunar windows are computed from orbital math — no hardcoded tables.
+- Moon phase, sunrise/sunset, and solunar windows are computed from orbital math (no hardcoded tables).
 - AI vision returns an honest 503 when `GEMINI_API_KEY` is missing. Insights and the assistant show sample sizes and confidence so small samples are obviously weak.
 - Spot coordinates are private by default and never leave the device.
 
@@ -41,7 +41,7 @@ Vite + React 18 + TypeScript + Tailwind + Express (`@google/genai` for vision).
 
 The repo is Vercel-ready: `api/index.ts` exports the Express app as a serverless function, `vercel.json` rewrites `/api/*` to it and all other routes to the SPA.
 
-**Via git (recommended)** — push to GitHub, then import the repo at vercel.com. Set the env var first:
+**Via git (recommended)**: push to GitHub, then import the repo at vercel.com. Set the env var first:
 
 ```
 GEMINI_API_KEY=<your key>   (Production)
@@ -57,6 +57,6 @@ vercel --prod
 ```
 
 Notes:
-- Vision (`/api/ai/analyze-fish`) needs `GEMINI_API_KEY`; without it the app still works — the vision tab shows an honest 503.
+- Vision (`/api/ai/analyze-fish`) needs `GEMINI_API_KEY`; without it the app still works (the vision tab shows an honest 503).
 - Function max duration is set to 60s in `vercel.json` (Hobby plan limit) for Gemini's response time.
 - No other keys needed: weather is Open-Meteo, solunar is computed locally.

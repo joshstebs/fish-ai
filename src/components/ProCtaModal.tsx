@@ -16,10 +16,10 @@ interface ProCtaModalProps {
 }
 
 const FEATURES = [
-  'Unlimited Fish Species Recognition',
-  'Advanced Fishing Tactics',
-  'Personalized Fishing Reports',
-  'Exclusive Fishing Community',
+  'AI fish species recognition',
+  'Size and weight estimation',
+  'Catch confidence scoring',
+  'Typical size limit reminders',
 ];
 
 /**

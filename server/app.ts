@@ -6,9 +6,9 @@ import { aiRouter } from './routes/aiRoutes.js';
 import { billingRouter, billingStripe, customerIsEntitled } from './routes/billingRoutes.js';
 import { mailRouter } from './routes/mailRoutes.js';
 import { rateLimit, rateLimitHeaders } from './utils/rateLimit.js';
-// Shared Express app — used by:
+// Shared Express app, used by:
 //  - server/server.ts (local dev: app.listen)
-//  - api/index.ts     (Vercel: exported as a serverless function)
+//  - api/index.ts (Vercel: exported as a serverless function)
 export const app = express();
 
 app.use(cors());
@@ -23,7 +23,7 @@ app.use(express.json({
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
 // ---------------------------------------------------------------------------
-// Rate limiting — per-IP sliding window on the expensive / sensitive endpoints.
+// Rate limiting: per-IP sliding window on the expensive / sensitive endpoints.
 // The util existed but was never wired up; these guards keep the free AI tier,
 // owner-verify, and mail endpoints from being hammered into quota exhaustion.
 // ---------------------------------------------------------------------------
@@ -46,7 +46,7 @@ function rateLimitMiddleware(limit: number, windowMs: number, label: string) {
     const lim = rateLimit(key, limit, windowMs);
     for (const [k, v] of Object.entries(rateLimitHeaders(lim))) res.setHeader(k, v);
     if (!lim.ok) {
-      return res.status(429).json({ error: 'Too many requests — slow down and try again shortly.', retryAfterSeconds: Math.ceil(lim.retryAfterMs / 1000) });
+      return res.status(429).json({ error: 'Too many requests. Slow down and try again shortly.', retryAfterSeconds: Math.ceil(lim.retryAfterMs / 1000) });
     }
     next();
   };
@@ -60,12 +60,12 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', server: 'FishAI Multi-Modal Server', timestamp: new Date().toISOString() });
 });
 
-// Owner sign-in — verify the app password (timing-safe). Public endpoint:
+// Owner sign-in: verify the app password (timing-safe). Public endpoint:
 // it exists so the app can validate a password BEFORE storing it locally.
 app.post('/api/auth/owner-verify', rateLimitMiddleware(VERIFY_LIMIT, 60_000, 'verify'), (req, res) => {
   if (!appSecret) {
     return res.status(503).json({
-      error: 'API auth is not configured — set FISH_APP_SECRET in the server environment.',
+      error: 'API auth is not configured. Set FISH_APP_SECRET in the server environment.',
       code: 'AUTH_NOT_CONFIGURED',
     });
   }
@@ -82,7 +82,7 @@ app.post('/api/auth/owner-verify', rateLimitMiddleware(VERIFY_LIMIT, 60_000, 've
   res.json({ ok: true, role: 'owner' });
 });
 
-// API auth gate — all /api/ai routes require either:
+// API auth gate: all /api/ai routes require either:
 //   1. the owner app secret (x-fish-app-secret === FISH_APP_SECRET), or
 //   2. an entitled Stripe customer (x-fish-customer-id with an active
 //      subscription or in-progress trial).
@@ -96,7 +96,7 @@ const rateLimitAi = (req: any, res: any, next: any) =>
 app.use('/api/ai', rateLimitAi, async (req, res, next) => {
   if (!appSecret) {
     return res.status(503).json({
-      error: 'API auth is not configured — set FISH_APP_SECRET in the server environment.',
+      error: 'API auth is not configured. Set FISH_APP_SECRET in the server environment.',
       code: 'AUTH_NOT_CONFIGURED',
     });
   }

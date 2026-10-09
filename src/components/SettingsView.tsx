@@ -57,7 +57,7 @@ export function SettingsView() {
 
   const statusLabel = billing?.entitled
     ? billing.status === 'trialing' && billing.trialEndsAt
-      ? `Premium trial active — ends ${new Date(billing.trialEndsAt * 1000).toLocaleDateString()}`
+      ? `Premium trial active (ends ${new Date(billing.trialEndsAt * 1000).toLocaleDateString()})`
       : 'Premium subscription active'
     : billing
       ? 'No active subscription'
@@ -79,7 +79,7 @@ export function SettingsView() {
           <Settings className="w-6 h-6 text-sky-400" /> Your Plan & Device
         </h2>
         <p className="text-slate-400 text-sm mt-1">
-          Manage your subscription — billing by Stripe.
+          Manage your subscription (billing by Stripe).
         </p>
       </div>
 
@@ -135,7 +135,7 @@ export function SettingsView() {
             <p className="text-slate-400 text-xs font-mono">
               {getCustomerId()
                 ? 'Your trial has ended or the subscription was canceled.'
-                : 'Start a 7-day free trial — $7.99/mo after. Cancel anytime.'}
+                : 'Start a 7-day free trial ($7.99/mo after). Cancel anytime.'}
             </p>
             <div className="flex flex-wrap gap-2">
               <input
@@ -173,7 +173,7 @@ export function SettingsView() {
           <Mail className="w-3.5 h-3.5 text-sky-400" /> Account on this device
         </span>
         <p className="text-sm text-slate-300 font-mono">
-          {email ? email : 'No email set yet — start a free trial to link one.'}
+          {email ? email : 'No email set yet. Start a free trial to link one.'}
         </p>
         <p className="text-[10px] font-mono text-slate-500">
           Tied to this device via Stripe. Manage Subscription before switching devices.

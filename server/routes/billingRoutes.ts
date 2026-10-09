@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import Stripe from 'stripe';
 
-// Billing routes — Stripe Checkout + Billing Portal, Stripe as source of truth
+// Billing routes: Stripe Checkout + Billing Portal, Stripe as source of truth
 // (no database). Subscription = $7.99/mo with a 7-day free trial.
 export const billingRouter = Router();
 
@@ -54,7 +54,7 @@ billingRouter.post('/checkout', async (req, res) => {
 
     const subs = await stripe.subscriptions.list({ customer: customer.id, status: 'all', limit: 10 });
     if (subs.data.some(isEntitled)) {
-      // Already on a trial/subscription — send them to manage it instead.
+      // Already on a trial/subscription: send them to manage it instead.
       const portal = await stripe.billingPortal.sessions.create({
         customer: customer.id,
         return_url: `${APP_URL}/`,
@@ -81,7 +81,7 @@ billingRouter.post('/checkout', async (req, res) => {
 
 // ---------------------------------------------------------------------------
 // GET /api/billing/status?customer_id=cus_xxx
-// Live entitlement check against Stripe (no caching — always accurate).
+// Live entitlement check against Stripe (no caching, always accurate).
 // ---------------------------------------------------------------------------
 billingRouter.get('/status', async (req, res) => {
   const customerId = String(req.query.customer_id || '');
