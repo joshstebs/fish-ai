@@ -107,8 +107,8 @@ export const PopularFishingAreasMap: React.FC = () => {
           });
           if (map.getZoom() < 7) return;
           const requests: Promise<Response>[] = [];
-          if (showRivers) requests.push(fetch(USGS_SERVICE + '/3/query?' + query('GNIS_NAME IS NOT NULL', 'GNIS_NAME,FTYPE,FCODE', 250), { signal }));
-          if (showLakes) requests.push(fetch(USGS_SERVICE + '/9/query?' + query('GNIS_NAME IS NOT NULL', 'GNIS_NAME,FTYPE,FCODE', 250), { signal }));
+          if (showRivers) requests.push(fetch(USGS_SERVICE + '/6/query?' + query('GNIS_NAME IS NOT NULL', 'GNIS_NAME,FTYPE,FCODE', 250), { signal }));
+          if (showLakes) requests.push(fetch(USGS_SERVICE + '/12/query?' + query('GNIS_NAME IS NOT NULL', 'GNIS_NAME,FTYPE,FCODE', 250), { signal }));
           const responses = await Promise.all(requests);
           if (responses.some(response => !response.ok)) throw new Error('USGS water features are temporarily unavailable.');
           const collections = await Promise.all(responses.map(response => response.json()));
