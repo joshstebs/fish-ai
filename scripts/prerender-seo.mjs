@@ -4,14 +4,14 @@ import { createServer } from 'vite';
 
 const DIST = path.resolve('dist');
 const SITE = 'https://fishai.shop';
-const TODAY = '2026-10-08';
+const TODAY = '2026-10-10';
 
 const pages = [
-  { path: '/guides/best-fishing-app-ontario', title: 'Ontario Fishing Apps Compared: Fish ON-Line, Fishbrain and FishAI', description: 'Compare Ontario fishing tools and search official open data for lake names and fishing access. Includes licences, source dates and safety cautions.' },
+  { path: '/guides/best-fishing-app-ontario', title: 'Ontario Fishing Access Points and App Guide | FishAI', description: 'Search Ontario open data for lake names and recorded fishing access points, then verify property permission, current operation and 2026 regulations.' },
   { path: '/shop', title: 'FishAI Fishing Merch — T-Shirts, Hoodies & Hats', description: 'Original FishAI fishing apparel and hats, printed to order and shipped from Ontario, Canada.' },
   { path: '/best-fishing-app', title: 'FishAI — AI Fishing App with Fish ID, Weather & Logbook', description: 'Compare the tools that make FishAI a practical fishing companion: AI fish ID, weather, solunar timing, private catch logbook, spot map and insights.' },
   { path: '/fishai-vs-fishbrain', title: 'FishAI vs Fishbrain — Fishing App Comparison', description: 'Compare FishAI and Fishbrain across AI fish identification, weather, private catch logging, spot tools and angler-focused features.' },
-  { path: '/fishai-vs-fishangler', title: 'FishAI vs FishAngler — Fishing App Comparison', description: 'Compare FishAI and FishAngler across AI fish identification, weather, private catch logging, spot tools and fishing features.' },
+  { path: '/fishai-vs-fishangler', title: 'FishAI vs FishAngler: Fishing App Comparison', description: 'Compare FishAI and FishAngler maps, catch logs, forecasts and privacy using a practical task table and a repeatable 20-minute trial.' },
   { path: '/listicle', title: 'Best Fishing App Features to Look For in 2026 | FishAI', description: 'A practical checklist for choosing a fishing app in 2026, including weather, solunar data, catch logging, fish identification and privacy.' },
   { path: '/how-to-choose', title: 'How to Choose a Fishing App | FishAI', description: 'Learn what to compare when choosing a fishing app: accurate conditions, useful catch history, fish identification, privacy and real angler workflows.' },
   { path: '/blog', title: 'FishAI Fishing Journal — Guides, Comparisons & Tips', description: 'Fishing guides and practical notes on AI fish identification, solunar timing, private catch logs and choosing fishing apps.' },
