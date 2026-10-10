@@ -6,7 +6,7 @@ import path from 'node:path';
 test('every sitemap page contains public content before JavaScript runs', async () => {
   const sitemap = await readFile('dist/sitemap.xml', 'utf8');
   const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => new URL(match[1]));
-  assert.equal(urls.length, 38);
+  assert.equal(urls.length, 39);
   for (const url of urls) {
     const file = url.pathname === '/' ? 'index.html' : `${url.pathname.slice(1)}.html`;
     const html = await readFile(path.join('dist', file), 'utf8');
