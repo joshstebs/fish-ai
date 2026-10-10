@@ -72,7 +72,7 @@ function ProductModal({ product, onClose }: { product: MerchProduct; onClose: ()
       aria-label={product.title}
     >
       <div
-        className="w-full sm:max-w-3xl bg-white rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl grid md:grid-cols-2 max-h-[92vh]"
+        className="w-full sm:max-w-3xl bg-white rounded-t-3xl sm:rounded-3xl overflow-y-auto md:overflow-hidden shadow-2xl grid md:grid-cols-2 max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="bg-slate-950 min-h-[240px]">
