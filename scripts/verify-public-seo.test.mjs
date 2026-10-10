@@ -20,7 +20,7 @@ test('every sitemap page contains public content before JavaScript runs', async 
 test('shop HTML exposes the complete catalog and working page links', async () => {
   const html = await readFile('dist/shop.html', 'utf8');
   const products = new Set([...html.matchAll(/href="(\/shop\/[^"/]+)"/g)].map(match => match[1]));
-  assert.equal(products.size, 22);
+  assert.equal(products.size, 23);
   for (const product of products) {
     const productHtml = await readFile(path.join('dist', `${product.slice(1)}.html`), 'utf8');
     assert.match(productHtml, /<h1[^>]*>[^<]+<\/h1>/);
