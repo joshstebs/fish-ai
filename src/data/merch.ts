@@ -9,6 +9,7 @@ export interface MerchProduct {
   category: MerchCategory;
   priceCad: number;
   image: string;
+  imageBack?: string;
   story: string;
   sizes: string[];
   sizeNote?: string;
@@ -72,6 +73,11 @@ export const MERCH_PRODUCTS: MerchProduct[] = [
     'Spring means one thing: slabs. A black crappie badge for the panfish crowd chasing dinner-plate slabs across the Great Lakes.'),
   p('tee-king-of-the-pier', 'King of the Pier Tee', 'tee', 39.99,
     'Chinook. Lake Ontario. The pier at dawn. For the salmon anglers who know the king doesn\u2019t come to you — you go to the king.'),
+  {
+    ...p('tee-lake-ontario-forever-protest', 'Lake Ontario Forever Protest Tee', 'tee', 39.99,
+      'Front: the flagship Lake Ontario Forever badge, lighthouse and all. Back: the quiet part out loud, a full-back protest print on the same cream blank. For everyone who knows exactly which lake this is.'),
+    imageBack: '/merch/tee-lake-ontario-forever-protest-back.jpg',
+  },
   // ---- Hoodies ($69.99) ----
   p('hoodie-lake-ontario-forever', 'Lake Ontario Forever Hoodie', 'hoodie', 69.99,
     'The flagship design on heavy fleece. For dawn launches when the air bites harder than the fish.'),
@@ -116,6 +122,7 @@ export const MERCH_PAYMENT_LINKS: Record<string, string> = {
   'tee-tables-have-turned': 'https://buy.stripe.com/fZudRa4Aoffx1J86DN1Jm0j',
   'tee-slab-season': 'https://buy.stripe.com/00w8wQ5Es2sL9bAd2b1Jm0k',
   'tee-king-of-the-pier': 'https://buy.stripe.com/28E00k5Es4AT4Vk0fp1Jm0l',
+  'tee-lake-ontario-forever-protest': 'https://buy.stripe.com/PLACEHOLDER-tee-lake-ontario-forever-protest',
   'hoodie-lake-ontario-forever': 'https://buy.stripe.com/cNi28s9UI9VdfzY1jt1Jm0b',
   'hoodie-winter-is-biting': 'https://buy.stripe.com/8x24gA3wk5EXgE22nx1Jm0c',
   'hoodie-walleye-after-dark': 'https://buy.stripe.com/4gMcN6d6U4AT0F48LV1Jm0d',

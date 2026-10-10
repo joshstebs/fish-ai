@@ -76,7 +76,18 @@ function ProductModal({ product, onClose }: { product: MerchProduct; onClose: ()
         onClick={(e) => e.stopPropagation()}
       >
         <div className="bg-slate-950 min-h-[240px]">
-          <img src={product.image} alt={product.title} className="w-full h-64 md:h-full object-cover" />
+          <div className="relative">
+            <img src={product.image} alt={product.title} className={`w-full object-cover ${product.imageBack ? 'h-64 md:h-80' : 'h-64 md:h-full'}`} />
+            {product.imageBack && (
+              <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-950/70 text-white text-[10px] font-black uppercase tracking-[0.2em]">Front</span>
+            )}
+          </div>
+          {product.imageBack && (
+            <div className="relative border-t border-white/10">
+              <img src={product.imageBack} alt={`${product.title} - back`} className="w-full h-64 md:h-80 object-cover" />
+              <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-950/70 text-white text-[10px] font-black uppercase tracking-[0.2em]">Back</span>
+            </div>
+          )}
         </div>
         <div className="p-6 md:p-8 overflow-y-auto">
           <div className="flex items-start justify-between gap-3">
