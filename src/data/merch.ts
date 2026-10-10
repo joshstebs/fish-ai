@@ -122,7 +122,7 @@ export const MERCH_PAYMENT_LINKS: Record<string, string> = {
   'tee-tables-have-turned': 'https://buy.stripe.com/fZudRa4Aoffx1J86DN1Jm0j',
   'tee-slab-season': 'https://buy.stripe.com/00w8wQ5Es2sL9bAd2b1Jm0k',
   'tee-king-of-the-pier': 'https://buy.stripe.com/28E00k5Es4AT4Vk0fp1Jm0l',
-  'tee-lake-ontario-forever-protest': 'https://buy.stripe.com/PLACEHOLDER-tee-lake-ontario-forever-protest',
+  'tee-lake-ontario-forever-protest': 'https://buy.stripe.com/6oUfZi3wk7N587w8LV1Jm0o',
   'hoodie-lake-ontario-forever': 'https://buy.stripe.com/cNi28s9UI9VdfzY1jt1Jm0b',
   'hoodie-winter-is-biting': 'https://buy.stripe.com/8x24gA3wk5EXgE22nx1Jm0c',
   'hoodie-walleye-after-dark': 'https://buy.stripe.com/4gMcN6d6U4AT0F48LV1Jm0d',
