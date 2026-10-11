@@ -87,6 +87,11 @@ try {
     const target = path.join(DIST, page.path.replace(/^\//, '') + '.html');
     await mkdir(path.dirname(target), { recursive: true });
     await writeFile(target, html);
+    if (page.path === '/guides/ontario-fish-stocking-records') {
+      const directoryTarget = path.join(DIST, page.path.replace(/^\\//, ''), 'index.html');
+      await mkdir(path.dirname(directoryTarget), { recursive: true });
+      await writeFile(directoryTarget, html);
+    }
   }
 
   const merchSource = await readFile(path.resolve('src/data/merch.ts'), 'utf8');
