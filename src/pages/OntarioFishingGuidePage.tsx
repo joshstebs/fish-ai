@@ -41,6 +41,7 @@ export function OntarioFishingGuidePage() {
       <h1 className="mt-3 text-3xl sm:text-5xl font-display font-black text-white">Ontario fishing apps and access points: a verification-first guide</h1>
       <p className="mt-5 text-lg">Use Ontario's official resources to research waterbodies and regulations, then verify access before leaving home. FishAI's lookup can surface provincial records, but a map point is the start of an access check, not permission to enter or proof that a launch is open.</p>
       <p className="mt-3 text-sm text-slate-400">Editorial disclosure: FishAI publishes this guide. It uses Ontario open-data services and links to the province's current regulatory sources. FishAI is not affiliated with or endorsed by the Government of Ontario.</p>
+      <p className="mt-3 text-sm">Researching a stocking row? Read <a className={link} href="/guides/ontario-fish-stocking-records">how to interpret Ontario fish stocking records</a> without treating a release as proof of present fish.</p>
 
       <section className="mt-8 grid sm:grid-cols-3 gap-4" aria-label="Fishing tool comparison">
         <div className={panel}><h2 className="font-bold text-white text-lg">Fish ON-Line</h2><p className="mt-2 text-sm">Ontario's official tool covers waterbodies, species observations, stocking, regulations, sanctuaries, access points and depth contours.</p><a className={link} href={sources.guide} target="_blank" rel="noreferrer">Government guide</a></div>
