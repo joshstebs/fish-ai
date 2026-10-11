@@ -15,10 +15,6 @@
       "destination": "/shop/:productId.html"
     },
     {
-      "source": "/guides/ontario-fish-stocking-records",
-      "destination": "/guides/ontario-fish-stocking-records.html"
-    },
-    {
       "source": "/guides/best-fishing-app-ontario",
       "destination": "/guides/best-fishing-app-ontario.html"
     },
