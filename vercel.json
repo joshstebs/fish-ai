@@ -15,6 +15,10 @@
       "destination": "/shop/:productId.html"
     },
     {
+      "source": "/guides/ontario-fishing-licence-checklist",
+      "destination": "/guides/ontario-fishing-licence-checklist.html"
+    },
+    {
       "source": "/guides/best-fishing-app-ontario",
       "destination": "/guides/best-fishing-app-ontario.html"
     },
