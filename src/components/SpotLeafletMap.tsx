@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { FishingSpot } from '../types/catchLogTypes';
+import { escapeHtml } from '../utils/mapData';
 import { LocateFixed } from 'lucide-react';
 
 interface SpotLeafletMapProps {
@@ -24,6 +25,10 @@ export const SpotLeafletMap: React.FC<SpotLeafletMapProps> = ({
   const markersRef = useRef<L.LayerGroup | null>(null);
   const pickMarkerRef = useRef<L.Marker | null>(null);
   const pickRef = useRef({ lat: 0, lon: 0 });
+
+  const callbacks = useRef({ onPickLocation, onSelectSpot });
+  callbacks.current = { onPickLocation, onSelectSpot };
+  const pickRequest = useRef<AbortController | null>(null);
 
   // Init map once
   useEffect(() => {
@@ -60,11 +65,15 @@ export const SpotLeafletMap: React.FC<SpotLeafletMapProps> = ({
         }),
       }).addTo(map);
 
+      pickRequest.current?.abort();
+      const controller = new AbortController();
+      pickRequest.current = controller;
+      const timeout = setTimeout(() => controller.abort(), 5000);
       let placeName: string | undefined;
       try {
         const res = await fetch(
           `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat.toFixed(5)}&lon=${lng.toFixed(5)}`,
-          { headers: { 'User-Agent': 'FishAI-app/1.0 (fishing spot tracker)' } }
+          { signal: controller.signal }
         );
         if (res.ok) {
           const data = await res.json();
@@ -73,14 +82,19 @@ export const SpotLeafletMap: React.FC<SpotLeafletMapProps> = ({
       } catch {
         /* reverse geocode is best-effort */
       }
-      onPickLocation(lat, lng, placeName);
+      clearTimeout(timeout);
+      if (pickRequest.current !== controller || mapRef.current !== map) return;
+      callbacks.current.onPickLocation(lat, lng, placeName);
     });
 
     return () => {
+      pickRequest.current?.abort();
       map.remove();
+      markersRef.current = null;
+      pickMarkerRef.current = null;
       mapRef.current = null;
     };
-  }, [onPickLocation]);
+  }, []);
 
   // Sync markers + fit bounds when spots change
   useEffect(() => {
@@ -93,28 +107,26 @@ export const SpotLeafletMap: React.FC<SpotLeafletMapProps> = ({
       const isSelected = spot.id === selectedSpotId;
       const icon = L.divIcon({
         className: '',
-        html: `<div class="spot-pin ${isSelected ? 'spot-pin-active' : ''}">${spot.name
-          .slice(0, 1)
-          .toUpperCase()}</div>`,
+        html: `<div class="spot-pin ${isSelected ? 'spot-pin-active' : ''}">${escapeHtml(spot.name.slice(0, 1).toUpperCase())}</div>`,
         iconSize: [26, 26],
         iconAnchor: [13, 13],
       });
       const marker = L.marker([spot.latitude, spot.longitude], { icon }).addTo(layer);
       marker.bindPopup(
         `<div style="font-family:monospace;font-size:11px;color:#0f172a;">
-          <b style="font-size:12px;">${spot.name}</b><br/>
-          ${spot.waterBody}<br/>
+          <b style="font-size:12px;">${escapeHtml(spot.name)}</b><br/>
+          ${escapeHtml(spot.waterBody)}<br/>
           <span style="color:#0d9488;">${spot.totalCatches} catches</span>
         </div>`
       );
-      marker.on('click', () => onSelectSpot(spot.id));
+      marker.on('click', () => callbacks.current.onSelectSpot(spot.id));
     });
 
     if (spots.length > 0) {
       const bounds = L.latLngBounds(spots.map((s) => [s.latitude, s.longitude] as [number, number]));
       map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
     }
-  }, [spots, selectedSpotId, onSelectSpot]);
+  }, [spots, selectedSpotId]);
 
   const handleLocate = () => {
     const map = mapRef.current;
@@ -157,7 +169,7 @@ export const SpotLeafletMap: React.FC<SpotLeafletMapProps> = ({
         </button>
       </div>
 
-      <div ref={containerRef} className="w-full aspect-16/10 bg-slate-950 z-0" />
+      <div ref={containerRef} className="w-full aspect-[16/10] min-h-[280px] bg-slate-950 z-0" />
 
       <div className="px-4 py-2.5 border-t border-slate-800 flex items-center justify-between">
         <span className="text-[10px] font-mono text-slate-400">
