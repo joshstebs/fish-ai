@@ -3,6 +3,9 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ExternalLink, Loader2, MapPinned } from 'lucide-react';
 
+import { escapeHtml, fetchMapData, accessLabel } from '../utils/mapData';
+import OntarioLakeSearch from './OntarioLakeSearch';
+
 type Region = 'ontario' | 'us';
 const ONTARIO_SERVICE = 'https://ws.lioservices.lrc.gov.on.ca/arcgis2/rest/services/LIO_OPEN_DATA/LIO_Open07/MapServer';
 const USGS_SERVICE = 'https://hydro.nationalmap.gov/arcgis/rest/services/nhd/MapServer';
@@ -17,7 +20,7 @@ const US_AREAS = [
   { name: 'Kenai River', detail: 'Alaska · salmon, rainbow trout', lat: 60.49, lon: -151.07, href: 'https://www.adfg.alaska.gov/index.cfm?adfg=ByAreaSouthcentralUpperKenai.fishingInfo', agency: 'Alaska Department of Fish and Game' },
   { name: 'Columbia River', detail: 'Oregon and Washington · salmon and steelhead', lat: 45.65, lon: -121.94, href: 'https://myodfw.com/recreation-report/fishing-report/columbia-zone', agency: 'Oregon Department of Fish and Wildlife' },
 ];
-const escapeHtml = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c));
+
 
 export const PopularFishingAreasMap: React.FC = () => {
   const container = useRef<HTMLDivElement>(null);
@@ -69,36 +72,37 @@ export const PopularFishingAreasMap: React.FC = () => {
         ...common, where, outFields: fields, resultRecordCount: String(count),
       }).toString();
       setLoading(true);
+      setError('');
       try {
         if (region === 'ontario') {
           const params = query('1=1', '*', 500);
-          const [waterRes, riverRes, accessRes] = await Promise.all([
-            fetch(ONTARIO_SERVICE + '/2/query?' + params, { signal }),
-            fetch(ONTARIO_SERVICE + '/1/query?' + params, { signal }),
-            fetch(ONTARIO_SERVICE + '/15/query?' + params, { signal }),
+          const results = await Promise.allSettled([
+            fetchMapData(ONTARIO_SERVICE + '/2/query?' + params, signal),
+            fetchMapData(ONTARIO_SERVICE + '/1/query?' + params, signal),
+            fetchMapData(ONTARIO_SERVICE + '/15/query?' + params, signal),
           ]);
-          if (!waterRes.ok || !riverRes.ok || !accessRes.ok) throw new Error('Ontario open data is temporarily unavailable.');
-          const [water, rivers, access] = await Promise.all([waterRes.json(), riverRes.json(), accessRes.json()]);
+          const [water, rivers, access] = results.map(r => r.status === 'fulfilled' ? r.value : undefined);
+          if (alive && !signal.aborted && results.some(r => r.status === 'rejected')) setError('Some Ontario layers could not load. Available layers are shown; move the map to retry.');
           if (!alive || signal.aborted) return;
-          if (water.features) L.geoJSON(water, {
+          if (water?.features) L.geoJSON(water, {
             style: { color: '#41d9c0', weight: 1, opacity: 0.8, fillColor: '#168f86', fillOpacity: 0.18 },
             onEachFeature: (feature, item) => {
               const p = feature.properties || {};
               item.bindPopup('<b>' + escapeHtml(p.OFFICIAL_WATERBODY_NAME || p.CORPORATE_WATERBODY_NAME || 'Ontario waterbody') + '</b><br>' + escapeHtml(p.WATERBODY_TYPE || 'Lake or river') + '<br>Ontario Fish ON-Line open data');
             },
           }).addTo(layer);
-          if (rivers.features) L.geoJSON(rivers, {
+          if (rivers?.features) L.geoJSON(rivers, {
             style: { color: '#73b8ff', weight: 2, opacity: 0.9 },
             onEachFeature: (feature, item) => {
               const p = feature.properties || {};
               item.bindPopup('<b>' + escapeHtml(p.OFFICIAL_WATERBODY_NAME || p.CORPORATE_WATERBODY_NAME || 'Ontario river or stream') + '</b><br>River or stream · Ontario Fish ON-Line open data');
             },
           }).addTo(layer);
-          if (access.features) L.geoJSON(access, {
+          if (access?.features) L.geoJSON(access, {
             pointToLayer: (_f, latlng) => L.circleMarker(latlng, { radius: 4, color: '#06211d', weight: 1, fillColor: '#fbbf24', fillOpacity: 0.95 }),
             onEachFeature: (feature, item) => {
               const p = feature.properties || {};
-              item.bindPopup('<b>' + escapeHtml(p.ACCESS_POINT_NAME || p.NAME || p.DESCRIPTION || 'Fishing access point') + '</b><br>Public fishing access · Ontario open data');
+              item.bindPopup('<b>' + accessLabel(p) + '</b><br>' + escapeHtml(p.FISHING_ACCESS_POINT_TYPE || 'Access point') + '<br>Ontario catalogue entry; verify permission and current access');
             },
           }).addTo(layer);
         } else {
@@ -108,24 +112,24 @@ export const PopularFishingAreasMap: React.FC = () => {
               .addTo(layer);
           });
           if (map.getZoom() < 7) return;
-          const requests: Promise<Response>[] = [];
-          if (showRivers) requests.push(fetch(USGS_SERVICE + '/6/query?' + query('GNIS_NAME IS NOT NULL', 'GNIS_NAME,FTYPE,FCODE', 250), { signal }));
-          if (showLakes) requests.push(fetch(USGS_SERVICE + '/12/query?' + query('GNIS_NAME IS NOT NULL', 'GNIS_NAME,FTYPE,FCODE', 250), { signal }));
-          const responses = await Promise.all(requests);
-          if (responses.some(response => !response.ok)) throw new Error('USGS water features are temporarily unavailable.');
-          const collections = await Promise.all(responses.map(response => response.json()));
+          const requests: ReturnType<typeof fetchMapData>[] = [];
+          if (showRivers) requests.push(fetchMapData(USGS_SERVICE + '/6/query?' + query('GNIS_NAME IS NOT NULL', 'GNIS_NAME,FTYPE,FCODE', 250), signal));
+          if (showLakes) requests.push(fetchMapData(USGS_SERVICE + '/12/query?' + query('GNIS_NAME IS NOT NULL', 'GNIS_NAME,FTYPE,FCODE', 250), signal));
+          const results = await Promise.allSettled(requests);
+          const collections = results.map(r => r.status === 'fulfilled' ? r.value : undefined);
+          if (alive && !signal.aborted && results.some(r => r.status === 'rejected')) setError('Some USGS layers could not load. Available layers and featured fisheries are shown; move the map to retry.');
           if (!alive || signal.aborted) return;
           let collectionIndex = 0;
           if (showRivers) {
             const rivers = collections[collectionIndex++];
-            if (rivers.features) L.geoJSON(rivers, {
+            if (rivers?.features) L.geoJSON(rivers, {
               style: { color: '#73b8ff', weight: 2, opacity: 0.88 },
               onEachFeature: (feature, item) => item.bindPopup('<b>' + escapeHtml(feature.properties?.gnis_name || feature.properties?.GNIS_NAME || 'U.S. river or stream') + '</b><br>USGS National Hydrography Dataset'),
             }).addTo(layer);
           }
           if (showLakes) {
             const lakes = collections[collectionIndex];
-            if (lakes.features) L.geoJSON(lakes, {
+            if (lakes?.features) L.geoJSON(lakes, {
               style: { color: '#41d9c0', weight: 1, opacity: 0.85, fillColor: '#168f86', fillOpacity: 0.18 },
               onEachFeature: (feature, item) => item.bindPopup('<b>' + escapeHtml(feature.properties?.GNIS_NAME || 'U.S. lake or reservoir') + '</b><br>USGS National Hydrography Dataset'),
             }).addTo(layer);
@@ -170,12 +174,13 @@ export const PopularFishingAreasMap: React.FC = () => {
       </div>}
       <span className="flex items-center gap-2 text-[11px] text-slate-400">{loading ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading map data…</> : region === 'us' ? 'Zoom to level 7+ to load visible U.S. waters' : 'Move or zoom the map to load nearby data'}</span>
     </div>
+    {region === 'ontario' && <OntarioLakeSearch onSelect={(lat, lon) => mapRef.current?.setView([lat, lon], 12)} />}
     {error && <p role="status" className="mb-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200">{error}</p>}
     <div ref={container} className="h-[62vh] min-h-[420px] w-full rounded-2xl border border-white/10 bg-slate-950" />
     <div className="mt-3 grid gap-3 sm:grid-cols-2">
       <div className="rounded-xl border border-white/10 bg-slate-900 p-4 text-xs text-slate-300">
         <p className="font-black uppercase tracking-wider text-emerald-400">Ontario data</p>
-        <p className="mt-1">Fish ON-Line waterbody boundaries, rivers and public access points load from Ontario’s live open GIS service for the visible area.</p>
+        <p className="mt-1">Fish ON-Line waterbody boundaries, rivers and catalogued access points load from Ontario’s live open GIS service for the visible area. Catalogue entries do not establish public access rights; check permission and current regulations.</p>
         <a className="mt-2 inline-flex items-center gap-1 text-emerald-300 hover:text-white" href="https://www.ontario.ca/page/how-use-fish-line" target="_blank" rel="noreferrer">Fish ON-Line details <ExternalLink className="h-3 w-3" /></a>
         <span className="mx-2 text-slate-500">·</span><a className="inline-flex items-center gap-1 text-emerald-300 hover:text-white" href="https://data.ontario.ca/dataset/fish-on-line" target="_blank" rel="noreferrer">Ontario datasets <ExternalLink className="h-3 w-3" /></a>
       </div>
