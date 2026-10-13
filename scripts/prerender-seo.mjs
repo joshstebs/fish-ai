@@ -4,9 +4,10 @@ import { createServer } from 'vite';
 
 const DIST = path.resolve('dist');
 const SITE = 'https://fishai.shop';
-const TODAY = '2026-10-10';
+const TODAY = '2026-10-13';
 
 const pages = [
+  { path: '/guides/ontario-fishing-licence-checklist', title: 'Ontario Fishing Licence and Regulations Checklist | FishAI', description: 'A printable Ontario fishing trip checklist for licence documents, zones, waterbody exceptions, current notices and access verification.' },
   { path: '/guides/best-fishing-app-ontario', title: 'Ontario Fishing Access Points and App Guide | FishAI', description: 'Search Ontario open data for lake names and recorded fishing access points, then verify property permission, current operation and 2026 regulations.' },
   { path: '/shop', title: 'FishAI Fishing Merch — T-Shirts, Hoodies & Hats', description: 'Original FishAI fishing apparel and hats, printed to order and shipped from Ontario, Canada.' },
   { path: '/best-fishing-app', title: 'FishAI — AI Fishing App with Fish ID, Weather & Logbook', description: 'Compare the tools that make FishAI a practical fishing companion: AI fish ID, weather, solunar timing, private catch logbook, spot map and insights.' },
