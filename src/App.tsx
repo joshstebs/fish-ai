@@ -220,6 +220,18 @@ export function AcademyIndex({ onStart }: { onStart: () => void }) {
           </div>
         ))}
       </div>
+      <section className="mt-8 space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed">
+        <h2 className="text-xl font-black text-white">Practical checks before your next trip</h2>
+        <h3 className="font-bold text-white">Better catch photos and measurements</h3>
+        <p>Take a clear side-profile photo in even light. Keep the fish and a real reference measurement visible when possible, and avoid photos that crop out the head or tail. A photo estimate is only an estimate: if size restrictions matter, use a suitable physical measuring tool and verify the current rules for your species and waterbody. Never rely on an AI identification as legal confirmation.</p>
+        <h3 className="font-bold text-white">Use solunar windows as one planning signal</h3>
+        <p>Sunrise, sunset, moon position and the proposed major or minor feeding periods can help you plan an outing. They cannot guarantee bites. Compare predicted windows with safe weather conditions, current water conditions and the time you can actually fish. A calm, safe trip matters more than chasing a forecast window.</p>
+        <h3 className="font-bold text-white">Watch pressure trends, not isolated numbers</h3>
+        <p>Barometric pressure can change as weather systems move in or out. Note whether it is rising, falling or stable over the period you fish, alongside wind and temperature. Build your own observations before drawing conclusions about fish behaviour. If forecasts show storms, lightning or unsafe winds, change the plan rather than treating conditions as a fishing advantage.</p>
+        <h3 className="font-bold text-white">Keep a logbook you can actually use</h3>
+        <p>For each outing, record the date, approximate time, location, species, method or lure and basic weather conditions. Add a short note about what did not work as well as successful catches. Review several trips before treating a pattern as meaningful. Keep sensitive locations private if you do not want to share them with others.</p>
+        <p>The most useful fishing record is consistent and understandable months later. Before trusting any app for long-term storage, check its export, backup and privacy options.</p>
+      </section>
       <p className="mt-5 text-sm text-slate-300">Start with our <a className="text-emerald-300 underline" href="/guides/ontario-fishing-licence-checklist">Ontario fishing licence checklist</a>, <a className="text-emerald-300 underline" href="/how-to-choose">fishing app selection guide</a>, or <a className="text-emerald-300 underline" href="/blog">fishing journal</a>. Treat photo estimates and bite forecasts as planning aids, not guarantees.</p>
       <div className="mt-6"><button onClick={onStart} className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">back to app</button></div>
     </div>
