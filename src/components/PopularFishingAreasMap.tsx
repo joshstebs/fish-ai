@@ -37,9 +37,9 @@ export const PopularFishingAreasMap: React.FC = () => {
     if (!container.current || mapRef.current) return;
     const map = L.map(container.current, { center: [44.2, -79.5], zoom: 6 });
     mapRef.current = map;
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd', maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
     features.current = L.layerGroup().addTo(map);
     return () => { map.remove(); mapRef.current = null; features.current = null; };
