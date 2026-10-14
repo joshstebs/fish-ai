@@ -7,6 +7,7 @@ const SITE = 'https://fishai.shop';
 const TODAY = '2026-10-13';
 
 const pages = [
+  { path: '/guides/ontario-fish-stocking-records', title: 'Ontario Fish Stocking Records: How to Read the Data | FishAI', description: 'Interpret Ontario fish stocking records without treating a dated release as proof of present fish, access or current regulations.' },
   { path: '/guides/ontario-fishing-licence-checklist', title: 'Ontario Fishing Licence and Regulations Checklist | FishAI', description: 'A printable Ontario fishing trip checklist for licence documents, zones, waterbody exceptions, current notices and access verification.' },
   { path: '/guides/best-fishing-app-ontario', title: 'Ontario Fishing Access Points and App Guide | FishAI', description: 'Search Ontario open data for lake names and recorded fishing access points, then verify property permission, current operation and 2026 regulations.' },
   { path: '/shop', title: 'FishAI Fishing Merch — T-Shirts, Hoodies & Hats', description: 'Original FishAI fishing apparel and hats, printed to order and shipped from Ontario, Canada.' },
@@ -87,6 +88,11 @@ try {
     const target = path.join(DIST, page.path.replace(/^\//, '') + '.html');
     await mkdir(path.dirname(target), { recursive: true });
     await writeFile(target, html);
+    if (page.path === '/guides/ontario-fish-stocking-records') {
+      const directoryTarget = path.join(DIST, page.path.replace(/^\//, ''), 'index.html');
+      await mkdir(path.dirname(directoryTarget), { recursive: true });
+      await writeFile(directoryTarget, html);
+    }
   }
 
   const merchSource = await readFile(path.resolve('src/data/merch.ts'), 'utf8');
