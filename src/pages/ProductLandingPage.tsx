@@ -17,6 +17,9 @@ export function ProductLandingPage({ productId }: { productId: string }) {
   }
 
   const checkoutUrl = paymentLinkFor(product.id);
+  const relatedProducts = MERCH_PRODUCTS
+    .filter((item) => item.id !== product.id && item.category === product.category)
+    .slice(0, 3);
 
   return (
     <main className="min-h-screen bg-slate-950 text-white px-4 py-8 sm:py-12">
@@ -58,6 +61,23 @@ export function ProductLandingPage({ productId }: { productId: string }) {
             </div>
           </div>
         </div>
+        {relatedProducts.length > 0 && (
+          <section aria-labelledby="related-designs-heading" className="mt-10">
+            <h2 id="related-designs-heading" className="font-display text-2xl font-black uppercase tracking-wide">
+              More {CATEGORY_LABELS[product.category].toLowerCase()} designs
+            </h2>
+            <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+              {relatedProducts.map((related) => (
+                <li key={related.id}>
+                  <a href={`/shop/${related.id}`} className="block rounded-xl border border-slate-700 bg-slate-900 p-4 hover:border-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-400">
+                    <span className="block font-bold">{related.title}</span>
+                    <span className="mt-1 block text-sm text-slate-300">{formatCad(related.priceCad)}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </main>
   );
