@@ -19,6 +19,7 @@ import { CompareFishbrainPage } from './pages/CompareFishbrainPage';
 import { CompareFishAnglerPage } from './pages/CompareFishAnglerPage';
 import { ProductLandingPage } from './pages/ProductLandingPage';
 import { OntarioFishingGuidePage } from './pages/OntarioFishingGuidePage';
+import { OntarioFishStockingRecordsPage } from './pages/OntarioFishStockingRecordsPage';
 import { OntarioFishingLicenceChecklistPage } from './pages/OntarioFishingLicenceChecklistPage';
 
 const FishDimensionEstimator = React.lazy(() => import('./components/FishDimensionEstimator').then(m => ({ default: m.FishDimensionEstimator })));
@@ -381,6 +382,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<AppRoutes />} />
         <Route path="/guides/best-fishing-app-ontario" element={<OntarioFishingGuidePage />} />
+        <Route path="/guides/ontario-fish-stocking-records" element={<OntarioFishStockingRecordsPage />} />
         <Route path="/guides/ontario-fishing-licence-checklist" element={<OntarioFishingLicenceChecklistPage />} />
         <Route path="/blog" element={<BlogIndex onStart={() => window.location.assign('/')} />} />
         <Route path="/blog/:slug" element={<BlogPost slug={window.location.pathname.replace('/blog/','')} onStart={() => window.location.assign('/')} />} />

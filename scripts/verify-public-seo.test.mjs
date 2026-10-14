@@ -6,7 +6,9 @@ import path from 'node:path';
 test('every sitemap page contains public content before JavaScript runs', async () => {
   const sitemap = await readFile('dist/sitemap.xml', 'utf8');
   const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => new URL(match[1]));
-  assert.equal(urls.length, 40);
+  assert.ok(urls.length >= 40, 'sitemap unexpectedly lost published pages');
+  assert.equal(new Set(urls.map(url => url.href)).size, urls.length, 'sitemap URLs should be unique');
+  assert.ok(urls.some(url => url.pathname === '/guides/ontario-fish-stocking-records'), 'new stocking guide missing from sitemap');
   for (const url of urls) {
     const file = url.pathname === '/' ? 'index.html' : `${url.pathname.slice(1)}.html`;
     const html = await readFile(path.join('dist', file), 'utf8');
