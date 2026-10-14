@@ -114,7 +114,7 @@ export function BlogIndex({ onStart }: { onStart: () => void }) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
       <h1 className="text-2xl sm:text-4xl font-display font-black uppercase tracking-tight text-white">journal</h1>
-      <p className="mt-2 text-slate-400 text-sm">short guides, comparisons, and real notes from the field.</p>
+      <p className="mt-2 text-slate-400 text-sm">Guides and product comparisons to help you plan a trip and check claims for yourself.</p>
       <div className="mt-6 grid gap-3">
         {posts.map(p => (
           <a key={p.slug} href={`/blog/${p.slug}`} className="block bg-slate-900 border border-white/10 rounded-2xl p-4 hover:border-emerald-500/40 transition-colors">
@@ -206,7 +206,7 @@ export function AcademyIndex({ onStart }: { onStart: () => void }) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
       <h1 className="text-2xl sm:text-4xl font-display font-black uppercase tracking-tight text-white">academy</h1>
-      <p className="mt-2 text-slate-400 text-sm">beginner-friendly guides written by anglers, not AI content mills.</p>
+      <p className="mt-2 text-slate-400 text-sm">Beginner topics to help you check measurements, weather conditions and catch records before your next trip.</p>
       <div className="mt-6 grid gap-3">
         {[
           ['how to measure a fish with AI', 'lighting, angle, and confidence.'],
@@ -220,6 +220,7 @@ export function AcademyIndex({ onStart }: { onStart: () => void }) {
           </div>
         ))}
       </div>
+      <p className="mt-5 text-sm text-slate-300">Start with our <a className="text-emerald-300 underline" href="/guides/ontario-fishing-licence-checklist">Ontario fishing licence checklist</a>, <a className="text-emerald-300 underline" href="/how-to-choose">fishing app selection guide</a>, or <a className="text-emerald-300 underline" href="/blog">fishing journal</a>. Treat photo estimates and bite forecasts as planning aids, not guarantees.</p>
       <div className="mt-6"><button onClick={onStart} className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">back to app</button></div>
     </div>
   );
