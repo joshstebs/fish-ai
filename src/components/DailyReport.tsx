@@ -1,9 +1,3 @@
-// ============================================================================
-// Daily fish report — carried over verbatim from the Lovable project
-// (src/components/DailyReport.tsx). Only change: the TanStack useQuery + server
-// function are replaced by the same-shaped real-data hook
-// (src/utils/fishReportData.ts -> useFishReport). Markup is unchanged.
-// ============================================================================
 import { MapPin, RefreshCw, SlidersHorizontal } from 'lucide-react';
 import lure from '../assets/lure.png';
 import { useFishReport } from '../utils/fishReportData';
@@ -11,7 +5,7 @@ import type { AnglerProfile } from '../utils/profile';
 
 function Panel({ title, children, className = '' }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`rounded-xl border border-border bg-card p-5 ${className}`} style={{ boxShadow: 'var(--shadow-panel)' }}>
+    <section className={`report-panel rounded-xl border border-border bg-card p-5 ${className}`} style={{ boxShadow: 'var(--shadow-panel)' }}>
       <h3 className="mb-4 text-sm font-semibold text-foreground">{title}</h3>
       {children}
     </section>
@@ -31,9 +25,9 @@ function ConfidenceRing({ score }: { score: number }) {
   const r = 46;
   const c = 2 * Math.PI * r;
   return (
-    <svg viewBox="0 0 120 120" className="size-28 -rotate-[135deg]" aria-hidden="true">
-      <circle cx="60" cy="60" r={r} fill="none" stroke="var(--color-secondary)" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${c * 0.75} ${c}`} />
-      <circle cx="60" cy="60" r={r} fill="none" stroke="var(--color-primary)" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${(c * 0.75 * score) / 100} ${c}`} />
+    <svg viewBox="0 0 120 120" className="size-28 rotate-[135deg]" aria-hidden="true">
+      <circle cx="60" cy="60" r={r} fill="none" stroke="rgb(var(--color-secondary))" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${c * 0.75} ${c}`} />
+      <circle cx="60" cy="60" r={r} fill="none" stroke="rgb(var(--color-primary))" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${(c * 0.75 * score) / 100} ${c}`} />
     </svg>
   );
 }
@@ -46,7 +40,7 @@ function Sparkline({ series }: { series: number[] }) {
   const pts = series.map((v, i) => `${(i / (series.length - 1)) * 200},${52 - ((v - min) / span) * 44}`).join(' ');
   return (
     <svg viewBox="0 0 200 60" className="h-14 flex-1" aria-hidden="true">
-      <polyline points={pts} fill="none" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <polyline points={pts} fill="none" stroke="rgb(var(--color-primary))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -71,9 +65,9 @@ export function DailyReport({ profile, onEdit }: { profile: AnglerProfile; onEdi
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="daily-heading flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-primary">Live weather powered</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-primary">Conditions & timing</p>
           <h2 className="headline mt-3 text-4xl sm:text-5xl">Your daily fish report.</h2>
           <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
             <MapPin className="size-4 text-primary" />
@@ -194,7 +188,7 @@ export function DailyReport({ profile, onEdit }: { profile: AnglerProfile; onEdi
           </div>
 
           <div className="mt-4 grid gap-6 rounded-xl border border-border bg-card p-6 sm:grid-cols-[auto_1fr_1fr] sm:items-center" style={{ boxShadow: 'var(--shadow-panel)' }}>
-            <img src={lure} alt={data.recommendation.lure} width={944} height={704} loading="lazy" className="w-40 justify-self-center" />
+            <img src={lure} alt="Fishing lure illustration" width={944} height={704} loading="lazy" className="w-40 justify-self-center" />
             <div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
                 Recommended approach · {data.recommendation.match}% match
@@ -217,3 +211,4 @@ export function DailyReport({ profile, onEdit }: { profile: AnglerProfile; onEdi
     </>
   );
 }
+

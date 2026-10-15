@@ -398,19 +398,19 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
     : 0;
 
   return (
-    <div className="fishai-premium-vision space-y-6 font-sans text-slate-900">
+    <div className="fishai-premium-vision space-y-6 font-sans text-slate-100">
       {/* Header Banner */}
-      <div className="bg-slate-900 border-l-4 border-emerald-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="tool-heading vision-heading flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-3 py-1 bg-emerald-600 text-slate-950 font-black text-xs uppercase tracking-widest rounded">
-              FishAI Multi-Modal Vision
+            <span className="eyebrow">
+              Your catch, a closer look
             </span>
-            <span className="text-xs font-mono text-cyan-400 font-bold uppercase flex items-center gap-1">
+            <span className="hidden">
               <Sparkles className="w-3.5 h-3.5" /> Spatial Calibration Scale Active
             </span>
           </div>
-          <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-4xl sm:text-5xl font-display font-bold uppercase text-white tracking-tight flex items-center gap-2">
             Catch <span className="text-emerald-400">Snapshot</span>
           </h2>
           <p className="text-slate-400 text-sm mt-1">
@@ -442,7 +442,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
               ref={photoContainerRef}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
-              className="relative aspect-4/3 rounded-lg overflow-hidden bg-black border border-slate-800 flex items-center justify-center select-none touch-none"
+              className="relative aspect-[4/3] rounded-lg overflow-hidden bg-black border border-slate-800 flex items-center justify-center select-none touch-none"
             >
               <img
                 src={selectedImage}
@@ -1209,3 +1209,4 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
     </div>
   );
 };
+

@@ -1,6 +1,7 @@
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { AcademyIndex, AppRoutes, BestFishingApp, BlogIndex, BlogPost, SeoLanding } from './App';
+import { PublicPageLayout } from './components/PublicPageLayout';
 import { ShopView } from './components/ShopView';
 import { ProductLandingPage } from './pages/ProductLandingPage';
 import { ListiclePage } from './pages/ListiclePage';
@@ -36,8 +37,9 @@ export function renderPublicSeo(path: string): string {
       ? <ProductLandingPage productId={path.slice('/shop/'.length)} />
       : pages[path];
   if (!page) throw new Error(`No public renderer for ${path}`);
-  const html = renderToString(page);
+  const html = renderToString(path === '/' ? page : <PublicPageLayout>{page}</PublicPageLayout>);
   if (!/<h1\b/i.test(html)) throw new Error(`Missing public heading for ${path}`);
   if (html.includes('Product not found')) throw new Error(`Unknown product: ${path}`);
   return html;
 }
+

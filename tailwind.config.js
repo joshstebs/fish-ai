@@ -20,13 +20,13 @@ export default {
           100: '#eef0f2',
           200: '#dde0e4',
           300: '#b7bdc4',
-          400: '#9399a0',
-          500: '#5c646c',
+          400: '#a0b1b4',
+          500: '#93a6ad',
           600: '#3a4148',
           700: '#292e35',
           800: '#1d2228',
-          900: '#14191e',
-          950: '#090e12',
+          900: '#11191d',
+          950: '#090f12',
         },
         emerald: {
           50: '#ecfdf7',
@@ -66,10 +66,11 @@ export default {
         ring: 'rgb(var(--color-ring) / <alpha-value>)',
       },
       fontFamily: {
-        display: ['Oswald', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Oswald', 'Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },
   plugins: [],
 };
+
