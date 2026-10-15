@@ -195,9 +195,9 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ catches, spots }) 
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-900">
+    <div className="space-y-6 font-sans text-slate-100">
       {/* Header Banner */}
-      <div className="bg-slate-900 border-l-4 border-emerald-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl">
+      <div className="tool-heading">
         <div className="flex items-center gap-2 mb-1">
           <span className="px-3 py-1 bg-emerald-600 text-white font-black text-xs uppercase tracking-widest rounded">
             Fishing Assistant
@@ -320,3 +320,4 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ catches, spots }) 
     </div>
   );
 };
+

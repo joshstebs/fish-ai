@@ -66,7 +66,7 @@ export function SettingsView() {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-slate-900 border-l-4 border-sky-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl">
+      <div className="tool-heading">
         <div className="flex items-center gap-2 mb-1">
           <span className="px-3 py-1 bg-sky-600 text-white font-black text-xs uppercase tracking-widest rounded">
             Settings
@@ -182,3 +182,4 @@ export function SettingsView() {
     </div>
   );
 }
+

@@ -75,9 +75,9 @@ export const TackleAssistantView: React.FC = () => {
   const preset = TACKLE_DATABASE[key] || TACKLE_DATABASE['Largemouth Bass-STAINED-SHALLOW'];
 
   return (
-    <div className="space-y-6 font-sans text-slate-900">
+    <div className="space-y-6 font-sans text-slate-100">
       {/* Header Banner */}
-      <div className="bg-slate-900 border-l-4 border-amber-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="tool-heading flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-3 py-1 bg-amber-500 text-slate-950 font-black text-xs uppercase tracking-widest rounded">
@@ -251,3 +251,4 @@ export const TackleAssistantView: React.FC = () => {
     </div>
   );
 };
+

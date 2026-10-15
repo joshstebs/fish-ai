@@ -202,9 +202,9 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-900">
+    <div className="space-y-6 font-sans text-slate-100">
       {/* Hero Header — YOUR SPOTS. YOUR DATA. YOUR EDGE. */}
-      <div className="bg-slate-900 border-l-4 border-cyan-500 p-6 border-y border-r border-white/10 shadow-2xl rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="tool-heading flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className="px-3 py-1 bg-cyan-600 text-slate-950 font-black text-xs uppercase tracking-widest rounded">
@@ -601,3 +601,4 @@ export const SpotTrackerMap: React.FC<SpotTrackerMapProps> = ({
     </div>
   );
 };
+

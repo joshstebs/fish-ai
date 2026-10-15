@@ -1,10 +1,3 @@
-// ============================================================================
-// FishAI first-run onboarding — carried over nearly verbatim from the Lovable
-// project (src/components/SetupFlow.tsx) so the interface matches it exactly.
-// Only change: place search + reverse geocode were server functions backed by
-// Lovable's Google-Maps gateway; here they call the key-free OSM Nominatim
-// client util (src/utils/geocode.ts). Real places, no fabrication.
-// ============================================================================
 import { useState } from 'react';
 import { Crosshair, Loader2, MapPin, Search } from 'lucide-react';
 import { reverseGeocode, searchPlaces, PlaceResult } from '../utils/geocode';
@@ -88,14 +81,14 @@ export function SetupFlow({
 
   return (
     <div
-      className="mx-auto w-full max-w-2xl rounded-2xl border border-border bg-card p-6 sm:p-8"
+      className="setup-panel w-full rounded-2xl border border-border bg-card p-6 sm:p-8"
       style={{ boxShadow: 'var(--shadow-panel)' }}
     >
       {/* Step rail */}
       <ol className="flex items-center gap-3">
         {STEPS.map((s, i) => (
           <li key={s} className="flex flex-1 items-center gap-3">
-            <div className="flex-1">
+            <div className="flex-1" aria-current={i === step ? 'step' : undefined}>
               <div className={`h-1 rounded-full ${i <= step ? 'bg-primary' : 'bg-secondary'}`} aria-hidden="true" />
               <div
                 className={`mt-2 text-[10px] uppercase tracking-widest ${
@@ -136,7 +129,7 @@ export function SetupFlow({
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Lake Hartwell, Kootenay River, Austin TX…"
+                placeholder="Lake Erie, Detroit River, Windsor…"
                 aria-label="Search for a lake, river or town"
                 className="w-full rounded-lg border border-border bg-background py-3 pl-9 pr-3 text-sm outline-none focus:border-primary"
               />
@@ -265,3 +258,4 @@ export function SetupFlow({
     </div>
   );
 }
+
