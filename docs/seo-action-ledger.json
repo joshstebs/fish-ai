@@ -1,0 +1,59 @@
+{
+  "updatedAt": "2026-10-20",
+  "site": "fishai.shop",
+  "actions": [
+    {
+      "id": "fishai-ontario-fishing-access-20261020",
+      "dedupeKey": "content:ontario-fishing-access-verification",
+      "category": "content",
+      "page": "https://fishai.shop/guides/ontario-fishing-access",
+      "queryIntent": ["Ontario fishing access", "Ontario fishing spots verification"],
+      "observation": "FishAI had 49 impressions and 0 clicks in the latest settled 28-day window through 2026-10-17. Existing pages covered stocking, licence checks and app comparisons, but not a dedicated explanation of how to verify access permission separately from map data.",
+      "evidence": {
+        "gscProperty": "sc-domain:fishai.shop",
+        "window": "2026-09-20 to 2026-10-17",
+        "source": "Google Search Console API via GSC Wizard",
+        "baseline": {"clicks": 0, "impressions": 49, "ctr": 0, "averagePosition": 27.14},
+        "officialSources": [
+          "https://data.ontario.ca/dataset/fish-on-line",
+          "https://www.ontario.ca/page/how-use-fish-line",
+          "https://www.ontario.ca/document/ontario-fishing-regulations-summary",
+          "https://www.ontario.ca/page/fishing-notices-and-updates"
+        ]
+      },
+      "proposedChange": "Publish an original worksheet that distinguishes waterbody discovery from legal permission, operating conditions and current regulations.",
+      "priority": "medium",
+      "confidence": "medium",
+      "effort": "medium",
+      "status": "monitoring",
+      "implementationCommits": [
+        "429a5e07b768f94d5cd6d49425077ae567e7975a",
+        "6d2dee317cabbea6fd10d4808008f9c9b75be8ca",
+        "d65e9360cafabb6a8d1306280b89ed3df66b4751",
+        "4307eedade1e792d36fca050ed8b32a3d7a5f164",
+        "637eafa5b0196bc46101615e89ae1491db95534a",
+        "f75e6291d5237e69778d2f51cb9e98492f885f21"
+      ],
+      "deployment": {
+        "project": "fishai-app",
+        "deploymentId": "dpl_JB7JRTbgTeEJnWTumLdRTAQ9nhMH",
+        "state": "READY",
+        "verifiedAt": "2026-10-20T12:56:00Z",
+        "intermediateFailedDeployment": {
+          "deploymentId": "dpl_9Rc1UZsaxNZD5HBfrmMd3NiAAfcX",
+          "reason": "prerender-seo did not yet include the new public renderer"
+        }
+      },
+      "verification": {
+        "route": "https://fishai.shop/guides/ontario-fishing-access",
+        "gscInspection": "URL is unknown to Google",
+        "inspectionAt": "2026-10-20",
+        "sitemapSubmittedAt": "2026-10-20T12:56:44Z",
+        "indexed": false,
+        "rankingGain": "unknown"
+      },
+      "followUp": "Recheck sitemap processing after Google downloads it, then review settled performance after 28 days.",
+      "owner": "Josh"
+    }
+  ]
+}
