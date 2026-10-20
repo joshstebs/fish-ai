@@ -24,6 +24,7 @@ import { ProductLandingPage } from './pages/ProductLandingPage';
 import { OntarioFishingGuidePage } from './pages/OntarioFishingGuidePage';
 import { OntarioFishStockingRecordsPage } from './pages/OntarioFishStockingRecordsPage';
 import { OntarioFishingLicenceChecklistPage } from './pages/OntarioFishingLicenceChecklistPage';
+import { OntarioFishingAccessGuidePage } from './pages/OntarioFishingAccessGuidePage';
 
 const FishDimensionEstimator = React.lazy(() => import('./components/FishDimensionEstimator').then(m => ({ default: m.FishDimensionEstimator })));
 const CatchLogbookView = React.lazy(() => import('./components/CatchLogbookView').then(m => ({ default: m.CatchLogbookView })));
@@ -374,6 +375,7 @@ export default function App() {
         <Route path="/guides/best-fishing-app-ontario" element={<OntarioFishingGuidePage />} />
         <Route path="/guides/ontario-fish-stocking-records" element={<OntarioFishStockingRecordsPage />} />
         <Route path="/guides/ontario-fishing-licence-checklist" element={<OntarioFishingLicenceChecklistPage />} />
+        <Route path="/guides/ontario-fishing-access" element={<OntarioFishingAccessGuidePage />} />
         <Route path="/blog" element={<BlogIndex onStart={() => window.location.assign('/')} />} />
         <Route path="/blog/:slug" element={<BlogPost slug={window.location.pathname.replace('/blog/','')} onStart={() => window.location.assign('/')} />} />
         <Route path="/best-fishing-app" element={<BestFishingApp onStart={() => window.location.assign('/')} />} />
