@@ -11,6 +11,7 @@ import { CompareFishAnglerPage } from './pages/CompareFishAnglerPage';
 import { OntarioFishingGuidePage } from './pages/OntarioFishingGuidePage';
 import { OntarioFishStockingRecordsPage } from './pages/OntarioFishStockingRecordsPage';
 import { OntarioFishingLicenceChecklistPage } from './pages/OntarioFishingLicenceChecklistPage';
+import { OntarioFishingAccessGuidePage } from './pages/OntarioFishingAccessGuidePage';
 
 // Render the same public components as the client. Personal app state stays on
 // the device; the homepage renders only its default signed-out setup screen.
@@ -22,6 +23,7 @@ export function renderPublicSeo(path: string): string {
     '/guides/best-fishing-app-ontario': <OntarioFishingGuidePage />,
     '/guides/ontario-fish-stocking-records': <OntarioFishStockingRecordsPage />,
     '/guides/ontario-fishing-licence-checklist': <OntarioFishingLicenceChecklistPage />,
+    '/guides/ontario-fishing-access': <OntarioFishingAccessGuidePage />,
     '/best-fishing-app': <BestFishingApp onStart={onStart} />,
     '/listicle': <ListiclePage onStart={onStart} />,
     '/how-to-choose': <HowToChoosePage onStart={onStart} />,
