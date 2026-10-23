@@ -135,13 +135,26 @@ billingRouter.post('/portal', async (req, res) => {
 billingRouter.post('/webhook', (req, res) => {
   const sig = req.get('stripe-signature') || '';
   const secret = process.env.STRIPE_WEBHOOK_SECRET || '';
-  if (!stripe || !secret) {
+  const sandboxSecret = process.env.STRIPE_SANDBOX_WEBHOOK_SECRET || '';
+  if (!stripe || (!secret && !sandboxSecret)) {
     return res.status(501).json({ error: 'Webhook is not configured.' });
   }
   let event: Stripe.Event;
   try {
     const raw = (req as any).rawBody as Buffer | undefined;
-    event = stripe.webhooks.constructEvent(raw ?? Buffer.from(''), sig, secret);
+    const body = raw ?? Buffer.from('');
+    try {
+      if (!secret) throw new Error('Primary webhook signing secret is not configured.');
+      event = stripe.webhooks.constructEvent(body, sig, secret);
+    } catch (primaryError) {
+      if (!sandboxSecret) throw primaryError;
+      // Sandbox destinations have their own signing secret, independent of the
+      // API key used for customer billing. This sink only logs and acknowledges.
+      event = stripe.webhooks.constructEvent(body, sig, sandboxSecret);
+      if (event.livemode !== false) {
+        throw new Error('Sandbox signing secret cannot authenticate live events.');
+      }
+    }
   } catch (err: any) {
     console.error('webhook signature verification failed:', err?.message);
     return res.status(400).json({ error: `Signature verification failed: ${err?.message}` });
