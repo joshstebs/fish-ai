@@ -92,6 +92,7 @@ function enforceLimit(
 
 function statusPayload(subscription: Stripe.Subscription | null) {
   return {
+    authenticated: true,
     entitled: !!subscription,
     status: subscription?.status || 'none',
     trialEndsAt: subscription?.trial_end ?? null,
