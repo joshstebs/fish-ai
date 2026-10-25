@@ -1,6 +1,7 @@
 const EMAIL_KEY = 'fishai.email';
 
 export interface BillingStatus {
+  authenticated?: boolean;
   entitled: boolean;
   status: string;
   trialEndsAt: number | null;
@@ -38,7 +39,8 @@ export async function fetchBillingStatus(): Promise<BillingStatus> {
     if (!response.ok) return emptyStatus();
 
     return {
-      entitled: !!data.entitled,
+      authenticated: !!data.authenticated,
+    entitled: !!data.entitled,
       status: String(data.status || 'none'),
       trialEndsAt: typeof data.trialEndsAt === 'number' ? data.trialEndsAt : null,
       periodEnd: typeof data.periodEnd === 'number' ? data.periodEnd : null,
@@ -75,6 +77,7 @@ export async function claimCheckoutSession(sessionId: string): Promise<BillingSt
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data?.error || 'Could not verify checkout.');
   return {
+    authenticated: !!data.authenticated,
     entitled: !!data.entitled,
     status: String(data.status || 'none'),
     trialEndsAt: typeof data.trialEndsAt === 'number' ? data.trialEndsAt : null,
@@ -104,6 +107,7 @@ export async function claimRecoveryToken(token: string): Promise<BillingStatus> 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data?.error || 'Could not complete secure recovery.');
   return {
+    authenticated: !!data.authenticated,
     entitled: !!data.entitled,
     status: String(data.status || 'none'),
     trialEndsAt: typeof data.trialEndsAt === 'number' ? data.trialEndsAt : null,
