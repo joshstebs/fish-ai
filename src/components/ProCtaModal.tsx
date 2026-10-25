@@ -36,14 +36,16 @@ export const ProCtaModal: React.FC<ProCtaModalProps> = ({ onClose, onEntitled })
   const [msg, setMsg] = React.useState<string | null>(null);
   const [entitled, setEntitled] = React.useState<boolean>(false);
 
+  const onEntitledRef = React.useRef(onEntitled);
+  onEntitledRef.current = onEntitled;
   React.useEffect(() => {
     fetchBillingStatus()
       .then((b) => {
         setEntitled(!!b.entitled);
-        onEntitled?.(b);
+        if (b.entitled) onEntitledRef.current?.(b);
       })
       .catch(() => setEntitled(false));
-  }, [onEntitled]);
+  }, []);
 
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
