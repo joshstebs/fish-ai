@@ -3,9 +3,9 @@ import { CreditCard, Mail, RefreshCw, Settings, ShieldCheck } from 'lucide-react
 import {
   fetchBillingStatus,
   getStoredEmail,
-  getCustomerId,
   startCheckout,
   openBillingPortal,
+  requestAccountRecovery,
   type BillingStatus,
 } from '../utils/billing';
 
@@ -37,6 +37,24 @@ export function SettingsView() {
       window.location.href = url;
     } catch (err: any) {
       setError(err?.message || 'Could not start checkout. Please try again.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleRecovery = async () => {
+    const trimmed = email.trim();
+    if (!/^\S+@\S+\.\S+$/.test(trimmed)) {
+      setError('Enter the email address used at checkout.');
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const message = await requestAccountRecovery(trimmed);
+      setError(message);
+    } catch (err: any) {
+      setError(err?.message || 'Could not send a secure sign-in link.');
     } finally {
       setBusy(false);
     }
@@ -115,7 +133,7 @@ export function SettingsView() {
           </div>
         )}
 
-        {getCustomerId() && billing?.entitled && (
+        {billing?.entitled && (
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={handleManage}
@@ -133,9 +151,7 @@ export function SettingsView() {
         {!billing?.entitled && (
           <div className="space-y-3">
             <p className="text-slate-400 text-xs font-mono">
-              {getCustomerId()
-                ? 'Your trial has ended or the subscription was canceled.'
-                : 'Start a 7-day free trial ($7.99/mo after). Cancel anytime.'}
+              {'Start a 7-day free trial ($7.99/mo after), or sign in using your existing subscription email.'}
             </p>
             <div className="flex flex-wrap gap-2">
               <input
@@ -151,18 +167,16 @@ export function SettingsView() {
                 disabled={busy}
                 className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black uppercase text-xs tracking-wider rounded-lg transition-all active:scale-95 disabled:opacity-50"
               >
-                {busy ? 'Opening...' : getCustomerId() ? 'Subscribe $7.99/mo' : 'Start Free Trial'}
+                {busy ? 'Opening...' : 'Start Free Trial'}
               </button>
             </div>
-            {getCustomerId() && (
-              <button
-                onClick={handleManage}
-                disabled={busy}
-                className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-400 transition-colors"
-              >
-                Manage subscription
-              </button>
-            )}
+            <button
+              onClick={handleRecovery}
+              disabled={busy}
+              className="text-[11px] font-black uppercase tracking-widest text-emerald-300 hover:text-emerald-200 transition-colors"
+            >
+              Email a secure account sign-in link
+            </button>
           </div>
         )}
       </div>
@@ -176,7 +190,7 @@ export function SettingsView() {
           {email ? email : 'No email set yet. Start a free trial to link one.'}
         </p>
         <p className="text-[10px] font-mono text-slate-500">
-          Tied to this device via Stripe. Manage Subscription before switching devices.
+          Subscriptions use a secure browser session. You can sign in on another device with a verified email link.
         </p>
       </div>
     </div>
