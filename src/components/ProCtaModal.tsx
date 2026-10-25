@@ -1,12 +1,12 @@
 import React from 'react';
 import { X, Check, Sparkles, Loader2, CreditCard } from 'lucide-react';
 import {
-  getCustomerId,
   getStoredEmail,
   setStoredEmail,
   startCheckout,
   openBillingPortal,
   fetchBillingStatus,
+  requestAccountRecovery,
   type BillingStatus,
 } from '../utils/billing';
 
@@ -37,11 +37,6 @@ export const ProCtaModal: React.FC<ProCtaModalProps> = ({ onClose, onEntitled })
   const [entitled, setEntitled] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    const cus = getCustomerId();
-    if (!cus) {
-      setEntitled(false);
-      return;
-    }
     fetchBillingStatus()
       .then((b) => {
         setEntitled(!!b.entitled);
@@ -60,10 +55,9 @@ export const ProCtaModal: React.FC<ProCtaModalProps> = ({ onClose, onEntitled })
 
   const handleUpgrade = async () => {
     const clean = email.trim();
-    const cus = getCustomerId();
     if (busy) return;
     setMsg(null);
-    if (cus) {
+    if (entitled) {
       setBusy(true);
       try {
         const url = await openBillingPortal();
@@ -143,7 +137,7 @@ export const ProCtaModal: React.FC<ProCtaModalProps> = ({ onClose, onEntitled })
             ))}
           </ul>
 
-          {!getCustomerId() && (
+          {!entitled && (
             <input
               type="email"
               value={email}
@@ -171,6 +165,24 @@ export const ProCtaModal: React.FC<ProCtaModalProps> = ({ onClose, onEntitled })
             )}
             {entitled ? 'Manage Subscription' : 'Upgrade Now'}
           </button>
+
+          {!entitled && (
+            <button
+              onClick={async () => {
+                if (busy) return;
+                const clean = email.trim();
+                if (!/^\S+@\S+\.\S+$/.test(clean)) { setMsg('Enter your subscription email.'); return; }
+                setBusy(true);
+                try { setMsg(await requestAccountRecovery(clean)); }
+                catch (e) { setMsg((e as Error)?.message || 'Could not send sign-in link.'); }
+                finally { setBusy(false); }
+              }}
+              disabled={busy}
+              className="mt-2 w-full py-2 text-emerald-300 hover:text-white text-xs font-bold"
+            >
+              Already subscribed? Email me a secure sign-in link
+            </button>
+          )}
 
           <button
             onClick={onClose}
