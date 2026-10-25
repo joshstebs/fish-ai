@@ -16,6 +16,7 @@ export const billingRouter = Router();
 const stripe: Stripe | null = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY)
   : null;
+export const billingStripe: Stripe | null = stripe;
 const resend: Resend | null = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
@@ -32,7 +33,7 @@ function isEntitled(sub: Stripe.Subscription): boolean {
   return sub.status === 'trialing' || sub.status === 'active';
 }
 
-async function customerIsEntitled(customerId: string): Promise<{
+async function lookupEntitlement(customerId: string): Promise<{
   entitled: boolean;
   subscription: Stripe.Subscription | null;
 }> {
@@ -49,6 +50,12 @@ async function customerIsEntitled(customerId: string): Promise<{
     console.error('Stripe entitlement check failed:', error instanceof Error ? error.message : error);
     return { entitled: false, subscription: null };
   }
+}
+
+// Public helper for the AI entitlement gate. A caller-supplied customer ID
+// must never reach this function; only signed cookieSession claims can.
+export async function customerIsEntitled(customerId: string): Promise<boolean> {
+  return (await lookupEntitlement(customerId)).entitled;
 }
 
 function clientIp(req: any): string {
@@ -116,7 +123,7 @@ billingRouter.post('/checkout', async (req, res) => {
     let customer = matches[0] || null;
 
     for (const candidate of matches) {
-      const { entitled } = await customerIsEntitled(candidate.id);
+      const { entitled } = await lookupEntitlement(candidate.id);
       if (entitled) {
         return res.status(409).json({
           error: 'An active FishAI subscription already exists for this email. Use secure account recovery instead of starting a second subscription.',
@@ -177,7 +184,7 @@ billingRouter.post('/claim', async (req, res) => {
       return res.status(403).json({ error: 'This checkout session cannot authorize FishAI.' });
     }
 
-    const { entitled, subscription } = await customerIsEntitled(customerId);
+    const { entitled, subscription } = await lookupEntitlement(customerId);
     if (!entitled || !subscription) {
       return res.status(402).json({
         error: 'An active subscription or trial was not found.',
@@ -205,19 +212,16 @@ billingRouter.get('/status', async (req, res) => {
     });
   }
 
-  const { subscription } = await customerIsEntitled(claims.sub);
+  const { subscription } = await lookupEntitlement(claims.sub);
   // Inactive customers retain secure access to Stripe's portal for invoices/cancellation.
   setSubscriberCookie(res, claims.sub);
   return res.json(statusPayload(subscription));
 });
 
 billingRouter.post('/portal', async (req, res) => {
-  if (!stripe) return res.status(503).json({ error: 'Billing is not configured.' });
-
   const claims = cookieSession(req, SUBSCRIBER_COOKIE, ['subscriber']);
-  if (!claims) {
-    return res.status(401).json({ error: 'A secure subscriber session is required.' });
-  }
+  if (!claims) return res.status(401).json({ error: 'A secure subscriber session is required.' });
+  if (!stripe) return res.status(503).json({ error: 'Billing is not configured.' });
 
   try {
     // A valid signed session, not an untrusted customer ID, authorizes the portal.
@@ -289,7 +293,7 @@ billingRouter.post('/recover-claim', async (req, res) => {
     return res.status(401).json({ error: 'This recovery link is invalid or expired.' });
   }
 
-  const { subscription } = await customerIsEntitled(claims.sub);
+  const { subscription } = await lookupEntitlement(claims.sub);
   // Recovery proves email ownership and is allowed for canceled subscriptions too.
   setSubscriberCookie(res, claims.sub);
   return res.json(statusPayload(subscription));
