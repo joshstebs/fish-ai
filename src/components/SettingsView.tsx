@@ -19,6 +19,7 @@ export function SettingsView() {
   const [email, setEmail] = useState<string>(getStoredEmail());
   const [busy, setBusy] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBillingStatus().then(setBilling);
@@ -52,7 +53,7 @@ export function SettingsView() {
     setError(null);
     try {
       const message = await requestAccountRecovery(trimmed);
-      setError(message);
+      setNotice(message);
     } catch (err: any) {
       setError(err?.message || 'Could not send a secure sign-in link.');
     } finally {
@@ -127,13 +128,19 @@ export function SettingsView() {
           </button>
         </div>
 
+        {notice && (
+          <div role="status" className="bg-emerald-950/40 border border-emerald-500/30 p-3 rounded-xl text-emerald-200 text-xs font-mono">
+            {notice}
+          </div>
+        )}
+
         {error && (
           <div className="bg-red-950/40 border border-red-500/30 p-3 rounded-xl text-red-300 text-xs font-mono">
             {error}
           </div>
         )}
 
-        {billing?.entitled && (
+        {billing?.authenticated && (
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={handleManage}
