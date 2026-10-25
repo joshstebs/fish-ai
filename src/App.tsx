@@ -16,6 +16,7 @@ import { PublicPageLayout } from './components/PublicPageLayout';
 import { AppNavigation } from './components/AppNavigation';
 import heroDawn from './assets/hero-dawn.jpg';
 import { GlobalSeo } from './components/SeoHead';
+import { claimCheckoutSession, claimRecoveryToken } from './utils/billing';
 import { ListiclePage } from './pages/ListiclePage';
 import { HowToChoosePage } from './pages/HowToChoosePage';
 import { CompareFishbrainPage } from './pages/CompareFishbrainPage';
@@ -247,6 +248,39 @@ export function AppRoutes() {
   const state = useAppState();
   const { activeTab, setActiveTab, catches, setCatches, spots, setSpots, signedIn, setSignedIn, showSignIn, setShowSignIn, moreOpen, setMoreOpen, proFromHeader, setProFromHeader, profile, setProfile, setupOpen, setSetupOpen } = state;
 
+  const [billingNotice, setBillingNotice] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const checkoutId = params.get('session_id');
+    const recoveryToken = params.get('billing_recovery');
+    const outcome = params.get('checkout');
+    if (!checkoutId && !recoveryToken && !outcome) return;
+    // Remove bearer proof from the address bar and browser history immediately.
+    window.history.replaceState({}, '', window.location.pathname);
+    if (outcome === 'canceled') {
+      setBillingNotice('Checkout canceled. No subscription was started.');
+      return;
+    }
+    if (!checkoutId && !recoveryToken) {
+      setBillingNotice('Checkout could not be verified. Request a secure sign-in link in Settings.');
+      setActiveTab('SETTINGS');
+      return;
+    }
+    const claim = recoveryToken ? claimRecoveryToken(recoveryToken) : claimCheckoutSession(checkoutId!);
+    claim.then(status => {
+      if (status.entitled) {
+        setBillingNotice('Your FishAI Pro subscription is verified and ready.');
+        setActiveTab('VISION');
+      } else {
+        setBillingNotice('Your billing session was restored. Manage your plan in Settings.');
+        setActiveTab('SETTINGS');
+      }
+    }).catch(() => {
+      setBillingNotice('Could not verify this link. Use the secure email sign-in option in Settings.');
+      setActiveTab('SETTINGS');
+    });
+  }, []);
+
   const handleSaveCatch = (newCatchData: Omit<CatchLogItem, 'id' | 'timestamp' | 'formattedDate'>) => {
     const now = new Date();
     const formattedDate = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }).toUpperCase() + ' • ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
@@ -270,6 +304,7 @@ export function AppRoutes() {
   return (
     <>
       <GlobalSeo />
+      {billingNotice && <div role="status" className="mx-auto max-w-4xl p-3 text-sm text-emerald-200 bg-slate-900 border border-emerald-500/30 rounded-lg">{billingNotice}</div>}
       <AppNavigation
         tabs={[...PRIMARY_TABS, ...MORE_TABS]}
         activeTab={activeTab}
