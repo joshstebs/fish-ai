@@ -1,31 +1,10 @@
-// Billing helpers — Stripe Checkout trial flow, Stripe as source of truth.
-// The Stripe customer id is stored on this device and sent with AI calls so
-// the server can verify entitlement live (x-fish-customer-id header).
-const CUSTOMER_KEY = 'fishai.customerId';
 const EMAIL_KEY = 'fishai.email';
 
 export interface BillingStatus {
   entitled: boolean;
-  status: string; // 'trialing' | 'active' | 'none' | ...
+  status: string;
   trialEndsAt: number | null;
   periodEnd: number | null;
-  customerId: string;
-}
-
-export function getCustomerId(): string {
-  try {
-    return localStorage.getItem(CUSTOMER_KEY) || '';
-  } catch {
-    return '';
-  }
-}
-
-export function setCustomerId(id: string): void {
-  try {
-    localStorage.setItem(CUSTOMER_KEY, id);
-  } catch {
-    /* storage unavailable */
-  }
 }
 
 export function getStoredEmail(): string {
@@ -39,50 +18,106 @@ export function getStoredEmail(): string {
 export function setStoredEmail(email: string): void {
   try {
     localStorage.setItem(EMAIL_KEY, email);
+    localStorage.removeItem('fishai.customerId');
+    localStorage.removeItem('fishai.billingSession');
   } catch {
     /* storage unavailable */
   }
 }
 
+function emptyStatus(): BillingStatus {
+  return { entitled: false, status: 'none', trialEndsAt: null, periodEnd: null };
+}
+
 export async function fetchBillingStatus(): Promise<BillingStatus> {
-  const customerId = getCustomerId();
-  if (!customerId) {
-    return { entitled: false, status: 'none', trialEndsAt: null, periodEnd: null, customerId: '' };
-  }
   try {
-    const resp = await fetch(`/api/billing/status?customer_id=${encodeURIComponent(customerId)}`);
-    return (await resp.json()) as BillingStatus;
+    const response = await fetch('/api/billing/status', {
+      credentials: 'same-origin',
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) return emptyStatus();
+
+    return {
+      entitled: !!data.entitled,
+      status: String(data.status || 'none'),
+      trialEndsAt: typeof data.trialEndsAt === 'number' ? data.trialEndsAt : null,
+      periodEnd: typeof data.periodEnd === 'number' ? data.periodEnd : null,
+    };
   } catch {
-    return { entitled: false, status: 'none', trialEndsAt: null, periodEnd: null, customerId };
+    return emptyStatus();
   }
 }
 
-// Start checkout (or get the portal URL if already entitled).
-export async function startCheckout(email: string): Promise<{ url: string; customerId: string }> {
-  const resp = await fetch('/api/billing/checkout', {
+export async function startCheckout(email: string): Promise<{ url: string }> {
+  const response = await fetch('/api/billing/checkout', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
     body: JSON.stringify({ email }),
   });
-  const data = await resp.json();
-  if (!resp.ok || !data.url) {
-    throw new Error(data?.error || 'Could not start checkout. Please try again.');
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || typeof data?.url !== 'string') {
+    const error = new Error(data?.error || 'Could not start checkout. Please try again.');
+    (error as Error & { code?: string }).code = data?.code;
+    throw error;
   }
-  if (data.customerId) setCustomerId(data.customerId);
   setStoredEmail(email);
-  return data;
+  return { url: data.url };
+}
+
+export async function claimCheckoutSession(sessionId: string): Promise<BillingStatus> {
+  const response = await fetch('/api/billing/claim', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify({ sessionId }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data?.error || 'Could not verify checkout.');
+  return {
+    entitled: !!data.entitled,
+    status: String(data.status || 'none'),
+    trialEndsAt: typeof data.trialEndsAt === 'number' ? data.trialEndsAt : null,
+    periodEnd: typeof data.periodEnd === 'number' ? data.periodEnd : null,
+  };
+}
+
+export async function requestAccountRecovery(email: string): Promise<string> {
+  const response = await fetch('/api/billing/recovery', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify({ email }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data?.error || 'Could not start secure recovery.');
+  return data?.message || 'If an active account exists, a secure sign-in link has been sent.';
+}
+
+export async function claimRecoveryToken(token: string): Promise<BillingStatus> {
+  const response = await fetch('/api/billing/recover-claim', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify({ token }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data?.error || 'Could not complete secure recovery.');
+  return {
+    entitled: !!data.entitled,
+    status: String(data.status || 'none'),
+    trialEndsAt: typeof data.trialEndsAt === 'number' ? data.trialEndsAt : null,
+    periodEnd: typeof data.periodEnd === 'number' ? data.periodEnd : null,
+  };
 }
 
 export async function openBillingPortal(): Promise<string> {
-  const customerId = getCustomerId();
-  if (!customerId) throw new Error('No account on this device.');
-  const resp = await fetch('/api/billing/portal', {
+  const response = await fetch('/api/billing/portal', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ customerId }),
+    credentials: 'same-origin',
   });
-  const data = await resp.json();
-  if (!resp.ok || !data.url) {
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || typeof data?.url !== 'string') {
     throw new Error(data?.error || 'Could not open the billing portal.');
   }
   return data.url;
