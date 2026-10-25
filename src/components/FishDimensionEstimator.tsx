@@ -29,7 +29,6 @@ import { ProCtaModal } from './ProCtaModal';
 import { getAppSecret, setAppSecret } from '../utils/apiAuth';
 import { SAMPLE_FISH_PHOTOS } from '../utils/samplePhotos';
 import {
-  getCustomerId,
   getStoredEmail,
   fetchBillingStatus,
   startCheckout,
@@ -167,26 +166,9 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
   }, [openPro, onProOpened]);
   const [billing, setBilling] = useState<BillingStatus | null>(null);
 
-  // After returning from Stripe Checkout (?checkout=success|canceled), refresh
-  // entitlement once and clean the URL so a refresh doesn't re-trigger it.
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const outcome = params.get('checkout');
-    if (outcome) {
-      history.replaceState({}, '', window.location.pathname);
-      fetchBillingStatus().then((status) => {
-        setBilling(status);
-        if (status.entitled) {
-          setNeedsBilling(false);
-          setBillingMsg('Your free trial is active — AI analysis is unlocked.');
-        } else if (outcome === 'canceled') {
-          setBillingMsg('Checkout canceled — no charge was made. You can try again anytime.');
-        }
-      });
-    } else if (getCustomerId()) {
-      fetchBillingStatus().then(setBilling);
-    }
-  }, []);
+  // Subscriber sessions are HttpOnly cookies. The app root handles the
+  // verified Checkout success and recovery redirects before this view mounts.
+  useEffect(() => { void fetchBillingStatus().then(setBilling); }, []);
 
   // Interactive Measurement Tool State
   const [isOverlayActive, setIsOverlayActive] = useState<boolean>(true);
@@ -274,7 +256,6 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
         headers: {
           'Content-Type': 'application/json',
           'x-fish-app-secret': getAppSecret(),
-          'x-fish-customer-id': getCustomerId(),
         },
         body: JSON.stringify({
           imageBase64: imagePayload,
@@ -283,9 +264,13 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
       });
 
       if (resp.status === 401) {
-        setNeedsAuth(true);
-        setAuthInput(getAppSecret());
-        throw new Error('AI analysis is locked — enter your app password to unlock.');
+        if (getAppSecret()) {
+          setNeedsAuth(true);
+          setAuthInput(getAppSecret());
+          throw new Error('Owner sign-in expired. Verify your app password again.');
+        }
+        setNeedsBilling(true);
+        throw new Error('Sign in to FishAI Pro using the secure email option in Settings.');
       }
 
       if (resp.status === 402) {

@@ -1,0 +1,26 @@
+name: FishAI security regression
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  security-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Verify session and authorization checks
+        run: npx tsx --test server/utils/session.test.ts server/security.regression.test.ts
+      - name: Type-check and build
+        run: npm run build

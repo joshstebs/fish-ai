@@ -6,12 +6,28 @@ import { aiRouter } from './routes/aiRoutes.js';
 import { billingRouter, billingStripe, customerIsEntitled } from './routes/billingRoutes.js';
 import { mailRouter } from './routes/mailRoutes.js';
 import { rateLimit, rateLimitHeaders } from './utils/rateLimit.js';
+import { SUBSCRIBER_COOKIE, cookieSession } from './utils/session.js';
 // Shared Express app, used by:
 //  - server/server.ts (local dev: app.listen)
 //  - api/index.ts (Vercel: exported as a serverless function)
 export const app = express();
 
+// Same-origin cookies carry subscriber identity. Reject cross-site write requests.
+app.disable('x-powered-by');
 app.use(cors());
+app.use((req, res, next) => {
+  if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return next();
+  if (req.get('sec-fetch-site') === 'cross-site') {
+    return res.status(403).json({ error: 'Cross-site requests are not allowed.' });
+  }
+  const origin = req.get('origin');
+  // Browsers provide Origin on writes. Compare it with the host serving this
+  // request, which also supports Vercel preview domains without wildcards.
+  if (origin && origin !== `https://${req.get('host')}` && origin !== `http://${req.get('host')}`) {
+    return res.status(403).json({ error: 'Cross-origin requests are not allowed.' });
+  }
+  return next();
+});
 // Client-side image compression (FishDimensionEstimator) keeps payloads well
 // under 1MB; 15mb is generous headroom (Vercel caps requests at 4.5MB anyway).
 // The verify hook stashes the raw body (needed for Stripe webhook signature
@@ -82,43 +98,35 @@ app.post('/api/auth/owner-verify', rateLimitMiddleware(VERIFY_LIMIT, 60_000, 've
   res.json({ ok: true, role: 'owner' });
 });
 
-// API auth gate: all /api/ai routes require either:
-//   1. the owner app secret (x-fish-app-secret === FISH_APP_SECRET), or
-//   2. an entitled Stripe customer (x-fish-customer-id with an active
-//      subscription or in-progress trial).
-// 503 when the owner secret env var is missing; 402 when a public caller has
-// no active entitlement. Without Stripe configured, only the owner secret
-// works (pre-launch behavior).
+// Owner mode retains the existing app-password flow; paid accounts use only
+// a server-authenticated encrypted HttpOnly session from checkout/recovery.
 const appSecret = process.env.FISH_APP_SECRET || '';
+function isOwner(req: express.Request): boolean {
+  const supplied = req.get('x-fish-app-secret') || '';
+  if (!appSecret || !supplied) return false;
+  const actual = Buffer.from(supplied, 'utf8');
+  const expected = Buffer.from(appSecret, 'utf8');
+  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
+}
 const rateLimitAi = (req: any, res: any, next: any) =>
-  rateLimitMiddleware(req.get('x-fish-app-secret') === appSecret ? AI_AUTHED_LIMIT : AI_TRIAL_LIMIT, 60_000, 'ai')(req, res, next);
+  rateLimitMiddleware(isOwner(req) ? AI_AUTHED_LIMIT : AI_TRIAL_LIMIT, 60_000, 'ai')(req, res, next);
 
 app.use('/api/ai', rateLimitAi, async (req, res, next) => {
-  if (!appSecret) {
-    return res.status(503).json({
-      error: 'API auth is not configured. Set FISH_APP_SECRET in the server environment.',
-      code: 'AUTH_NOT_CONFIGURED',
+  if (isOwner(req)) return next();
+  const session = cookieSession(req, SUBSCRIBER_COOKIE, ['subscriber']);
+  if (!session) {
+    return res.status(401).json({
+      error: 'Sign in securely to access FishAI Pro.',
+      code: 'SESSION_REQUIRED',
     });
   }
-  const provided = req.get('x-fish-app-secret') || '';
-  if (provided === appSecret) return next();
-
-  if (!billingStripe) {
-    return res.status(401).json({ error: 'AI analysis is locked.' });
-  }
-  const customerId = req.get('x-fish-customer-id') || '';
-  if (!customerId) {
+  if (!billingStripe || !(await customerIsEntitled(session.sub))) {
     return res.status(402).json({
-      error: 'Start your free trial to unlock AI analysis.',
+      error: 'An active subscription is required for AI analysis.',
       code: 'SUBSCRIPTION_REQUIRED',
     });
   }
-  const entitled = await customerIsEntitled(customerId);
-  if (entitled) return next();
-  return res.status(402).json({
-    error: 'An active subscription is required to use AI analysis.',
-    code: 'SUBSCRIPTION_REQUIRED',
-  });
+  return next();
 });
 
 // AI Routes
