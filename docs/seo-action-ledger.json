@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-20",
+  "updatedAt": "2026-10-29",
   "site": "fishai.shop",
   "actions": [
     {
@@ -7,13 +7,21 @@
       "dedupeKey": "content:ontario-fishing-access-verification",
       "category": "content",
       "page": "https://fishai.shop/guides/ontario-fishing-access",
-      "queryIntent": ["Ontario fishing access", "Ontario fishing spots verification"],
+      "queryIntent": [
+        "Ontario fishing access",
+        "Ontario fishing spots verification"
+      ],
       "observation": "FishAI had 49 impressions and 0 clicks in the latest settled 28-day window through 2026-10-17. Existing pages covered stocking, licence checks and app comparisons, but not a dedicated explanation of how to verify access permission separately from map data.",
       "evidence": {
         "gscProperty": "sc-domain:fishai.shop",
         "window": "2026-09-20 to 2026-10-17",
         "source": "Google Search Console API via GSC Wizard",
-        "baseline": {"clicks": 0, "impressions": 49, "ctr": 0, "averagePosition": 27.14},
+        "baseline": {
+          "clicks": 0,
+          "impressions": 49,
+          "ctr": 0,
+          "averagePosition": 27.14
+        },
         "officialSources": [
           "https://data.ontario.ca/dataset/fish-on-line",
           "https://www.ontario.ca/page/how-use-fish-line",
@@ -54,6 +62,63 @@
       },
       "followUp": "Recheck sitemap processing after Google downloads it, then review settled performance after 28 days.",
       "owner": "Josh"
+    },
+    {
+      "id": "fishai-ontario-fishing-zones-20261029",
+      "dedupeKey": "content:ontario-fishing-zones-planner",
+      "category": "content-and-claims",
+      "page": "https://fishai.shop/guides/ontario-fishing-zones",
+      "queryIntent": [
+        "Ontario fishing zones",
+        "Ontario Fisheries Management Zone map",
+        "Ontario fishing zone rules"
+      ],
+      "observation": "Existing FishAI guides covered access, licences and stocking, but did not provide a direct route to all 20 official zone pages or explain the order for checking zone-wide rules and more specific exceptions. The /seo landing page also described a photo estimate as providing legality, which was not a supportable product claim.",
+      "evidence": {
+        "observedAt": "2026-10-29",
+        "gscProperty": "sc-domain:fishai.shop",
+        "currentGscStatus": "unknown because the connected GSC Wizard subscription is expired",
+        "lastDurableBaseline": {
+          "window": "2026-09-20 to 2026-10-17",
+          "clicks": 0,
+          "impressions": 49,
+          "ctr": 0,
+          "averagePosition": 27.14,
+          "note": "Low-volume directional baseline, not refreshed this run."
+        },
+        "officialSources": [
+          "https://www.ontario.ca/document/ontario-fishing-regulations-summary/fisheries-management-zones-map",
+          "https://www.ontario.ca/document/ontario-fishing-regulations-summary",
+          "https://www.ontario.ca/page/how-use-fish-line",
+          "https://www.ontario.ca/page/fishing-notices-and-updates"
+        ]
+      },
+      "proposedChange": "Publish a practical zones 1 to 20 planner with official links and a worksheet, add crawlable internal links and metadata, and replace the unsupported legality wording with a species and size estimate that users must verify.",
+      "expectedMechanism": "Answer zone-planning intent with source-backed public HTML while improving claim accuracy and internal discovery.",
+      "priority": "high",
+      "confidence": "high",
+      "effort": "medium",
+      "owner": "Josh",
+      "status": "implemented",
+      "implementationCommits": [
+        "0c3b8f56981aa7c39fcd47ce6dee449b39b8503d",
+        "0d3585f0096fc8bc3b7a0a9231b37d346687d14c",
+        "f9a9db8791575783c210751229bcb17e366aea9b",
+        "c90f9c614051401f257244792f756285ae92ddb5",
+        "84037430f0e40168bae6c47229a79ed4b2fbd698",
+        "8a620b7246c45e94508828a299f315b1e7edc3c5",
+        "d96d3b87c6ca47db7604bf8147c9b4c908646bdd"
+      ],
+      "deployment": {
+        "project": "fishai-app",
+        "state": "pending verification"
+      },
+      "verification": {
+        "route": "https://fishai.shop/guides/ontario-fishing-zones",
+        "indexed": "unknown",
+        "rankingGain": "unknown"
+      },
+      "followUp": "Verify the production response and metadata after deployment, then review settled search performance after 28 days."
     }
   ]
 }
