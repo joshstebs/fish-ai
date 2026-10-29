@@ -26,6 +26,7 @@ import { OntarioFishingGuidePage } from './pages/OntarioFishingGuidePage';
 import { OntarioFishStockingRecordsPage } from './pages/OntarioFishStockingRecordsPage';
 import { OntarioFishingLicenceChecklistPage } from './pages/OntarioFishingLicenceChecklistPage';
 import { OntarioFishingAccessGuidePage } from './pages/OntarioFishingAccessGuidePage';
+import { OntarioFishingZonesPage } from './pages/OntarioFishingZonesPage';
 
 const FishDimensionEstimator = React.lazy(() => import('./components/FishDimensionEstimator').then(m => ({ default: m.FishDimensionEstimator })));
 const CatchLogbookView = React.lazy(() => import('./components/CatchLogbookView').then(m => ({ default: m.CatchLogbookView })));
@@ -89,7 +90,7 @@ export function SeoLanding({ onStart }: { onStart: () => void }) {
       <p className="mt-3 text-slate-300 text-sm sm:text-base">the fishing app built around one rule: make the next cast smarter than the last one.</p>
       <div className="mt-6 grid sm:grid-cols-3 gap-3">
         {[
-          ['AI Fish ID', 'snap a photo, get species, size, legality.'],
+          ['AI Fish ID', 'snap a photo for a species and size estimate to verify.'],
           ['Logbook + Insights', 'every catch makes your predictions better.'],
           ['Spot Map + Solunar', 'real conditions, real times, real spots.'],
         ].map(([t,d]) => (
@@ -379,6 +380,7 @@ export function AppRoutes() {
         </div>
         <nav aria-label="Fishing resources" className="max-w-7xl mx-auto px-4 mt-5 flex flex-wrap justify-center gap-x-6 gap-y-3 text-slate-300">
           <a href="/guides/best-fishing-app-ontario" className="hover:text-emerald-400 focus-visible:underline">Ontario fishing guide</a>
+          <a href="/guides/ontario-fishing-zones" className="hover:text-emerald-400 focus-visible:underline">Ontario fishing zones</a>
           <a href="/blog" className="hover:text-emerald-400 focus-visible:underline">Fishing journal</a>
           <a href="/academy" className="hover:text-emerald-400 focus-visible:underline">Beginner fishing guides</a>
           <a href="/how-to-choose" className="hover:text-emerald-400 focus-visible:underline">Choosing a fishing app</a>
@@ -411,6 +413,7 @@ export default function App() {
         <Route path="/guides/ontario-fish-stocking-records" element={<OntarioFishStockingRecordsPage />} />
         <Route path="/guides/ontario-fishing-licence-checklist" element={<OntarioFishingLicenceChecklistPage />} />
         <Route path="/guides/ontario-fishing-access" element={<OntarioFishingAccessGuidePage />} />
+        <Route path="/guides/ontario-fishing-zones" element={<OntarioFishingZonesPage />} />
         <Route path="/blog" element={<BlogIndex onStart={() => window.location.assign('/')} />} />
         <Route path="/blog/:slug" element={<BlogPost slug={window.location.pathname.replace('/blog/','')} onStart={() => window.location.assign('/')} />} />
         <Route path="/best-fishing-app" element={<BestFishingApp onStart={() => window.location.assign('/')} />} />
