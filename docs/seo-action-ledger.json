@@ -99,7 +99,7 @@
       "confidence": "high",
       "effort": "medium",
       "owner": "Josh",
-      "status": "implemented",
+      "status": "verified",
       "implementationCommits": [
         "0c3b8f56981aa7c39fcd47ce6dee449b39b8503d",
         "0d3585f0096fc8bc3b7a0a9231b37d346687d14c",
@@ -111,10 +111,20 @@
       ],
       "deployment": {
         "project": "fishai-app",
-        "state": "pending verification"
+        "deploymentId": "dpl_8REEWbGS4hmNndecLGmruaNM88YK",
+        "state": "READY",
+        "commit": "466be6de7442c09878061a8b906cd5e07ed2317c",
+        "verifiedAt": "2026-10-29T12:46:00Z",
+        "deploymentUrl": "https://fishai-cvhuvupt7-stebs-co.vercel.app"
       },
       "verification": {
         "route": "https://fishai.shop/guides/ontario-fishing-zones",
+        "httpStatus": 200,
+        "canonical": "https://fishai.shop/guides/ontario-fishing-zones",
+        "prerenderedHtml": true,
+        "sitemapIncluded": true,
+        "robotsAllowsPublicCrawl": true,
+        "verifiedAt": "2026-10-29",
         "indexed": "unknown",
         "rankingGain": "unknown"
       },
