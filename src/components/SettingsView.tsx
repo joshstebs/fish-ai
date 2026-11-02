@@ -158,7 +158,7 @@ export function SettingsView() {
         {!billing?.entitled && (
           <div className="space-y-3">
             <p className="text-slate-400 text-xs font-mono">
-              {'Start a 7-day free trial ($7.99/mo after), or sign in using your existing subscription email.'}
+              {'Start a 7-day free trial ($5/mo after), or sign in using your existing subscription email.'}
             </p>
             <div className="flex flex-wrap gap-2">
               <input
