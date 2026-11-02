@@ -376,7 +376,7 @@ export function AppRoutes() {
       <footer className="app-footer text-xs text-slate-400">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2"><Fish className="w-4 h-4 text-emerald-400" /><span className="font-bold text-slate-300">FishAI</span></div>
-          <span>Free core app. AI estimator: 7-day free trial, $7.99/mo after, cancel anytime.</span>
+          <span>Free core app. AI estimator: 7-day free trial, $5/mo after, cancel anytime.</span>
         </div>
         <nav aria-label="Fishing resources" className="max-w-7xl mx-auto px-4 mt-5 flex flex-wrap justify-center gap-x-6 gap-y-3 text-slate-300">
           <a href="/guides/best-fishing-app-ontario" className="hover:text-emerald-400 focus-visible:underline">Ontario fishing guide</a>
