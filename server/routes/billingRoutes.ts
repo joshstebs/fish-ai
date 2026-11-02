@@ -20,8 +20,9 @@ export const billingStripe: Stripe | null = stripe;
 const resend: Resend | null = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
-
-const PRICE_ID = process.env.STRIPE_PRICE_ID || '';
+// Checkout price by visitor country: CAD for Canada, USD elsewhere.
+const PRICE_ID_USD = process.env.STRIPE_PRICE_ID_USD || process.env.STRIPE_PRICE_ID || '';
+const PRICE_ID_CAD = process.env.STRIPE_PRICE_ID_CAD || '';
 const TRIAL_DAYS = 7;
 const APP_URL = (process.env.APP_URL || 'https://fishai.shop').replace(/\/$/, '');
 const RESEND_FROM = process.env.RESEND_FROM || 'FishAI <onboarding@resend.dev>';
@@ -105,8 +106,14 @@ function setSubscriberCookie(res: any, customerId: string) {
   res.setHeader('Set-Cookie', sessionCookie(SUBSCRIBER_COOKIE, token, SUBSCRIBER_TTL_SECONDS));
 }
 
+function checkoutPriceId(req: express.Request): string {
+    const country = String(req.headers['x-vercel-ip-country'] || '').toUpperCase();
+    if (country === 'CA' && PRICE_ID_CAD) return PRICE_ID_CAD;
+    return PRICE_ID_USD;
+}
 billingRouter.post('/checkout', async (req, res) => {
-  if (!stripe || !PRICE_ID || !sessionConfigured()) {
+  const priceId = checkoutPriceId(req);
+  if (!stripe || !priceId || !sessionConfigured()) {
     return res.status(503).json({
       error: 'Billing is not fully configured.',
       code: 'BILLING_NOT_CONFIGURED',
@@ -143,7 +150,7 @@ billingRouter.post('/checkout', async (req, res) => {
     const checkout = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer: customer.id,
-      line_items: [{ price: PRICE_ID, quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       subscription_data: {
         trial_period_days: TRIAL_DAYS,
         metadata: { app: 'fishai' },
