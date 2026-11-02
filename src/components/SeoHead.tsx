@@ -24,7 +24,7 @@ const software = {
   description: site.description,
   offers: {
     '@type': 'Offer',
-    price: '7.99',
+    price: '5.00',
     priceCurrency: 'USD',
     description: '7-day free trial, then $7.99/month',
   },
