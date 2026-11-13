@@ -4,20 +4,28 @@ const CATCHES_STORAGE_KEY = 'fish_ai_catch_logbook';
 const SPOTS_STORAGE_KEY = 'fish_ai_fishing_spots';
 const TACKLE_STORAGE_KEY = 'fish_ai_tackle_box';
 
+/** Neutralize spreadsheet formula injection in exported CSV cells. */
+export function csvCell(value: unknown): string {
+  let text = String(value ?? '').replace(/"/g, '""');
+  // Leading = + - @ (and tab/CR) can be interpreted as formulas by Excel/Sheets.
+  if (/^[=+\-@\t\r]/.test(text)) text = "'" + text;
+  return `"${text}"`;
+}
+
 export function exportCatchesToCSV(catches: CatchLogItem[]): void {
   if (catches.length === 0) return;
   const headers = ['Date', 'Species', 'Length', 'Weight', 'Location', 'Bait', 'Water Temp', 'Notes'];
   const rows = catches.map((c) => [
-    `"${c.formattedDate}"`,
-    `"${c.species}"`,
-    `"${c.estimatedLength}"`,
-    `"${c.estimatedWeight}"`,
-    `"${c.locationName}"`,
-    `"${c.baitUsed}"`,
-    `"${c.weather?.waterTempF || ''}"`,
-    `"${(c.notes || '').replace(/"/g, '""')}"`,
+    csvCell(c.formattedDate),
+    csvCell(c.species),
+    csvCell(c.estimatedLength),
+    csvCell(c.estimatedWeight),
+    csvCell(c.locationName),
+    csvCell(c.baitUsed),
+    csvCell(c.weather?.waterTempF ?? ''),
+    csvCell(c.notes),
   ]);
-  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.map(csvCell).join(','), ...rows.map((r) => r.join(','))].join('\n');
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
@@ -27,14 +35,20 @@ export function exportCatchesToCSV(catches: CatchLogItem[]): void {
   document.body.removeChild(link);
 }
 
-function safeLoad<T>(key: string): T | null {
+function safeLoad(key: string): unknown | null {
   try {
     const data = localStorage.getItem(key);
-    if (data) return JSON.parse(data) as T;
+    if (data) return JSON.parse(data);
   } catch (e) {
     console.error(`Failed to load ${key} from local storage:`, e);
   }
   return null;
+}
+
+/** Load a JSON array from localStorage; malformed or non-array values yield []. */
+export function loadStoredArray<T>(key: string): T[] {
+  const parsed = safeLoad(key);
+  return Array.isArray(parsed) ? (parsed as T[]) : [];
 }
 
 function safeSave(key: string, value: unknown): void {
@@ -47,7 +61,7 @@ function safeSave(key: string, value: unknown): void {
 
 // --- Catches: a brand-new user starts EMPTY. No fabricated seed data. ---
 export function loadStoredCatches(): CatchLogItem[] {
-  return safeLoad<CatchLogItem[]>(CATCHES_STORAGE_KEY) || [];
+  return loadStoredArray<CatchLogItem>(CATCHES_STORAGE_KEY);
 }
 
 export function saveStoredCatches(catches: CatchLogItem[]): void {
@@ -56,7 +70,7 @@ export function saveStoredCatches(catches: CatchLogItem[]): void {
 
 // --- Spots: a brand-new user starts EMPTY. ---
 export function loadStoredSpots(): FishingSpot[] {
-  return safeLoad<FishingSpot[]>(SPOTS_STORAGE_KEY) || [];
+  return loadStoredArray<FishingSpot>(SPOTS_STORAGE_KEY);
 }
 
 export function saveStoredSpots(spots: FishingSpot[]): void {
@@ -65,7 +79,7 @@ export function saveStoredSpots(spots: FishingSpot[]): void {
 
 // --- Tackle box: persisted, starts EMPTY. ---
 export function loadStoredTackle(): TackleItem[] {
-  return safeLoad<TackleItem[]>(TACKLE_STORAGE_KEY) || [];
+  return loadStoredArray<TackleItem>(TACKLE_STORAGE_KEY);
 }
 
 export function saveStoredTackle(items: TackleItem[]): void {

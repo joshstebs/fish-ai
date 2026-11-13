@@ -117,15 +117,18 @@ export function analyzeCatches(catches: CatchLogItem[]): InsightsReport {
   }
   personalBests.sort((a, b) => b.weightLbs - a.weightLbs);
 
-  // Best hour bucket (6-9 AM style)
+  // Best hour bucket (6-9 AM style). Skip unparseable timestamps so we never emit "NaN AM".
   const hourCounts = new Map<number, number>();
   for (const c of catches) {
-    const h = new Date(c.timestamp).getHours();
+    const t = new Date(c.timestamp);
+    if (Number.isNaN(t.getTime())) continue;
+    const h = t.getHours();
+    if (!Number.isFinite(h) || h < 0 || h > 23) continue;
     hourCounts.set(h, (hourCounts.get(h) || 0) + 1);
   }
   const bestHour = [...hourCounts.entries()].sort((a, b) => b[1] - a[1])[0];
   let bestHourRange = '—';
-  if (bestHour) {
+  if (bestHour && Number.isFinite(bestHour[0])) {
     const h = bestHour[0];
     const fmt = (x: number) => {
       const ampm = x >= 12 ? 'PM' : 'AM';

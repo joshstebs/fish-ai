@@ -10,6 +10,8 @@
     "dev": "vite",
     "build": "tsc && vite build && node scripts/prerender-seo.mjs && npm run verify:seo",
     "verify:seo": "node --test scripts/verify-public-seo.test.mjs",
+    "test": "tsx --test server/utils/session.test.ts server/utils/ontarioLakeSearch.test.ts server/security.regression.test.ts src/utils/mapData.test.ts src/utils/verifiedRepairs.test.ts",
+    "check": "npm run test && npm run build",
     "preview": "vite preview",
     "server": "tsx --env-file-if-exists=.env server/server.ts",
     "dev:all": "concurrently \"npm run server\" \"npm run dev\""

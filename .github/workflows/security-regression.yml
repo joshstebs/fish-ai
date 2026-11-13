@@ -20,7 +20,7 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - name: Verify session and authorization checks
-        run: npx tsx --test server/utils/session.test.ts server/security.regression.test.ts
+      - name: Verify session, authorization, and verified-repair regressions
+        run: npm test
       - name: Type-check and build
         run: npm run build
