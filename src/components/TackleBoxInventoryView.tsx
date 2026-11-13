@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Package, PlusCircle, CheckCircle2, AlertCircle, Trash2, Tag, Search, Sparkles } from 'lucide-react';
+import { Package, PlusCircle, Trash2, Search } from 'lucide-react';
 import { TackleItem } from '../types/catchLogTypes';
+import { normalizeTackleQuantity } from '../utils/catchLogHelpers';
 import { loadStoredTackle, saveStoredTackle } from '../utils/storage';
 
 export const TackleBoxInventoryView: React.FC = () => {
   const [items, setItems] = useState<TackleItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [qtyError, setQtyError] = useState<string | null>(null);
 
   // Load persisted tackle box on mount — a new user starts EMPTY.
   useEffect(() => {
@@ -33,20 +35,27 @@ export const TackleBoxInventoryView: React.FC = () => {
   );
 
   const handleAddItem = () => {
-    if (!newName) return;
+    if (!newName.trim()) return;
+    const qty = normalizeTackleQuantity(newQty);
+    if (qty === null) {
+      setQtyError('Quantity must be a whole number from 1 to 9999.');
+      return;
+    }
     const newItem: TackleItem = {
       id: `tackle-${Date.now()}`,
-      name: newName,
+      name: newName.trim(),
       category: newCategory,
       colorPattern: newColor || 'Standard',
-      quantity: newQty,
+      quantity: qty,
       notes: newNotes,
     };
     setItems([newItem, ...items]);
     setIsAddModalOpen(false);
+    setQtyError(null);
     setNewName('');
     setNewColor('');
     setNewNotes('');
+    setNewQty(1);
   };
 
   const handleDeleteItem = (id: string) => {
@@ -70,7 +79,7 @@ export const TackleBoxInventoryView: React.FC = () => {
             🧰 Digital Tackle Box Inventory
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Catalog your lures, hooks, lines, and terminal tackle. Track quantities and cross-reference with AI lure recommendations.
+            Catalog your lures, hooks, lines, and terminal tackle. Track quantities on this device; Insights uses your catch history for lure patterns.
           </p>
         </div>
 
@@ -104,7 +113,7 @@ export const TackleBoxInventoryView: React.FC = () => {
           <Package className="w-12 h-12 text-slate-600 mx-auto" />
           <h3 className="text-base font-black uppercase tracking-wider text-white">Your Tackle Box is Empty</h3>
           <p className="text-slate-400 text-xs max-w-md mx-auto font-mono">
-            Add the lures, hooks, and lines you actually own. Your box is saved on this device and cross-referenced with your catch history in the Insights tab.
+            Add the lures, hooks, and lines you actually own. Your box is saved on this device. Lure recommendations appear in Insights after you log catches — nothing is invented while the box is empty.
           </p>
           <button
             onClick={() => setIsAddModalOpen(true)}
@@ -206,10 +215,17 @@ export const TackleBoxInventoryView: React.FC = () => {
                 <label className="font-bold uppercase text-slate-400">Quantity in Box:</label>
                 <input
                   type="number"
+                  min={1}
+                  max={9999}
+                  step={1}
                   value={newQty}
-                  onChange={(e) => setNewQty(Number(e.target.value))}
+                  onChange={(e) => {
+                    setQtyError(null);
+                    setNewQty(Number(e.target.value));
+                  }}
                   className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-white font-mono focus:outline-none focus:border-amber-500"
                 />
+                {qtyError && <p className="text-amber-300 text-[11px] font-mono">{qtyError}</p>}
               </div>
 
               <div className="space-y-1">

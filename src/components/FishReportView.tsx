@@ -292,8 +292,8 @@ export const FishReportView: React.FC<FishReportViewProps> = ({ catches, spots }
             <span className="px-3 py-1 bg-cyan-600 text-slate-950 font-black text-xs uppercase tracking-widest rounded">
               Today's Fish Report
             </span>
-            <span className="text-xs font-mono text-emerald-400 font-bold uppercase flex items-center gap-1">
-              <Gauge className="w-3.5 h-3.5" /> Live Data
+            <span className={`text-xs font-mono font-bold uppercase flex items-center gap-1 ${weather ? 'text-emerald-400' : 'text-slate-500'}`}>
+              <Gauge className="w-3.5 h-3.5" /> {weather ? 'Live Weather' : 'Solunar + History'}
             </span>
           </div>
           <h2 className="text-2xl font-display font-black uppercase text-white tracking-tight">
