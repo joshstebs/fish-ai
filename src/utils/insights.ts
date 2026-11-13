@@ -45,17 +45,27 @@ export function speciesOf(c: CatchLogItem): string {
 export function parseWeightLbs(s: string | undefined): number | null {
   if (!s) return null;
   const m = s.match(/(\d+(?:\.\d+)?)\s*(?:-|–)\s*(\d+(?:\.\d+)?)\s*lbs/);
-  if (m) return (parseFloat(m[1]) + parseFloat(m[2])) / 2;
+  if (m) {
+    const n = (parseFloat(m[1]) + parseFloat(m[2])) / 2;
+    return Number.isFinite(n) ? n : null;
+  }
   const m2 = s.match(/~?(\d+(?:\.\d+)?)\s*lbs/);
-  return m2 ? parseFloat(m2[1]) : null;
+  if (!m2) return null;
+  const n = parseFloat(m2[1]);
+  return Number.isFinite(n) ? n : null;
 }
 
 export function parseLengthInches(s: string | undefined): number | null {
   if (!s) return null;
   const m = s.match(/(\d+(?:\.\d+)?)\s*(?:-|–)\s*(\d+(?:\.\d+)?)\s*in/);
-  if (m) return (parseFloat(m[1]) + parseFloat(m[2])) / 2;
+  if (m) {
+    const n = (parseFloat(m[1]) + parseFloat(m[2])) / 2;
+    return Number.isFinite(n) ? n : null;
+  }
   const m2 = s.match(/(\d+(?:\.\d+)?)\s*in/);
-  return m2 ? parseFloat(m2[1]) : null;
+  if (!m2) return null;
+  const n = parseFloat(m2[1]);
+  return Number.isFinite(n) ? n : null;
 }
 
 function confidenceFor(n: number): 'HIGH' | 'MEDIUM' | 'LOW' {
@@ -90,8 +100,8 @@ export function analyzeCatches(catches: CatchLogItem[]): InsightsReport {
   const speciesStats: SpeciesStat[] = [];
   const personalBests: InsightsReport['personalBests'] = [];
   for (const [name, list] of bySpecies) {
-    const weights = list.map((c) => parseWeightLbs(c.estimatedWeight)).filter((w): w is number => w !== null);
-    const lengths = list.map((c) => parseLengthInches(c.estimatedLength)).filter((l): l is number => l !== null);
+    const weights = list.map((c) => parseWeightLbs(c.estimatedWeight)).filter((w): w is number => w !== null && Number.isFinite(w));
+    const lengths = list.map((c) => parseLengthInches(c.estimatedLength)).filter((l): l is number => l !== null && Number.isFinite(l));
     const baitCounts = new Map<string, number>();
     const spotCounts = new Map<string, number>();
     for (const c of list) {

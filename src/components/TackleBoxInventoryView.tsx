@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, PlusCircle, CheckCircle2, AlertCircle, Trash2, Tag, Search, Sparkles } from 'lucide-react';
+import { Package, PlusCircle, Trash2, Search } from 'lucide-react';
 import { TackleItem } from '../types/catchLogTypes';
 import { normalizeTackleQuantity } from '../utils/catchLogHelpers';
 import { loadStoredTackle, saveStoredTackle } from '../utils/storage';

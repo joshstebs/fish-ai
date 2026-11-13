@@ -143,6 +143,14 @@ test('analyzeCatches keeps dash hour range when all timestamps are bad', () => {
   assert.equal(report.bestHourRange, '—');
 });
 
+test('parseWeightLbs / parseLengthInches reject non-finite values', async () => {
+  const { parseWeightLbs, parseLengthInches } = await import('./insights.js');
+  assert.equal(parseWeightLbs('3 lbs'), 3);
+  assert.equal(parseLengthInches('20 inches'), 20);
+  assert.equal(parseWeightLbs('Not weighed'), null);
+  assert.equal(parseLengthInches('Not measured'), null);
+});
+
 // ---------------------------------------------------------------------------
 // 6. Ontario lake search tokenization
 // ---------------------------------------------------------------------------
