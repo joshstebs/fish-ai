@@ -60,3 +60,10 @@ Notes:
 - Vision (`/api/ai/analyze-fish`) needs `GEMINI_API_KEY`; without it the app still works (the vision tab shows an honest 503).
 - Function max duration is set to 60s in `vercel.json` (Hobby plan limit) for Gemini's response time.
 - No other keys needed: weather is Open-Meteo, solunar is computed locally.
+
+### Command Center health
+
+Set a server-only `FISH_OPERATIONS_TOKEN` of at least 32 characters, distinct from
+`FISH_APP_SECRET`. Authenticated `GET /api/operations` returns a server-side Gemini
+configuration flag. Live module metrics require instrumentation. GPS privacy must be
+verified on the actual client network and export paths.
