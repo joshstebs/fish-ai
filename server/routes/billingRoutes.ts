@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Request } from 'express';
 import Stripe from 'stripe';
 import { Resend } from 'resend';
 import { rateLimit, rateLimitHeaders } from '../utils/rateLimit.js';
@@ -106,7 +106,7 @@ function setSubscriberCookie(res: any, customerId: string) {
   res.setHeader('Set-Cookie', sessionCookie(SUBSCRIBER_COOKIE, token, SUBSCRIBER_TTL_SECONDS));
 }
 
-function checkoutPriceId(req: express.Request): string {
+function checkoutPriceId(req: Request): string {
     const country = String(req.headers['x-vercel-ip-country'] || '').toUpperCase();
     if (country === 'CA' && PRICE_ID_CAD) return PRICE_ID_CAD;
     return PRICE_ID_USD;
