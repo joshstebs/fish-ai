@@ -25,8 +25,8 @@ export function exportCatchesToCSV(catches: CatchLogItem[]): void {
     csvCell(c.weather?.waterTempF ?? ''),
     csvCell(c.notes),
   ]);
-  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.map(csvCell).join(','), ...rows.map((r) => r.join(','))].join('\n');
-  const encodedUri = encodeURI(csvContent);
+  const csvContent = [headers.map(csvCell).join(','), ...rows.map((r) => r.join(','))].join('\n');
+  const encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
   link.setAttribute('download', `FishAI_Catch_Logbook_${new Date().toISOString().slice(0, 10)}.csv`);

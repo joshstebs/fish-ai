@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { csvCell, loadStoredArray } from './storage.js';
+import { csvCell, exportCatchesToCSV, loadStoredArray } from './storage.js';
 import { analyzeCatches } from './insights.js';
 import {
   catchMatchesFilters,
@@ -203,4 +203,26 @@ test('confidenceBand reflects actual scores', () => {
   assert.equal(confidenceBand(Number.NaN), 'UNCERTAIN');
   assert.equal(confidenceBandLabel('HIGH'), 'High Confidence');
   assert.equal(confidenceBandLabel('UNCERTAIN'), 'Uncertain ID');
+});
+
+test('CSV download preserves hash signs, percent signs and quoted text', () => {
+  const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
+  let href = '';
+  const link = {
+    setAttribute(name: string, value: string) { if (name === 'href') href = value; },
+    click() {},
+  };
+  Object.defineProperty(globalThis, 'document', {
+    configurable: true,
+    value: { createElement: () => link, body: { appendChild() {}, removeChild() {} } },
+  });
+  try {
+    exportCatchesToCSV([{ notes: 'Lure #2, 100% "blue"' } as CatchLogItem]);
+    const url = new URL(href);
+    assert.equal(url.hash, '');
+    assert.match(decodeURIComponent(url.pathname), /"Lure #2, 100% ""blue"""$/);
+  } finally {
+    if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
+    else Reflect.deleteProperty(globalThis, 'document');
+  }
 });
