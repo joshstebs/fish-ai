@@ -147,9 +147,10 @@ export async function buildFishReport(input: {
       condition: cur.condition,
       windMph,
       windDir: cur.windDirection,
-      humidity: cur.relativeHumidityPct ?? 0,
-      dewPointF: cur.dewPointF ?? 0,
-      visibilityMi: cur.visibilityMi ?? 0,
+      // Preserve nulls so the UI can label missing fields instead of showing fake 0s as live data.
+      humidity: cur.relativeHumidityPct ?? null,
+      dewPointF: cur.dewPointF ?? null,
+      visibilityMi: cur.visibilityMi ?? null,
       pressureInHg: cur.pressureInHg,
       cloudCover,
       precipChance: cur.precipitationMm > 0 ? Math.min(100, cur.precipitationMm * 20) : 0,

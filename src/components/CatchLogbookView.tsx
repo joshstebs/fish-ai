@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CatchLogItem, FishingSpot, WeatherSnapshot } from '../types/catchLogTypes';
 import { exportCatchesToCSV } from '../utils/storage';
+import { catchMatchesFilters, parsePositiveMeasurement } from '../utils/catchLogHelpers';
 import { fetchLiveWeather, resolveWeatherCoords } from '../utils/weather';
 import {
   BookOpen,
@@ -110,21 +111,10 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
   // Unique species list for filter dropdown
   const speciesList = Array.from(new Set(catches.map((c) => c.commonName || c.species)));
 
-  // Filter catches by search and species filter
-  const filteredCatches = catches.filter((item) => {
-    const matchesSearch =
-      item.species.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.locationName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.baitUsed.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.notes.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesSpecies =
-      selectedSpeciesFilter === 'ALL' ||
-      item.species.includes(selectedSpeciesFilter) ||
-      item.commonName.includes(selectedSpeciesFilter);
-
-    return matchesSearch && matchesSpecies;
-  });
+  // Filter catches by search and species filter (case-insensitive, null-safe)
+  const filteredCatches = catches.filter((item) =>
+    catchMatchesFilters(item, searchQuery, selectedSpeciesFilter),
+  );
 
   // Render-only grouping of the filtered log by date (date part of formattedDate, e.g. "Jul 12, 2026")
   const groupedCatches = filteredCatches.reduce<Record<string, CatchLogItem[]>>((groups, item) => {
@@ -190,6 +180,17 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
       return;
     }
 
+    const lengthCheck = parsePositiveMeasurement(qLength);
+    const weightCheck = parsePositiveMeasurement(qWeight);
+    if (!lengthCheck.ok) {
+      setQSaveMsg(lengthCheck.error);
+      return;
+    }
+    if (!weightCheck.ok) {
+      setQSaveMsg(weightCheck.error);
+      return;
+    }
+
     const weather: WeatherSnapshot | undefined = qAttachWeather
       ? qWeather || {
           temperatureF: Number(qTemp) || 0,
@@ -201,8 +202,8 @@ export const CatchLogbookView: React.FC<CatchLogbookViewProps> = ({
         }
       : undefined;
 
-    const lengthStr = qLength ? `${qLength} inches` : 'Not measured';
-    const weightStr = qWeight ? `${qWeight} lbs` : 'Not weighed';
+    const lengthStr = Number.isFinite(lengthCheck.value) ? `${lengthCheck.value} inches` : 'Not measured';
+    const weightStr = Number.isFinite(weightCheck.value) ? `${weightCheck.value} lbs` : 'Not weighed';
 
     onAddCatch({
       species: commonName,

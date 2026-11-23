@@ -6,6 +6,7 @@
  * Does not scrape the Fish ON-Line viewer or represent legal fishing advice.
  */
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { buildLakeNameWhere } from '../server/utils/ontarioLakeSearch.js';
 
 const ORIGIN = 'https://ws.lioservices.lrc.gov.on.ca/arcgis2/rest/services/LIO_OPEN_DATA';
 const SOURCE = {
@@ -47,8 +48,9 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     q.set('outFields', 'SITE_NAME,FISHING_ACCESS_POINT_TYPE,SITE_LAST_VERIFICATION_DATE,PARKING_PRESENCE_FLG,USER_FEE_FLG');
   } else {
     const name = (p.get('q') || '').trim();
-    if (!/^[a-zA-Z0-9 '-]{2,50}$/.test(name)) return send(res, 400, { error: 'Enter 2 to 50 letters/numbers for a lake-name search' });
-    q.set('where', "(ENTITY_TYPE LIKE '%Lake%' OR ENTITY_TYPE LIKE '%Reservoir%') AND OFFICIAL_NAME LIKE '%" + name.replace(/'/g, "''") + "%'");
+    const where = buildLakeNameWhere(name);
+    if (!where) return send(res, 400, { error: 'Enter 2 to 50 letters/numbers for a lake-name search' });
+    q.set('where', where);
     q.set('outFields', 'OFFICIAL_NAME,ENTITY_TYPE,LATITUDE_DECIMAL_DEGREES,LONGITUDE_DECIMAL_DEGREES,GEONAME_STATUS');
     q.set('returnGeometry', 'false');
     q.set('orderByFields', 'OFFICIAL_NAME ASC');

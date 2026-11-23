@@ -45,17 +45,27 @@ export function speciesOf(c: CatchLogItem): string {
 export function parseWeightLbs(s: string | undefined): number | null {
   if (!s) return null;
   const m = s.match(/(\d+(?:\.\d+)?)\s*(?:-|–)\s*(\d+(?:\.\d+)?)\s*lbs/);
-  if (m) return (parseFloat(m[1]) + parseFloat(m[2])) / 2;
+  if (m) {
+    const n = (parseFloat(m[1]) + parseFloat(m[2])) / 2;
+    return Number.isFinite(n) ? n : null;
+  }
   const m2 = s.match(/~?(\d+(?:\.\d+)?)\s*lbs/);
-  return m2 ? parseFloat(m2[1]) : null;
+  if (!m2) return null;
+  const n = parseFloat(m2[1]);
+  return Number.isFinite(n) ? n : null;
 }
 
 export function parseLengthInches(s: string | undefined): number | null {
   if (!s) return null;
   const m = s.match(/(\d+(?:\.\d+)?)\s*(?:-|–)\s*(\d+(?:\.\d+)?)\s*in/);
-  if (m) return (parseFloat(m[1]) + parseFloat(m[2])) / 2;
+  if (m) {
+    const n = (parseFloat(m[1]) + parseFloat(m[2])) / 2;
+    return Number.isFinite(n) ? n : null;
+  }
   const m2 = s.match(/(\d+(?:\.\d+)?)\s*in/);
-  return m2 ? parseFloat(m2[1]) : null;
+  if (!m2) return null;
+  const n = parseFloat(m2[1]);
+  return Number.isFinite(n) ? n : null;
 }
 
 function confidenceFor(n: number): 'HIGH' | 'MEDIUM' | 'LOW' {
@@ -90,8 +100,8 @@ export function analyzeCatches(catches: CatchLogItem[]): InsightsReport {
   const speciesStats: SpeciesStat[] = [];
   const personalBests: InsightsReport['personalBests'] = [];
   for (const [name, list] of bySpecies) {
-    const weights = list.map((c) => parseWeightLbs(c.estimatedWeight)).filter((w): w is number => w !== null);
-    const lengths = list.map((c) => parseLengthInches(c.estimatedLength)).filter((l): l is number => l !== null);
+    const weights = list.map((c) => parseWeightLbs(c.estimatedWeight)).filter((w): w is number => w !== null && Number.isFinite(w));
+    const lengths = list.map((c) => parseLengthInches(c.estimatedLength)).filter((l): l is number => l !== null && Number.isFinite(l));
     const baitCounts = new Map<string, number>();
     const spotCounts = new Map<string, number>();
     for (const c of list) {
@@ -117,15 +127,18 @@ export function analyzeCatches(catches: CatchLogItem[]): InsightsReport {
   }
   personalBests.sort((a, b) => b.weightLbs - a.weightLbs);
 
-  // Best hour bucket (6-9 AM style)
+  // Best hour bucket (6-9 AM style). Skip unparseable timestamps so we never emit "NaN AM".
   const hourCounts = new Map<number, number>();
   for (const c of catches) {
-    const h = new Date(c.timestamp).getHours();
+    const t = new Date(c.timestamp);
+    if (Number.isNaN(t.getTime())) continue;
+    const h = t.getHours();
+    if (!Number.isFinite(h) || h < 0 || h > 23) continue;
     hourCounts.set(h, (hourCounts.get(h) || 0) + 1);
   }
   const bestHour = [...hourCounts.entries()].sort((a, b) => b[1] - a[1])[0];
   let bestHourRange = '—';
-  if (bestHour) {
+  if (bestHour && Number.isFinite(bestHour[0])) {
     const h = bestHour[0];
     const fmt = (x: number) => {
       const ampm = x >= 12 ? 'PM' : 'AM';

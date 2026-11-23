@@ -165,7 +165,13 @@ export function buildFishReport(opts: {
   const speciesCatches = catches.filter((c) => speciesOf(c) === species);
   if (speciesCatches.length > 0) {
     const hour = now.getHours();
-    const hourHits = speciesCatches.filter((c) => new Date(c.timestamp).getHours() === hour).length;
+    const parseHour = (iso: string): number | null => {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return null;
+      const h = d.getHours();
+      return Number.isFinite(h) ? h : null;
+    };
+    const hourHits = speciesCatches.filter((c) => parseHour(c.timestamp) === hour).length;
     if (hourHits > 0) {
       score += 8;
       factors.push({
@@ -175,12 +181,14 @@ export function buildFishReport(opts: {
         detail: `You've landed ${hourHits} ${species} around this hour (${hourHits}/${speciesCatches.length} of your ${species} catches).`,
       });
     } else {
-      const best = [...new Set(speciesCatches.map((c) => new Date(c.timestamp).getHours()))].sort((a, b) => a - b);
+      const best = [...new Set(speciesCatches.map((c) => parseHour(c.timestamp)).filter((h): h is number => h !== null))].sort((a, b) => a - b);
       factors.push({
         label: 'Personal history',
         impact: 'NEUTRAL',
         fromHistory: true,
-        detail: `Your ${species} catches cluster around ${best.map((h) => `${h % 12 || 12}${h >= 12 ? 'PM' : 'AM'}`).join(', ')} — this hour is off your pattern.`,
+        detail: best.length
+          ? `Your ${species} catches cluster around ${best.map((h) => `${h % 12 || 12}${h >= 12 ? 'PM' : 'AM'}`).join(', ')} — this hour is off your pattern.`
+          : `You have ${species} catches logged, but their timestamps aren't usable for hour patterns yet.`,
       });
     }
     // Weather-based history match

@@ -140,12 +140,13 @@ export function DailyReport({ profile, onEdit }: { profile: AnglerProfile; onEdi
                 <div>
                   <div className="font-display text-5xl font-bold leading-none">{data.current.tempF}°</div>
                   <div className="mt-2 max-w-28 text-sm text-muted-foreground">{data.current.condition}</div>
+                  <div className="mt-2 text-[10px] uppercase tracking-widest text-primary">Open-Meteo live reading</div>
                 </div>
                 <div className="flex-1">
                   <Row label="Wind" value={`${data.current.windDir} ${data.current.windMph} mph`} />
-                  <Row label="Humidity" value={`${data.current.humidity}%`} />
-                  <Row label="Dew point" value={`${data.current.dewPointF}°`} />
-                  <Row label="Visibility" value={`${data.current.visibilityMi} mi`} />
+                  <Row label="Humidity" value={data.current.humidity == null ? '—' : `${data.current.humidity}%`} />
+                  <Row label="Dew point" value={data.current.dewPointF == null ? '—' : `${data.current.dewPointF}°`} />
+                  <Row label="Visibility" value={data.current.visibilityMi == null ? '—' : `${data.current.visibilityMi} mi`} />
                 </div>
               </div>
             </Panel>

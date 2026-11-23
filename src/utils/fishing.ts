@@ -30,9 +30,9 @@ export type FishReport = {
     condition: string;
     windMph: number;
     windDir: string;
-    humidity: number;
-    dewPointF: number;
-    visibilityMi: number;
+    humidity: number | null;
+    dewPointF: number | null;
+    visibilityMi: number | null;
     pressureInHg: number;
     cloudCover: number;
     precipChance: number;

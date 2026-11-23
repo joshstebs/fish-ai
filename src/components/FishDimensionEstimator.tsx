@@ -27,6 +27,7 @@ import {
 import { CatchLogItem } from '../types/catchLogTypes';
 import { ProCtaModal } from './ProCtaModal';
 import { getAppSecret, setAppSecret } from '../utils/apiAuth';
+import { confidenceBand, confidenceBandLabel } from '../utils/catchLogHelpers';
 import { SAMPLE_FISH_PHOTOS } from '../utils/samplePhotos';
 import {
   getStoredEmail,
@@ -737,13 +738,24 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                   </p>
                   {result.visionProvider && (
                     <p className="text-[10px] font-mono uppercase tracking-widest text-slate-500">
-                      via {result.visionProvider}
+                      via {result.visionProvider} · AI estimate, not a confirmed ID
                     </p>
                   )}
                   <div className="pt-2">
-                    <span className="inline-flex items-center gap-1.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded-full px-3 py-1 text-xs font-black uppercase tracking-wider">
-                      <Sparkles className="w-3 h-3" /> High Confidence
-                    </span>
+                    {(() => {
+                      const band = confidenceBand(result.confidence);
+                      const styles =
+                        band === 'HIGH'
+                          ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                          : band === 'MEDIUM'
+                            ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                            : 'bg-slate-500/15 text-slate-300 border-slate-500/30';
+                      return (
+                        <span className={`inline-flex items-center gap-1.5 border rounded-full px-3 py-1 text-xs font-black uppercase tracking-wider ${styles}`}>
+                          <Sparkles className="w-3 h-3" /> {confidenceBandLabel(band)} ({Math.round(result.confidence)}%)
+                        </span>
+                      );
+                    })()}
                   </div>
                 </div>
 
