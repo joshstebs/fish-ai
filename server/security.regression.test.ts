@@ -71,3 +71,24 @@ test('cross-origin write attempts are refused', async () => {
     assert.equal(response.status, 403);
   });
 });
+
+test('operations flags require a distinct bearer token and expose no secrets', async () => {
+  const token = 'fixture-operations-token-not-for-production';
+  process.env.FISH_OPERATIONS_TOKEN = token;
+  process.env.GEMINI_API_KEY = 'fixture-provider-key-must-stay-server-side';
+  try {
+    await withServer(async base => {
+      assert.equal((await fetch(base + '/api/operations')).status, 401);
+      assert.equal((await fetch(base + '/api/operations', {
+        headers: { Authorization: 'Bearer ' + process.env.FISH_APP_SECRET },
+      })).status, 401);
+      const response = await fetch(base + '/api/operations', { headers: { Authorization: 'Bearer ' + token } });
+      assert.equal(response.status, 200);
+      assert.equal(response.headers.get('cache-control'), 'no-store');
+      assert.deepEqual(await response.json(), { geminiConfigured: true, modules: {} });
+    });
+  } finally {
+    delete process.env.FISH_OPERATIONS_TOKEN;
+    delete process.env.GEMINI_API_KEY;
+  }
+});

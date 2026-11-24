@@ -76,6 +76,23 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', server: 'FishAI Multi-Modal Server', timestamp: new Date().toISOString() });
 });
 
+// Read-only operations flags. Do not include provider keys, payloads or coordinates.
+app.get('/api/operations', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  const expected = process.env.FISH_OPERATIONS_TOKEN || '';
+  const supplied = req.get('authorization') || '';
+  const expectedDigest = crypto.createHash('sha256').update('Bearer ' + expected).digest();
+  const suppliedDigest = crypto.createHash('sha256').update(supplied).digest();
+  if (expected.length < 32 || expected === process.env.FISH_APP_SECRET ||
+      !crypto.timingSafeEqual(suppliedDigest, expectedDigest)) {
+    return res.status(401).json({ error: 'Operations authentication required.' });
+  }
+  return res.json({
+    geminiConfigured: Boolean(process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY_2),
+    modules: {},
+  });
+});
+
 // Owner sign-in: verify the app password (timing-safe). Public endpoint:
 // it exists so the app can validate a password BEFORE storing it locally.
 app.post('/api/auth/owner-verify', rateLimitMiddleware(VERIFY_LIMIT, 60_000, 'verify'), (req, res) => {

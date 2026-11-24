@@ -26,7 +26,7 @@ const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || '';
 const ANTHROPIC_MODEL = process.env.ANTHROPIC_VISION_MODEL || 'claude-sonnet-4-5';
 
 const GEMINI_KEYS = [
-  process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '',
+  process.env.GEMINI_API_KEY || '',
   process.env.GEMINI_API_KEY_2 || '',
 ].filter(Boolean) as string[];
 const GEMINI_MODELS = process.env.GEMINI_MODEL
