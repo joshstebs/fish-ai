@@ -123,7 +123,7 @@
 .setup-panel button.bg-primary { letter-spacing: .035em; text-transform: none; }
 .setup-panel input { min-width: 0; }
 .setup-panel form > div { min-width: 0; }
-.onboarding-shortcuts { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #29383d; border-radius: 12px; overflow: hidden; }
+.onboarding-shortcuts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid #29383d; border-radius: 12px; overflow: hidden; }
 .onboarding-shortcuts button { display: flex; align-items: center; gap: 16px; padding: 21px; text-align: left; background: #10191d; min-width: 0; }
 .onboarding-shortcuts button + button { border-left: 1px solid #29383d; }
 .onboarding-shortcuts button:hover { background: #15242a; }

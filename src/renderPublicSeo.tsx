@@ -14,12 +14,17 @@ import { OntarioFishingLicenceChecklistPage } from './pages/OntarioFishingLicenc
 import { OntarioFishingAccessGuidePage } from './pages/OntarioFishingAccessGuidePage';
 import { OntarioFishingZonesPage } from './pages/OntarioFishingZonesPage';
 
+import { FishingLogbookPage } from './pages/FishingLogbookPage';
+import { ProPage } from './pages/ProPage';
+
 // Render the same public components as the client. Personal app state stays on
 // the device; the homepage renders only its default signed-out setup screen.
 export function renderPublicSeo(path: string): string {
   const onStart = () => {};
   const pages: Record<string, React.ReactElement> = {
     '/': <AppRoutes />,
+    '/fishing-logbook': <FishingLogbookPage />,
+    '/pro': <ProPage />,
     '/blog': <BlogIndex onStart={onStart} />,
     '/guides/best-fishing-app-ontario': <OntarioFishingGuidePage />,
     '/guides/ontario-fish-stocking-records': <OntarioFishStockingRecordsPage />,
