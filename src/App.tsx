@@ -17,6 +17,10 @@ import { AppNavigation } from './components/AppNavigation';
 import heroDawn from './assets/hero-dawn.jpg';
 import { GlobalSeo } from './components/SeoHead';
 import { claimCheckoutSession, claimRecoveryToken } from './utils/billing';
+import { PRO_MONTHLY_PRICE, PRO_TRIAL_DAYS } from './utils/proPlan';
+import { LOGBOOK_ENTRY } from './utils/publicEntry';
+import { FishingLogbookPage } from './pages/FishingLogbookPage';
+import { ProPage } from './pages/ProPage';
 import { ListiclePage } from './pages/ListiclePage';
 import { HowToChoosePage } from './pages/HowToChoosePage';
 import { CompareFishbrainPage } from './pages/CompareFishbrainPage';
@@ -165,8 +169,8 @@ export function BlogPost({ slug, onStart }: { slug: string; onStart: () => void 
     'logbook-seo': {
       title: 'Why a private logbook is the secret advantage most anglers ignore',
       body: [
-        'public logbooks leak your spots. fishAI keeps your logbook local by default.',
-        'over time, your personal bests, top lures, and best conditions become a competitive advantage no forum thread can match.'
+        'FishAI saves your catch entries in the browser you use to log them. You can keep a CSV copy for your own records.',
+        'Compare personal bests, lures and conditions across your logged trips. Check the sample size before drawing conclusions.'
       ]
     }
   };
@@ -177,7 +181,11 @@ export function BlogPost({ slug, onStart }: { slug: string; onStart: () => void 
       <div className="mt-6 space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed">{post.body.map((p,i) => <p key={i}>{p}</p>)}</div>
       <div className="mt-8 flex gap-3">
         <a href="/blog" className="px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider border border-white/20">all posts</a>
-        <button onClick={onStart} className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg">open fishAI</button>
+        {slug === 'logbook-seo' ? (
+          <a href={LOGBOOK_ENTRY} className="px-4 py-2.5 rounded-lg bg-emerald-400 text-slate-950 font-bold">Open free logbook</a>
+        ) : (
+          <button onClick={onStart} className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg">open fishAI</button>
+        )}
       </div>
     </div>
   );
@@ -255,7 +263,15 @@ export function AppRoutes() {
     const checkoutId = params.get('session_id');
     const recoveryToken = params.get('billing_recovery');
     const outcome = params.get('checkout');
-    if (!checkoutId && !recoveryToken && !outcome) return;
+    if (!checkoutId && !recoveryToken && !outcome) {
+      const view = params.get('view');
+      if (view === 'logbook') setActiveTab('LOGBOOK');
+      if (view === 'pro') {
+        setActiveTab('VISION');
+        setProFromHeader(true);
+      }
+      return;
+    }
     // Remove bearer proof from the address bar and browser history immediately.
     window.history.replaceState({}, '', window.location.pathname);
     if (outcome === 'canceled') {
@@ -350,6 +366,7 @@ export function AppRoutes() {
                 />
                 </div>
                 <div className="onboarding-shortcuts">
+                  <button onClick={() => goTo('LOGBOOK')}><BookOpen className="size-5" /><span><strong>Log a catch</strong><small>Free and private in your browser</small></span><ArrowRight className="size-4" /></button>
                   <button onClick={() => goTo('VISION')}><Camera className="size-5" /><span><strong>Know your catch</strong><small>Photo identification & estimates</small></span><ArrowRight className="size-4" /></button>
                   <button onClick={() => goTo('AREAS')}><MapPin className="size-5" /><span><strong>Find your water</strong><small>Explore lakes, rivers & fishing areas</small></span><ArrowRight className="size-4" /></button>
                 </div>
@@ -376,9 +393,10 @@ export function AppRoutes() {
       <footer className="app-footer text-xs text-slate-400">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2"><Fish className="w-4 h-4 text-emerald-400" /><span className="font-bold text-slate-300">FishAI</span></div>
-          <span>Free core app. AI estimator: 7-day free trial, $7.99/mo after, cancel anytime.</span>
+          <span>Free core app. <a href="/pro" className="underline hover:text-emerald-400">Pro photo analysis</a>: {PRO_TRIAL_DAYS}-day free trial, then {PRO_MONTHLY_PRICE}/month.</span>
         </div>
         <nav aria-label="Fishing resources" className="max-w-7xl mx-auto px-4 mt-5 flex flex-wrap justify-center gap-x-6 gap-y-3 text-slate-300">
+          <a href="/fishing-logbook" className="hover:text-emerald-400 focus-visible:underline">Private fishing logbook</a>
           <a href="/guides/best-fishing-app-ontario" className="hover:text-emerald-400 focus-visible:underline">Ontario fishing guide</a>
           <a href="/guides/ontario-fishing-zones" className="hover:text-emerald-400 focus-visible:underline">Ontario fishing zones</a>
           <a href="/blog" className="hover:text-emerald-400 focus-visible:underline">Fishing journal</a>
@@ -409,6 +427,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<AppRoutes />} />
         <Route element={<PublicPageLayout><Outlet /></PublicPageLayout>}>
+        <Route path="/fishing-logbook" element={<FishingLogbookPage />} />
+        <Route path="/pro" element={<ProPage />} />
         <Route path="/guides/best-fishing-app-ontario" element={<OntarioFishingGuidePage />} />
         <Route path="/guides/ontario-fish-stocking-records" element={<OntarioFishStockingRecordsPage />} />
         <Route path="/guides/ontario-fishing-licence-checklist" element={<OntarioFishingLicenceChecklistPage />} />

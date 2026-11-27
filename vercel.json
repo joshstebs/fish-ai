@@ -15,6 +15,18 @@
       "destination": "/shop/:productId.html"
     },
     {
+      "source": "/fishing-logbook",
+      "destination": "/fishing-logbook.html"
+    },
+    {
+      "source": "/pro",
+      "destination": "/pro.html"
+    },
+    {
+      "source": "/guides/ontario-fish-stocking-records",
+      "destination": "/guides/ontario-fish-stocking-records.html"
+    },
+    {
       "source": "/guides/ontario-fishing-licence-checklist",
       "destination": "/guides/ontario-fishing-licence-checklist.html"
     },

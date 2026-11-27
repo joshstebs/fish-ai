@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { CatchLogItem } from '../types/catchLogTypes';
 import { ProCtaModal } from './ProCtaModal';
+import { PRO_MONTHLY_PRICE, PRO_TRIAL_DAYS } from '../utils/proPlan';
 import { getAppSecret, setAppSecret } from '../utils/apiAuth';
 import { confidenceBand, confidenceBandLabel } from '../utils/catchLogHelpers';
 import { SAMPLE_FISH_PHOTOS } from '../utils/samplePhotos';
@@ -674,7 +675,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-300">
                     <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>Local harvest rules & tackle recommendations</span>
+                    <span>Save reviewed results to your free logbook</span>
                   </div>
                 </div>
                 <button
@@ -682,10 +683,10 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                   className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black uppercase text-xs tracking-wider rounded-lg shadow-xl flex items-center justify-center gap-2 transition-all active:scale-95"
                 >
                   <Zap className="w-4 h-4" />
-                  Try PRO Free 7 Days
+                  Try Pro free for {PRO_TRIAL_DAYS} days
                 </button>
                 <p className="text-center text-[10px] text-slate-500 mt-2 font-mono">
-                  Then $7.99/mo · Cancel anytime
+                  Then {PRO_MONTHLY_PRICE}/month · Cancel anytime
                 </p>
               </div>
             </div>
@@ -705,7 +706,7 @@ export const FishDimensionEstimator: React.FC<FishDimensionEstimatorProps> = ({
                 Ready to Analyze
               </h3>
               <p className="text-slate-400 text-xs max-w-md mx-auto font-mono">
-                Upload a catch photo or try a demo to get species ID, size estimate, and harvest rules.
+                Upload a catch photo or try a sample photo for species and size estimates.
               </p>
             </div>
           )}

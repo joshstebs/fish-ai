@@ -8,6 +8,7 @@ export function PublicPageLayout({ children }: { children: ReactNode }) {
       <a href="/" aria-label="FishAI home"><FishBrand /></a>
       <nav aria-label="Fishing resources">
         <a href="/guides/best-fishing-app-ontario">Field guides</a>
+        <a href="/fishing-logbook">Logbook</a>
         <a href="/blog">Journal</a>
         <a href="/shop">Merch</a>
         <a href="/" className="public-open">Open FishAI<ArrowUpRight className="size-3.5" /></a>

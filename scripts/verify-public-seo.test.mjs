@@ -38,3 +38,26 @@ test('homepage has the default setup content and retains client bootstrapping', 
   assert.match(html, /type="module"[^>]*src="\/assets\//);
   assert.ok(!html.includes('Sign-in required to view this page'));
 });
+
+test('logbook and Pro landing pages expose specific CTAs and serving routes', async () => {
+  const pages = [
+    { route: '/fishing-logbook', copy: 'A private fishing logbook', entry: '/?view=logbook' },
+    { route: '/pro', copy: 'FishAI Pro for catch photos', entry: '/?view=pro' },
+  ];
+  const sitemap = await readFile('dist/sitemap.xml', 'utf8');
+  const { rewrites } = JSON.parse(await readFile('vercel.json', 'utf8'));
+  const fallback = rewrites.findIndex(({ source }) => source === '/(.*)');
+
+  for (const { route, copy, entry } of pages) {
+    const html = await readFile(`dist${route}.html`, 'utf8');
+    assert.ok(html.includes(copy), route);
+    assert.ok(html.includes(`href="${entry}"`), route);
+    assert.ok(sitemap.includes(`<loc>https://fishai.shop${route}</loc>`), route);
+    assert.ok(!html.includes('"@type": "SoftwareApplication"'), route);
+  }
+
+  for (const route of [...pages.map(({ route }) => route), '/guides/ontario-fish-stocking-records']) {
+    const index = rewrites.findIndex(({ source, destination }) => source === route && destination === `${route}.html`);
+    assert.ok(index >= 0 && index < fallback, `${route} must route to prerendered HTML`);
+  }
+});

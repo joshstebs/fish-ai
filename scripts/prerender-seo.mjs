@@ -7,6 +7,8 @@ const SITE = 'https://fishai.shop';
 const TODAY = '2026-10-29';
 
 const pages = [
+  { path: '/fishing-logbook', title: 'Free Private Fishing Logbook with CSV Export | FishAI', description: 'Record your fishing catches, lures and water conditions in a free browser-based logbook. Filter by species and export your catch history to CSV.' },
+  { path: '/pro', title: 'FishAI Pro Pricing and Free vs Pro Features', description: 'Compare FishAI’s free fishing logbook and planning tools with Pro catch-photo analysis for species identification and size estimates.' },
   { path: '/guides/ontario-fish-stocking-records', title: 'Ontario Fish Stocking Records: How to Read the Data | FishAI', description: 'Interpret Ontario fish stocking records without treating a dated release as proof of present fish, access or current regulations.' },
   { path: '/guides/ontario-fishing-licence-checklist', title: 'Ontario Fishing Licence and Regulations Checklist | FishAI', description: 'A printable Ontario fishing trip checklist for licence documents, zones, waterbody exceptions, current notices and access verification.' },
   { path: '/guides/ontario-fishing-access', title: 'Ontario Fishing Access Guide: Verify a Spot Before You Go | FishAI', description: 'Use Fish ON-Line and official Ontario sources to research a waterbody, then verify permission, launch conditions and current fishing rules separately.' },
@@ -46,7 +48,7 @@ function replaceTag(html, selector, replacement) {
 
 function pageHtml(template, page) {
   const url = SITE + page.path;
-  let html = template;
+  let html = template.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/gi, '');
   html = replaceTag(html, 'title', `<title>${page.title}</title>`);
   html = replaceTag(html, 'description', `<meta name="description" content="${page.description}" />`);
   html = replaceTag(html, 'canonical', `<link rel="canonical" href="${url}" />`);
@@ -115,8 +117,7 @@ try {
       description: `${product.story} ${categoryLabels[product.category]} printed to order in Canada.`,
     };
 
-    let html = pageHtml(template, page)
-      .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/gi, '');
+    let html = pageHtml(template, page);
 
     const image = `${SITE}/merch/${product.id}.jpg`;
     html = replaceTag(html, 'ogImage', `<meta property="og:image" content="${image}" />`);
